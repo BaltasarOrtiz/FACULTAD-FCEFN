@@ -34,7 +34,7 @@ class ColaEncadenada:
     
     def insertar(self, dato):
         nuevo = Nodo(dato)
-        if self.vacia():
+        if self.vacia(): #if self.__ul == None
             self.__pr = nuevo
         else:
             self.__ul.setSiguiente(nuevo) #type: ignore
