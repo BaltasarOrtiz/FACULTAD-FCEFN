@@ -30,16 +30,25 @@ class listaEncadenada:
         return self.__cabeza == None
 
     def anterior(self, dato):
+        aux = self.__cabeza
+        anterior = None
         pos = self.buscar(dato)
-        if pos == -1 or pos == self.__cabeza:
-            print('No existe el dato o es el primer elemento')
+        if pos == -1:
+            print('No existe el dato')
         else:
-            return pos.getDato()
+            while aux != None and aux.getDato() != dato:
+                anterior = aux
+                aux = aux.getSiguiente()
+            if anterior == None:
+                print('No existe el anterior')
+            else:
+                return anterior.getDato()
+
         
     def siguiente(self, dato):
         pos = self.buscar(dato)
-        if pos == -1 or pos == self.__cantidad:
-            print('No existe el dato o es el ultimo elemento')
+        if pos == -1:
+            print('No existe el dato')
         else:
             return pos.getSiguiente().getDato() #type: ignore
     
@@ -69,6 +78,7 @@ class listaEncadenada:
 
             nuevo.setSiguiente(aux)
             anterior.setSiguiente(nuevo) #type: ignore
+        self.__cantidad += 1
     
     def eliminar(self, dato):
         aux = self.__cabeza
@@ -81,9 +91,12 @@ class listaEncadenada:
         if aux == None:
             print("El dato no existe")
         elif anterior == None:
-            self.__cabeza = aux.getSiguiente() #
+            self.__cabeza = aux.getSiguiente() 
         else:
             anterior.setSiguiente(aux.getSiguiente())
+
+
+    def recuperar
 
     def mostrar(self):
         aux = self.__cabeza

@@ -94,10 +94,10 @@ class listaCursor:
             indice_nuevo = self.__disponible
             self.__disponible = self.__arreglo[self.__disponible].getSiguiente()
             
-            if indice_anterior == -1:
+            if indice_anterior == -1: #si el dato a insertar es menor de la cabeza
                 self.__arreglo[indice_nuevo].setSiguiente(self.__cabeza)
                 self.__cabeza = indice_nuevo
-            else:
+            else: #si el dato a insertar es mayor a la cabeza
                 self.__arreglo[indice_nuevo].setSiguiente(indice_actual)
                 self.__arreglo[indice_anterior].setSiguiente(indice_nuevo)
             
@@ -122,7 +122,6 @@ class listaCursor:
                     self.__cabeza = self.__arreglo[self.__cabeza].getSiguiente()
                 else:
                     self.__arreglo[indice_anterior].setSiguiente(self.__arreglo[indice_actual].getSiguiente())
-                self.__arreglo[indice_actual].setDato(None)
                 self.__arreglo[indice_actual].setSiguiente(self.__disponible)
                 self.__disponible = indice_actual
                 self.__cantidad -= 1
@@ -142,12 +141,10 @@ class listaCursor:
 if __name__ == '__main__':
     lista = listaCursor(7)
     lista.insertar(1)
-    lista.insertar(4)
-    lista.insertar(5)
     lista.insertar(2)
     lista.insertar(3)
     lista.recorrerArreglo()
-
+"""
     print("\n\n--------------------------------------------------------------------------")
     print("La posicion del elemento numero 4 es: ", lista.buscar(4))
     print("Anterior: ", lista.anterior(4))
@@ -162,6 +159,6 @@ if __name__ == '__main__':
 
     lista.insertar(4)
     lista.recorrer()
-    lista.recorrerArreglo()
+    lista.recorrerArreglo()"""
 
     
