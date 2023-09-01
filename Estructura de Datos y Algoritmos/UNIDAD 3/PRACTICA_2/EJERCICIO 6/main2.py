@@ -72,7 +72,7 @@ if __name__ == '__main__':
     tiempoSimulacion = 60
     tiempoAtencion = 5
     frecuencia = 2
-    tiempoActualCajero = tiempoAtencion + 1
+    #tiempoActualCajero = tiempoAtencion + 1
 
     #variables aux
     reloj = 0
@@ -88,7 +88,8 @@ if __name__ == '__main__':
             cola.insertar(reloj)
             print("Llego cliente numero [{}]".format(reloj))
             
-        if tiempoActualCajero == tiempoAtencion + 1: #cajero desocupado
+        #if tiempoActualCajero == tiempoAtencion + 1: #cajero desocupado
+        if tiempoAtencion == 0:
             if not cola.vacia():
                 cliente = cola.suprimir()
                 tiempoEspera = reloj - cliente #type:ignore
@@ -96,12 +97,10 @@ if __name__ == '__main__':
                 tiempoEsperaAcumulado += tiempoEspera 
 
                 print("Se atiende a cliente numero [{}]: tiempo de espera [{}]".format(cliente, tiempoEspera))
-                tiempoActualCajero = tiempoAtencion
+                tiempoAtencion = 5
 
         else: #cajero ocupado
-            tiempoActualCajero -= 1
-            if tiempoActualCajero == 0:
-                tiempoActualCajero = tiempoAtencion + 1
+            tiempoAtencion -= 1
         
         reloj+=1
     
