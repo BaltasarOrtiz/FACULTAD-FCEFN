@@ -68,9 +68,29 @@ class Huffman:
             derecho = nodo2
         
             self.insertarOtro(letra, frecuencia, izquierdo, derecho)
+
+#Metodos para codificar en binario
+    def mostrarTabla(self, tabla):
+        print("Letra | Codigo")
+        for i in tabla:
+            print(i[0], "   |", i[1])
+             
+    def codificador(self):
+        if self.vacio():
+            print("El arbol esta vacio")
+        else:
+            tabla = []
+            self.codificadorRec(self.__cabeza, "",tabla)  
+            self.mostrarTabla(tabla=sorted(tabla, key=lambda x: len(x[1]), reverse=True))
+
+    def codificadorRec(self, nodo, cadena,tabla):
+        if nodo.getIzquierdo() == None and nodo.getDerecho() == None:
+            tabla.append([nodo.getLetra(), cadena])
+            return
+        self.codificadorRec(nodo.getIzquierdo(), cadena + "0", tabla)
+        self.codificadorRec(nodo.getDerecho(), cadena + "1", tabla)
             
 #Metodos para mostrar el arbol
-
     def mostrarLista(self):
         aux = self.__cabeza
         while aux != None:
@@ -97,8 +117,7 @@ class Huffman:
                 mostrarArbolBinRec(nodo.getIzquierdo(), cadena + " " *sangria)
 
         mostrarArbolBinRec(self.__cabeza, "")
-            
-    
+              
 if __name__ == "__main__":
     os.system("cls")
 
@@ -120,3 +139,4 @@ if __name__ == "__main__":
     #h.mostrarLista()
     h.generarSubarbol()
     h.mostrarArbolBin()
+    h.codificador()
