@@ -208,7 +208,7 @@ class ArbolBinarioBusqueda:
                 mostrarArbolBinRec(nodo.getIzquierdo(), cadena + " " *sangria)
 
         mostrarArbolBinRec(self.__raiz, "")
-    
+        
     #---Otros Metodos:  Frontera---#
     def frontera(self,lista):
         if self.__raiz == None:
