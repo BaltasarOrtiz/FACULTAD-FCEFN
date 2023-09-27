@@ -1,4 +1,5 @@
 from nodo import Nodo
+import os
 
 class Huffman:
     __cabeza : None|Nodo 
@@ -10,42 +11,112 @@ class Huffman:
         return self.__cabeza == None
     
     def insertar(self, letra, frecuencia):
-        nuevoNodo = Nodo(key, frecuencia)
+        nuevoNodo = Nodo(letra, frecuencia)
         
-        if self.vacio():
+        if self.vacio() or frecuencia < self.__cabeza.getFrecuencia(): #type: ignore
+            nuevoNodo.setSiguiente(self.__cabeza)
             self.__cabeza = nuevoNodo
         else:
             aux = self.__cabeza
+            anterior = None
             
-            while aux.getSiguiente() != None: #type: ignore
-                aux = aux.getSiguiente() #type: ignore
-            
-            aux.setSiguiente(nuevoNodo) #type: ignore
+            while aux is not None and frecuencia > aux.getFrecuencia():
+                anterior = aux
+                aux = aux.getSiguiente()
 
-    def mostrar(self):
+            nuevoNodo.setSiguiente(aux)
+            anterior.setSiguiente(nuevoNodo) #type: ignore
+    
+    def insertarOtro(self, letra, frecuencia, izquierdo, derecho):
+        nuevoNodo = Nodo(letra, frecuencia)
+        nuevoNodo.setIzquierdo(izquierdo)
+        nuevoNodo.setDerecho(derecho)
+        
+        if self.vacio() or frecuencia < self.__cabeza.getFrecuencia(): #type: ignore
+            nuevoNodo.setSiguiente(self.__cabeza)
+            self.__cabeza = nuevoNodo
+        else:
+            aux = self.__cabeza
+            anterior = None
+            
+            while aux is not None and frecuencia > aux.getFrecuencia():
+                anterior = aux
+                aux = aux.getSiguiente()
+
+            nuevoNodo.setSiguiente(aux)
+            anterior.setSiguiente(nuevoNodo) #type: ignore
+
+    def suprimir(self):
+        if self.vacio():
+            print("No hay elementos en la lista")
+        else:
+            aux = self.__cabeza
+            self.__cabeza = self.__cabeza.getSiguiente()
+            aux.setSiguiente(None)
+            return aux
+    
+    def generarSubarbol(self):
+        while self.__cabeza.getSiguiente() != None:
+            nodo1 = self.suprimir()
+            nodo2 = self.suprimir()
+
+            frecuencia = nodo1.getFrecuencia() + nodo2.getFrecuencia() #type: ignore
+            letra = nodo1.getLetra() + nodo2.getLetra() #type: ignore
+            #print(letra, frecuencia)
+
+            izquierdo = nodo1
+            derecho = nodo2
+        
+            self.insertarOtro(letra, frecuencia, izquierdo, derecho)
+            
+#Metodos para mostrar el arbol
+
+    def mostrarLista(self):
         aux = self.__cabeza
         while aux != None:
             print(aux.getLetra(), aux.getFrecuencia())
-            aux = aux.getSiguiente() #type: ignore
-        
-    def codificador(self):
-        pass
+            aux = aux.getSiguiente()
+    
+    def mostrarArbolBin(self, sangria=4):
+        if self.vacio():
+            print("El arbol esta vacio")
+            return
 
+        def mostrarArbolBinRec(nodo, cadena):
+            print(str(nodo.getLetra()+" -> [{}]".format(nodo.getFrecuencia())))
+            #Para el hijo derecho
+            if nodo.getDerecho() != None:
+                if nodo.getIzquierdo() != None:
+                    print(cadena+ "├" + "─" * sangria, end="") 
+                else:
+                    print(cadena+ "└" + "─" * sangria, end="")
+                mostrarArbolBinRec(nodo.getDerecho(), cadena + "│" + " " *sangria)
+            #Para el hijo izquierdo
+            if nodo.getIzquierdo() != None:
+                print(cadena+ "└" + "─" * sangria, end="")
+                mostrarArbolBinRec(nodo.getIzquierdo(), cadena + " " *sangria)
 
+        mostrarArbolBinRec(self.__cabeza, "")
+            
+    
 if __name__ == "__main__":
-    dic ={  "A" : 15, 
-            "B" : 6, 
+    os.system("cls")
+
+    dic ={  "I" : 15, 
+            "G" : 6, 
             "C" : 7, 
             "D" : 12, 
             "E" : 25, 
             "F" : 4,
-            "G" : 6,
+            "B" : 6,
             "H" : 1,
-            "I" : 15, }
+            "A" : 15, }
 
     h = Huffman()
-
+    
     for key in dic:
         h.insertar(key, dic[key])
 
-    h.mostrar()
+    #h.mostrarLista()
+    h.generarSubarbol()
+    h.mostrarArbolBin()
