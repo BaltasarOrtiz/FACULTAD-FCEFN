@@ -9,7 +9,7 @@ class Monticulo:
     def __init__(self, dimension):
         self.__arreglo = np.empty(dimension, dtype = int)
         self.__cantidad = 0
-        self.__arreglo[0] = -1
+        self.__arreglo[0] = 0
         self.__dimension = dimension
     
     def vacio(self):
@@ -48,7 +48,7 @@ class Monticulo:
             pos = self.__cantidad
 
             #Se reordena el montículo
-            padre= self.Padre(pos) #Obtengo el padre
+            padre = self.Padre(pos) #Obtengo el padre
 
             #Mientras el padre sea mayor que el hijo
             while self.__arreglo[pos] < self.__arreglo[padre]: 
@@ -145,4 +145,3 @@ if __name__ == '__main__':
             else:
                 print("El Quirofano esta ocupado")
                 monticulo_desocupado = 0
-                print("hola")
