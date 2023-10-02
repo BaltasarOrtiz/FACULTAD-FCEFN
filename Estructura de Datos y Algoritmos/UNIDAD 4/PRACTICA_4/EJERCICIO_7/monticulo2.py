@@ -26,11 +26,12 @@ class Monticulo:
     def eliminarMinimo(self):
         if self.__arreglo[0] > 0:
             x = self.__arreglo[1]
-            self.__arreglo[1] = self.__arreglo[self.__arreglo[0]]
             self.__arreglo[0] -= 1
+            self.__arreglo[1] = self.__arreglo[self.__arreglo[0]]
+            
             i = 1
 
-            while i * 2+1 <= self.__arreglo[0] and self.__arreglo[i] > self.__arreglo[i*2] or self.__arreglo[i] > self.__arreglo[i*2+1]:
+            while (i * 2 + 1 <= self.__arreglo[0]) and ((self.__arreglo[i] > self.__arreglo[i*2]) or (self.__arreglo[i] > self.__arreglo[i*2+1])):
                 if self.__arreglo[i*2] < self.__arreglo[i*2+1]:
                     aux = self.__arreglo[i*2]
                     self.__arreglo[i*2] = self.__arreglo[i]
@@ -96,7 +97,6 @@ if __name__ == '__main__':
     m.insertar(4)
     m.insertar(5)
     m.insertar(6)
-    m.insertar(7)
     
     print("Mostrando monticulo")
     m.mostrarMonticulo()
