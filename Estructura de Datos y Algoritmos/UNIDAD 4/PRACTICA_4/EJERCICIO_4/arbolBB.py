@@ -254,9 +254,9 @@ class ArbolBinarioBusqueda:
         
     def contadorRecursivo(self, subArbol, cont):
         if subArbol != None:
+            cont+=1
             cont=self.contadorRecursivo(subArbol.getIzquierdo(),cont)
             cont=self.contadorRecursivo(subArbol.getDerecho(),cont)
-            cont+=1
 
         return cont
 #---Otros Metodos: Altura---#
@@ -264,9 +264,9 @@ class ArbolBinarioBusqueda:
         if self.__raiz == None:
             print("El arbol esta vacio")
         else:
-            return self.alturaRecursivo(self.__raiz)
+            return self.alturaRecursivo(self.__raiz,0,0)
     
-    def alturaRecursivo(self, subArbol):
+    """def alturaRecursivo(self, subArbol):
         if subArbol == None:
             return -1
         else:
@@ -275,7 +275,14 @@ class ArbolBinarioBusqueda:
             if altIzq > altDer:
                 return altIzq + 1
             else:
-                return altDer + 1
+                return altDer + 1"""
+
+    def alturaRecursivo(self, subArbol, izq, der):
+        if subArbol != None:
+            self.alturaRecursivo(subArbol.getIzquierdo(),izq,der)
+            self.alturaRecursivo(subArbol.getDerecho(),izq,der)
+
+
 
 #---Otros Metodos: Mostrar Sucesores---#
     def mostrarSucesores(self, dato):

@@ -22,7 +22,7 @@ if __name__ == "__main__":
     abb.insertar(7)
     abb.insertar(6)
     abb.insertar(8)
-    
+    abb.insertar(10)
 
     bandera= True
 

@@ -210,19 +210,19 @@ class ArbolBinarioBusqueda:
         mostrarArbolBinRec(self.__raiz, "")
         
     #---Otros Metodos:  Frontera---#
-    def frontera(self,lista):
+    def frontera(self):
         if self.__raiz == None:
             print("El arbol esta vacio")
         else:
-            self.fronteraRec(self.__raiz, lista)
+            self.fronteraRec(self.__raiz)
     
-    def fronteraRec(self, nodo, lista):
+    def fronteraRec(self, nodo):
         if nodo != None:
             if nodo.getIzquierdo() == None and nodo.getDerecho() == None:
-                lista.append(nodo.getDato())
+                print(nodo.getDato())
             else:
-                self.fronteraRec(nodo.getIzquierdo(), lista)
-                self.fronteraRec(nodo.getDerecho(), lista)
+                self.fronteraRec(nodo.getIzquierdo())
+                self.fronteraRec(nodo.getDerecho())
 
     
         

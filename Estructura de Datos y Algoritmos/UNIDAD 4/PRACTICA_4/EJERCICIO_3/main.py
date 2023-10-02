@@ -13,7 +13,6 @@ if __name__ == "__main__":
     abb.insertar(8)
     abb.mostrarArbolBin()
     
-    frontera=[]
 
-    abb.frontera(frontera)
-    print("\nLa frontera del arbol es: ", frontera)
+    abb.frontera()
+    

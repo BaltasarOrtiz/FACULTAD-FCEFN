@@ -145,3 +145,4 @@ if __name__ == '__main__':
             else:
                 print("El Quirofano esta ocupado")
                 monticulo_desocupado = 0
+                print("hola")
