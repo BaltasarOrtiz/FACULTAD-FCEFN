@@ -20,41 +20,46 @@ class DireccionamientoAbierto:
             self.__tabla[i]=0
         
 
-    def __getPrimo(self,numero):
+    def getPrimo(self,numero):
         for i in range(2,numero):
             if numero % i == 0:
-                return self.__getPrimo(numero+1)
+                return self.getPrimo(numero+1)
         print("Primo: ",numero)
         return numero
 
+    #FUNCIÓN DE TRANSFORMACIÓN H(K)
+    #Método de la división (módulo) h(k) = k % m
+    def metododeDivison(self,valor): 
+        return valor % self.__dimension
+    
 
     def insertar(self,valor):
-        direcconOrigen = direccion = self.__metododeDivison(valor)
+        print("Valor: ",valor)
+        print("Direccion: ",self.metododeDivison(valor))
+        direccion = self.metododeDivison(valor)
         j = 0
         if self.__tabla[direccion] == 0:
             self.__tabla[direccion] = valor
         else:
             while self.__tabla[direccion] != valor and self.__tabla[direccion] != 0 and j<self.__dimension:
-                direccion = (direccion + 1) % self.__dimension
+                #direccion = (direccion + 1) % self.__dimension
+                direccion = self.metododeDivison(direccion+1)
                 j += 1
 
             if j<self.__dimension and self.__tabla[direccion] == 0:
                 self.__tabla[direccion] = valor
-        print(j)
+        #print(j)
 
 
     def buscar(self,valor):
-        index = self.__PruebaLineal(valor)
-        if index != -1:
-            return self.__tabla[index]
-        else:
-            return None
-    
-
-    # FUNCIÓN DE TRANSFORMACIÓN H(K)
-    #Método de la división (módulo) h(k) = k % m
-    def __metododeDivison(self,valor): 
-        return valor % self.__dimension
+        direccion = self.metododeDivison(valor)
+        j=0
+        while self.__tabla[direccion] != valor and self.__tabla[direccion] != 0 and j<self.__dimension:
+                #direccion = (direccion + 1) % self.__dimension
+                direccion = self.metododeDivison(direccion+1)
+                j += 1
+        
+        
     
 
     def mostrarTablaHashing(self):
@@ -65,8 +70,7 @@ if __name__ == '__main__':
 
     for i in range(10):
         tabla.insertar(random.randint(20,30))
-    tabla.insertar(15)
-    tabla.insertar(43)
+
 
     tabla.mostrarTablaHashing()
     
