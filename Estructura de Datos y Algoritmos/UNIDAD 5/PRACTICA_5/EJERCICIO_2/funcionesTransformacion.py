@@ -10,7 +10,7 @@ class tablaHash_DA_primo: #Direccionamiento Abierto (DA) con num primo para la d
         self.__dimension = self.getPrimo(int(dimension//0.7)) #Factor de carga = 0.7 ejemplo 100 // 0.7 = 142 primo mas cercano 149
         self.__tabla = np.empty(self.__dimension, dtype= int)
         self.__contador = 0
-
+    
         for i in range(0,self.__dimension):
             self.__tabla[i] = 0
     
