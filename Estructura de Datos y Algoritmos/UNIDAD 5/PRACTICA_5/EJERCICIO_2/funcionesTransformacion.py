@@ -21,7 +21,7 @@ class tablaHash_DA_primo: #Direccionamiento Abierto (DA) con num primo para la d
         return numero
     
     def insertar(self, valor):
-        direccion = self.metodoPlegado(valor)
+        direccion = self.metodoClavesAlfanumericas(valor)
         j = 0
         if self.__tabla[direccion] == 0:
             self.__tabla[direccion] = valor
@@ -75,13 +75,15 @@ class tablaHash_DA_primo: #Direccionamiento Abierto (DA) con num primo para la d
 
     def metodoCuadradosMedios(self, valor): #Consiste en que te de los valores centrales del digito como clave 
         #print (int(str(valor**2)[1:-1]))
-        return int(str(valor**2)[1:-1]) % self.__dimension #Ejemplo: 123 -> 123^2 = 15129 -> 5129 -> 512 % 149 = 65 
+        return int(str(valor**2)[1:-1]) % self.__dimension #Ejemplo: 123 -> 123^2 = 15129 -> 512 % 149 = 65 
 
     def metodoClavesAlfanumericas(self, valor):
         acumulador = 0
 
         for i in range(0, len(str(valor))):
-            acumulador += ord(str(valor)[i])
+            acumulador += ord(str(valor)[i]) * (10**i)
+        
+        print(acumulador)
 
         return acumulador % self.__dimension
         
@@ -92,6 +94,7 @@ if __name__ == "__main__":
     tabla = tablaHash_DA_primo(100)
 
     tabla.insertar(123)
+    tabla.insertar(321)
     
     #Mostrar tabla
     tabla.mostrar()
