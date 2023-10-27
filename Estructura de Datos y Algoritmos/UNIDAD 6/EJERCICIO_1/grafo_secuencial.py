@@ -55,9 +55,34 @@ class GrafoSecuencial:
             elif i != padre:
                 return True
         return False
-        
     
+    
+    def recorrido_en_anchura(self, verticeInicial):
+        visitados = [False] * self.__CantidadV
+        cola = []
+        visitados[verticeInicial] = True
+        cola.append(verticeInicial)
+        while len(cola) > 0:
+            vertice = cola.pop(0)
+            print(vertice, end=' ')
+            for i in self.obtener_adyacentes(vertice):
+                if not visitados[i]:
+                    visitados[i] = True
+                    cola.append(i)
+        print()
 
+    def recorrido_en_profundidad(self, verticeInicial):
+        visitados = [False] * self.__CantidadV
+        self.recorrido_en_profundidad_aux(verticeInicial, visitados)
+        print()
+
+    def recorrido_en_profundidad_aux(self, vertice, visitados):
+        visitados[vertice] = True
+        print(vertice, end=' ')
+        for i in self.obtener_adyacentes(vertice):
+            if not visitados[i]:
+                self.recorrido_en_profundidad_aux(i, visitados)
+    
     def mostrarGrafo(self):
         for i in range(self.__CantidadV):
             print("[{}]".format(i),end=' ')
@@ -69,11 +94,18 @@ class GrafoSecuencial:
         return self.__matriz
 
 if __name__ == '__main__':
-    grafo = GrafoSecuencial(2)
-    grafo.crear_arista(0, 1)
-    grafo.crear_arista(0, 0)
-    grafo.crear_arista(1, 1)
+    grafo = GrafoSecuencial(5)
+    grafo.crear_arista(1, 4)
+    grafo.crear_arista(1, 2)
+    grafo.crear_arista(2, 3)
+    grafo.crear_arista(3, 4)
+    grafo.crear_arista(4, 0)
     grafo.mostrarGrafo()
     print("Adyacentes de 1: ", grafo.obtener_adyacentes(1))
     grafo.es_conexo()
     print("Es aciclico?: ", grafo.es_aciclicoRecursivo())
+    print("\n\n")
+    print("Recorrido en Anchura: ")
+    grafo.recorrido_en_anchura(1)
+    print("Recorrido en Profundidad: ")
+    grafo.recorrido_en_profundidad(1)
