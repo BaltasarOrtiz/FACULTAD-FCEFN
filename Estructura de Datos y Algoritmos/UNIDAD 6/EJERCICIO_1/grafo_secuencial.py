@@ -83,10 +83,17 @@ class GrafoSecuencial:
                 self.recorrido_en_profundidad_aux(i, visitados)
     
     def mostrarGrafo(self):
+        print("Grafo: ")
+
+        print("   ",end='')
+        for k in range(self.__CantidadV):
+            print("[{}]".format(k),end='')
+
+        print()        
         for i in range(self.__CantidadV):
-            print("[{}]".format(i),end=' ')
+            print("[{}]".format(i),end='')
             for j in range(self.__CantidadV):
-                print(self.__matriz[i][j], end=' ')
+                print(" {} ".format(self.__matriz[i][j]),end='') #type: ignore 
             print()
     
     def camino(self, origen, destino):
