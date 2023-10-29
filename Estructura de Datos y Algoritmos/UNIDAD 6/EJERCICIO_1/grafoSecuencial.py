@@ -1,5 +1,5 @@
 import numpy as np
-import random
+import os 
 
 class GrafoSecuencial:
     __CantidadV = 0
@@ -11,15 +11,15 @@ class GrafoSecuencial:
 
     def crear_arista(self, i, j):
         if (i <= self.__CantidadV and j <= self.__CantidadV) and (i >= 0 and j >= 0):
-            self.__matriz[i][j] = 1
-            self.__matriz[j][i] = 1
+            self.__matriz[i][j] = 1 #type: ignore
+            self.__matriz[j][i] = 1 #type: ignore
         else:
             print("Error: vertices no validos")
 
     def obtener_adyacentes(self, i):
         adyacentes = []
         for j in range(0,self.__CantidadV):
-            if self.__matriz[i][j] == 1:
+            if self.__matriz[i][j] == 1: #type: ignore
                 adyacentes.append(j)
         return adyacentes
 
@@ -124,8 +124,11 @@ class GrafoSecuencial:
                 if self.caminoAux2(i, destino, visitados, camino): #Se llama recursivamente
                     return camino #Se devuelve el camino
         camino.pop() #Si no se encuentra el camino, se elimina el ultimo elemento de la lista
+
     
 if __name__ == '__main__':
+    os.system("cls")
+
     grafo = GrafoSecuencial(5)
     grafo.crear_arista(1, 4)
     grafo.crear_arista(1, 2)
@@ -133,12 +136,6 @@ if __name__ == '__main__':
     grafo.crear_arista(3, 4)
     grafo.crear_arista(4, 0)
     grafo.mostrarGrafo()
-    #print("Adyacentes de 1: ", grafo.obtener_adyacentes(1))
-    #grafo.es_conexo()
-    #print("Es aciclico?: ", grafo.es_aciclicoRecursivo())
-    #print("\n\n")
-    #print("Recorrido en Anchura: ")
-    #grafo.recorrido_en_anchura(1)
-    #print("Recorrido en Profundidad: ")
-    #grafo.recorrido_en_profundidad(1)
+
     print("Camino entre 1 y 3: ", grafo.camino(1, 3))
+    print("\n\n")
