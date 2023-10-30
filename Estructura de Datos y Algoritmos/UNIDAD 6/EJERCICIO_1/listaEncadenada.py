@@ -18,10 +18,6 @@ class Nodo:
     def setSiguiente(self, siguiente):
         self.__siguiente = siguiente
 
-    #error Nonetype objec has no attribute setSiguiente: que dice? que el objeto no tiene atributo setSiguiente
-    #porque? porque el objeto es None, y None no tiene atributo setSiguiente
-    #SOLUCION: verificar que el objeto no sea None
-    #en la linea 77: if self.vacio() or dato < self.__cabeza.getDato(): #type: ignore
 class listaEncadenada:
     __cabeza = None
     __cantidad: int
@@ -69,6 +65,8 @@ class listaEncadenada:
         if self.vacio() or dato < self.__cabeza.getDato(): #type: ignore
             nuevo.setSiguiente(self.__cabeza)
             self.__cabeza = nuevo
+            self.__cantidad += 1
+
         else:
             aux = self.__cabeza
             anterior = None
@@ -80,7 +78,7 @@ class listaEncadenada:
             if aux == None and anterior != None:
                 nuevo.setSiguiente(aux)
                 anterior.setSiguiente(nuevo) #type: ignore
-            self.__cantidad += 1
+                self.__cantidad += 1
     
     def eliminar(self, dato):
         aux = self.__cabeza
