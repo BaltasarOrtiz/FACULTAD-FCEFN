@@ -159,6 +159,7 @@ if __name__ == '__main__':
     #grafo.rep()
 
     print("Camino de 0 a 3: ",grafo.camino(0,3))
+    print("Camino de 0 a 0: ",grafo.camino(0,0))
     print("Camino de 0 a 4: ",grafo.camino(0,4))
 
 

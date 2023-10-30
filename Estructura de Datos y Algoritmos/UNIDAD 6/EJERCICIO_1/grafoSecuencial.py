@@ -9,25 +9,25 @@ class GrafoSecuencial:
         self.__CantidadV = n
         self.__matriz = np.zeros((n, n), dtype=int)
 
-    def crear_arista(self, i, j):
+    def crearArista(self, i, j):
         if (i <= self.__CantidadV and j <= self.__CantidadV) and (i >= 0 and j >= 0):
             self.__matriz[i][j] = 1 #type: ignore
             self.__matriz[j][i] = 1 #type: ignore
         else:
             print("Error: vertices no validos")
 
-    def obtener_adyacentes(self, i):
+    def obtenerAdyacentes(self, i):
         adyacentes = []
         for j in range(0,self.__CantidadV):
             if self.__matriz[i][j] == 1: #type: ignore
                 adyacentes.append(j)
         return adyacentes
 
-    def es_conexo(self):
+    def esConexo(self):
         band = True
         i = 0
         while band and i < self.__CantidadV:
-            if len(self.obtener_adyacentes(i)) == 0:
+            if len(self.obtenerAdyacentes(i)) == 0:
                 band = False
             else:
                 i+=1
@@ -37,64 +37,41 @@ class GrafoSecuencial:
             print("El grafo no es conexo")
 
     #Funciones para saber si es aciclico
-    def es_aciclicoRecursivo(self):
-        visitados = [False] * self.__CantidadV
-        for i in range(self.__CantidadV):
-            if not visitados[i]:
-                if self.es_aciclicoRecursivoAux(i, visitados, -1):
-                    return False
-        return True
+    def esAciclico(self):
+        i = 0
+        band = True #Se inicializa la bandera en False
+        while i < self.__CantidadV and band == True: #Se recorre el grafo
+            if self.__matriz[i][i] == 1: #type: ignore
+                print("el vertice {} tiene ciclo".format(i)) #Si se encuentra un ciclo, se imprime el vertice
+                band = False #Si se encuentra un ciclo, se cambia la bandera a True
+            i += 1
+        return band #Se devuelve la bandera 
     
-    #Funcion auxiliar para saber si es aciclico
-    def es_aciclicoRecursivoAux(self, v, visitados, padre):
-        visitados[v] = True
-        for i in self.obtener_adyacentes(v):
-            if not visitados[i]:
-                if self.es_aciclicoRecursivoAux(i, visitados, v):
-                    return True
-            elif i != padre:
-                return True
-        return False
-
-    def recorrido_en_anchura(self, verticeInicial):
+    def rea(self, verticeInicial): #Recorrido en anchura
         visitados = [False] * self.__CantidadV
-        cola = []
+        lista = []
         visitados[verticeInicial] = True
-        cola.append(verticeInicial)
-        while len(cola) > 0:
-            vertice = cola.pop(0)
+        lista.append(verticeInicial)
+        while len(lista) > 0:
+            vertice = lista.pop(0)
             print(vertice, end=' ')
-            for i in self.obtener_adyacentes(vertice):
+            for i in self.obtenerAdyacentes(vertice):
                 if not visitados[i]:
                     visitados[i] = True
-                    cola.append(i)
+                    lista.append(i)
         print()
 
-    def recorrido_en_profundidad(self, verticeInicial):
+    def rep(self, verticeInicial):
         visitados = [False] * self.__CantidadV
-        self.recorrido_en_profundidad_aux(verticeInicial, visitados)
+        self.repRecursivo(verticeInicial, visitados)
         print()
 
-    def recorrido_en_profundidad_aux(self, vertice, visitados):
+    def repRecursivo(self, vertice, visitados):
         visitados[vertice] = True
         print(vertice, end=' ')
         for i in self.obtener_adyacentes(vertice):
             if not visitados[i]:
                 self.recorrido_en_profundidad_aux(i, visitados)
-    
-    def mostrarGrafo(self):
-        print("Grafo: ")
-
-        print("   ",end='')
-        for k in range(self.__CantidadV):
-            print("[{}]".format(k),end='')
-
-        print()        
-        for i in range(self.__CantidadV):
-            print("[{}]".format(i),end='')
-            for j in range(self.__CantidadV):
-                print(" {} ".format(self.__matriz[i][j]),end='') #type: ignore 
-            print()
     
     def camino(self, origen, destino):
         visitados = [False] * self.__CantidadV #Lista de visitados: False = no visitado, True = visitado
@@ -119,23 +96,40 @@ class GrafoSecuencial:
         if origen == destino: #Si el origen es igual al destino, se devuelve el camino
             return camino #Se devuelve el camino
         
-        for i in self.obtener_adyacentes(origen): #Se recorren los adyacentes del origen
+        for i in self.obtenerAdyacentes(origen): #Se recorren los adyacentes del origen
             if not visitados[i]: #Si no esta visitado
                 if self.caminoAux2(i, destino, visitados, camino): #Se llama recursivamente
                     return camino #Se devuelve el camino
         camino.pop() #Si no se encuentra el camino, se elimina el ultimo elemento de la lista
 
-    
+    def mostrarGrafo(self):
+        print("Grafo: ")
+
+        print("   ",end='')
+        for k in range(self.__CantidadV):
+            print("[{}]".format(k),end='')
+
+        print()        
+        for i in range(self.__CantidadV):
+            print("[{}]".format(i),end='')
+            for j in range(self.__CantidadV):
+                print(" {} ".format(self.__matriz[i][j]),end='') #type: ignore 
+            print()
+
 if __name__ == '__main__':
     os.system("cls")
 
     grafo = GrafoSecuencial(5)
-    grafo.crear_arista(1, 4)
-    grafo.crear_arista(1, 2)
-    grafo.crear_arista(2, 3)
-    grafo.crear_arista(3, 4)
-    grafo.crear_arista(4, 0)
-    grafo.mostrarGrafo()
+    grafo.crearArista(1, 4)
+    grafo.crearArista(1, 2)
+    grafo.crearArista(1, 1)
+    grafo.crearArista(2, 3)
+    grafo.crearArista(2, 4)
 
-    print("Camino entre 1 y 3: ", grafo.camino(1, 3))
+    grafo.mostrarGrafo()
+    print("Es Aciclico: ", grafo.esAciclico())
+    #un grafo es aciclico si no tiene ciclos
+
+
+    #print("Camino entre 1 y 3: ", grafo.camino(1, 3))
     print("\n\n")
