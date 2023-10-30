@@ -38,14 +38,22 @@ class GrafoSecuencial:
 
     #Funciones para saber si es aciclico
     def esAciclico(self):
-        i = 0
-        band = True #Se inicializa la bandera en False
-        while i < self.__CantidadV and band == True: #Se recorre el grafo
-            if self.__matriz[i][i] == 1: #type: ignore
-                print("el vertice {} tiene ciclo".format(i)) #Si se encuentra un ciclo, se imprime el vertice
-                band = False #Si se encuentra un ciclo, se cambia la bandera a True
-            i += 1
-        return band #Se devuelve la bandera 
+        for i in range(self.__CantidadV):
+            if self.esAciclicoRec(i, visitados=[False] * self.__CantidadV, padre=-1):
+                return False
+        return True
+    
+    #Un ciclo es un camino simple cerrado de longitud 3 o mas. Un ciclo de longitud k se llama k-ciclo.
+    def esAciclicoRec(self, vertice, visitados, padre):
+        visitados[vertice] = True
+
+        for i in self.obtenerAdyacentes(vertice):
+            if not visitados[i]:
+                if self.esAciclicoRec(i, visitados, vertice):
+                    return True
+            elif i != padre:
+                return True
+        return False
     
     def rea(self, verticeInicial): #Recorrido en anchura
         visitados = [False] * self.__CantidadV
@@ -120,11 +128,9 @@ if __name__ == '__main__':
     os.system("cls")
 
     grafo = GrafoSecuencial(5)
-    grafo.crearArista(1, 4)
-    grafo.crearArista(1, 2)
-    grafo.crearArista(1, 1)
-    grafo.crearArista(2, 3)
-    grafo.crearArista(2, 4)
+    grafo.crearArista(0,1)
+    grafo.crearArista(1,2)
+    grafo.crearArista(2,0)
 
     grafo.mostrarGrafo()
     print("Es Aciclico: ", grafo.esAciclico())
