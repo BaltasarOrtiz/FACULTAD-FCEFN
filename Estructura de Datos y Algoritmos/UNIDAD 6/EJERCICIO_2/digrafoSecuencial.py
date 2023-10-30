@@ -128,17 +128,50 @@ class Digrafo:
 
     # Operaciones ADICIONALES de Digrafo
 
-    
+    def gradoDeEntrada(self, vertice):
+        grado = 0
+        for i in range(self.__CantidadV):
+            if self.__matriz[i][vertice] == 1:
+                grado += 1
+        return grado
 
+    def gradoDeSalida(self, vertice):
+        grado = 0
+        for j in range(self.__CantidadV):
+            if self.__matriz[vertice][j] == 1:
+                grado += 1
+        return grado
+
+    # Nodo Fuente: nodo que tiene grado de entrada 0
+    def NodoFuente(self):
+        for i in range(self.__CantidadV):
+            if self.gradoDeEntrada(i) == 0:
+                return i
+        return -1
+    # Nodo Sumidero: nodo que tiene grado de salida 0
+    def NodoSumidero(self):
+        for i in range(self.__CantidadV):
+            if self.gradoDeSalida(i) == 0:
+                return i
+        return -1
+    
 
 
 if __name__ == '__main__':
     digrafo = Digrafo(5)
     digrafo.crearArista(0, 1)
-    digrafo.crearArista(2, 0)
-    digrafo.crearArista(1, 2)
+    digrafo.crearArista(2, 1)
+    digrafo.crearArista(3, 1)
+    
 
     digrafo.mostrarDigrafo()
-    digrafo.esConexo()
+    #digrafo.esConexo()
     print("Es Aciclico: ", digrafo.esAciclico())
-    print("Camino desde 0 hasta 2: ", digrafo.camino(0, 2))
+    #print("Camino desde 0 hasta 2: ", digrafo.camino(0, 2))
+
+    print("Grado de entrada de 1: ", digrafo.gradoDeEntrada(1))
+    print("Grado de salida de 1: ", digrafo.gradoDeSalida(1))
+
+    print("Nodo Fuente: ", digrafo.NodoFuente())
+    print("Nodo Sumidero: ", digrafo.NodoSumidero())
+    
