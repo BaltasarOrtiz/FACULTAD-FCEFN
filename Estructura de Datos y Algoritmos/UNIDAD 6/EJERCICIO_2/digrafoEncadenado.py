@@ -14,7 +14,7 @@ class DigrafoEncadenado:
         for i in range(cantidadV):
             self.__arreglo[i] = listaEncadenada()
     
-    def agregarArista(self, i, j):
+    def crearArista(self, i, j):
         if (i <= self.__cantidadV and j <= self.__cantidadV) and (i >= 0 and j >= 0):
             self.__arreglo[i].insertar(j)
         else:
@@ -31,15 +31,12 @@ class DigrafoEncadenado:
         return lista
     
     def esConexo(self):
-        i=0
-        band= True
-
-        while i < self.__cantidadV and band == True:
-            if self.__arreglo[i].vacio() or self.__arreglo[i].getCantidad() != self.__cantidadV:
-                band = False
-            i+=1
-        return band
-
+        visitados = self.rep(0)
+        if len(visitados) == self.__cantidadV:
+            return True
+        else:
+            return False
+        
     def esAciclico(self):
         for i in range(self.__cantidadV):
             if self.esAciclicoRec(i, visitados=[False] * self.__cantidadV, padre=-1):
@@ -57,54 +54,69 @@ class DigrafoEncadenado:
             elif padre != v.getDato():
                 return True
         return False
-
     
     def rea(self, verticeInicial): #Recorrido en anchura
+        lista = []
         visitados = [False] * self.__cantidadV
-        cola = []
-        visitados[verticeInicial] = True
-        cola.append(verticeInicial)
-        while len(cola) != 0:
+        cola = [verticeInicial]
+
+        while cola:
             vertice = cola.pop(0)
-            print(vertice)
-            for i in self.obtenerAdyacentes(vertice):
-                if not visitados[i]:
-                    visitados[i] = True
-                    cola.append(i)
-
-    def rep(self, verticeInicial): #Recorrido en profundidad
-        visitados = [False] * self.__cantidadV
-        visitados[verticeInicial] = True
-        print(verticeInicial)
-        for i in self.obtenerAdyacentes(verticeInicial):
-            if not visitados[i]:
-                self.repRec(i, visitados)
-
-    def repRec(self, vertice, visitados):
-        visitados[vertice] = True
-        print(vertice)
-        for i in self.obtenerAdyacentes(vertice):
-            if not visitados[i]:
-                self.repRec(i, visitados)
+            lista.append(vertice)
+            visitados[vertice] = True
+            
+            v = self.__arreglo[vertice].getCabeza()
+            while v is not None:
+                if not visitados[v.getDato()]:
+                    cola.append(v.getDato())
+                    visitados[v.getDato()] = True
+                v = v.getSiguiente()
+        
+        return lista
     
+    def rep(self, verticeInicial): #Recorrido en profundidad
+        lista = []
+        self.repRec(verticeInicial, [False] * self.__cantidadV, lista)
+        return lista
+        
+    def repRec(self, vertice, visitados, lista):
+        visitados[vertice] = True
+        lista.append(vertice)
+        
+        cabeza = self.__arreglo[vertice].getCabeza()
+        while cabeza is not None:
+            if not visitados[cabeza.getDato()]:
+                self.repRec(cabeza.getDato(), visitados, lista)
+            cabeza = cabeza.getSiguiente()
+ 
     def camino(self, verticeInicial, verticeFinal):
-        visitados = [False] * self.__cantidadV
-        visitados[verticeInicial] = True
-        cola = []
-        cola.append(verticeInicial)
-        while len(cola) != 0:
-            vertice = cola.pop(0)
-            for i in self.obtenerAdyacentes(vertice):
-                if i == verticeFinal:
-                    return True
-                if not visitados[i]:
-                    visitados[i] = True
-                    cola.append(i)
+        return verticeFinal in self.rep(verticeInicial)
+           
+    #Adicionales Digrafo
+    def gradoEntrada(self, vertice):
+        grado = 0
+        for i in range(self.__cantidadV):
+            if self.__arreglo[i].buscar(vertice) != -1:
+                grado += 1
+        return grado
+    
+    def gradoSalida(self, vertice):
+        return self.__arreglo[vertice].getCantidad()
+    
+    #Nodo fuente: evalua si vertice es nodo funete
+    def nodoFuente(self, vertice):
+        if self.gradoEntrada(vertice) == 0:
+            return True
         return False
     
+    #Nodo sumidero: evalua si vertice es nodo sumidero
+    def nodoSumidero(self, vertice):
+        if self.gradoSalida(vertice) == 0:
+            return True
+        return False
     
-
-    def mostrar(self):
+    #Otros metodos
+    def mostrarDigrafo(self):
         for i in range(self.__cantidadV):
             print(f'{i} --> ', end='')
 
@@ -114,19 +126,18 @@ class DigrafoEncadenado:
                 lista_vecinos = lista_vecinos.getSiguiente()
             
             print("None")  # Marcar el final de los vecinos
-
-
+    
 if __name__ == '__main__':
-    os.system('clear')
-    print("Digrafo Encadenado")
-    digrafo = DigrafoEncadenado(5)
-    digrafo.agregarArista(0, 1)
-    digrafo.agregarArista(1, 1)
-    digrafo.agregarArista(3, 1)
-    digrafo.mostrar()
+    os.system('cls')
+    digrafo = DigrafoEncadenado(4)
+
+    digrafo.crearArista(0, 1)
+    digrafo.crearArista(0, 2)
+    digrafo.crearArista(1, 3)
+    digrafo.crearArista(2, 3)
+    digrafo.mostrarDigrafo()
+
+    print("Recorrido en anchura: ", digrafo.rea(0))
+    print("Recorrido en profundidad: ", digrafo.rep(0))
     print("Es conexo: ", digrafo.esConexo())
-    print("Es aciclico: ", digrafo.esAciclico())
-    digrafo.rea(2)
-    digrafo.rep(2)
-    print(digrafo.camino(2, 4))
-    print(digrafo.camino(4, 2))
+    print("Camino entre 0 y 3: ", digrafo.camino(0, 3))

@@ -1,6 +1,7 @@
 import numpy as np
+import os
 
-class Digrafo:
+class DigrafoSecuencial:
     __cantidadV: int
     __matriz = None
 
@@ -8,33 +9,25 @@ class Digrafo:
         self.__CantidadV = n
         self.__matriz = np.zeros((n, n), dtype=int)
 
-
     def crearArista(self, i, j):
         if (i <= self.__CantidadV and j <= self.__CantidadV) and (i >= 0 and j >= 0):
-            self.__matriz[i][j] = 1
+            self.__matriz[i][j] = 1 #type: ignore
         else:
             print("Error: vertices no validos")
 
-    
     def obtenerAdyacentes(self, vertice):
         adyacentes = []
         for j in range(0,self.__CantidadV):
-            if self.__matriz[vertice][j] == 1:
+            if self.__matriz[vertice][j] == 1: #type: ignore
                 adyacentes.append(j)
         return adyacentes
     
-    def esConexo(self):
-        band = True
-        i = 0
-        while band and i < self.__CantidadV:
-            if len(self.obtenerAdyacentes(i)) == 0:
-                band = False
-            else:
-                i+=1
-        if band:
-            print("El grafo es conexo")
+    def esConexo(self): #Si todos los vertices estan conectados digrafo
+        visitados = self.rep(self.NodoFuente())
+        if len(visitados) == self.__CantidadV:
+            return True
         else:
-            print("El grafo no es conexo")
+            return False
     
     def esAciclico(self):
         for i in range(self.__CantidadV):
@@ -61,56 +54,64 @@ class Digrafo:
         visitados = [False] * self.__CantidadV
         lista = []
 
+        cola = [verticeInicial]
         visitados[verticeInicial] = True
-        lista.append(verticeInicial)
 
-        while len(lista) != 0:
-            vertice = lista.pop(0)
-            print(vertice)
+        while cola:
+            vertice = cola.pop(0)
+            lista.append(vertice)
 
             for i in self.obtenerAdyacentes(vertice):
                 if not visitados[i]:
+                    cola.append(i)
                     visitados[i] = True
-                    lista.append(i)
 
-    def rep(self, verticeInicial):
-        visitados = [False] * self.__CantidadV
-        lista = []
-
-        visitados[verticeInicial] = True
-        lista.append(verticeInicial)
-
-        while len(lista) != 0:
-            vertice = lista.pop()
-            print(vertice)
-
-            for i in self.obtenerAdyacentes(vertice):
-                if not visitados[i]:
-                    visitados[i] = True
-                    lista.append(i)
-    
-    def camino(self, verticeInicial, verticeFinal):
-        visitados = [False] * self.__CantidadV
-        lista = []
-
-        self.caminoRec(verticeInicial, verticeFinal, visitados, lista)
         return lista
-
-    def caminoRec(self, verticeInicial, verticeFinal, visitados, lista):
+    
+    def rep(self, verticeInicial): #Recorrido en profundidad
+        lista = []
+        self.repRecursivo(verticeInicial, [False] * self.__CantidadV, lista)
+        return lista
+    
+    def repRecursivo(self, verticeInicial, visitados, lista):
         visitados[verticeInicial] = True
         lista.append(verticeInicial)
-
-        if verticeInicial == verticeFinal:
-            return True
 
         for i in self.obtenerAdyacentes(verticeInicial):
             if not visitados[i]:
-                if self.caminoRec(i, verticeFinal, visitados, lista):
-                    return True
-        lista.pop()
-        return False
+                self.repRecursivo(i, visitados, lista)
 
+    def camino(self, verticeInicial, verticeFinal):
+        return verticeFinal in self.rep(verticeInicial)
 
+    # Operaciones ADICIONALES de Digrafo
+    def gradoDeEntrada(self, vertice):
+        grado = 0
+        for i in range(self.__CantidadV):
+            if self.__matriz[i][vertice] == 1: #type: ignore
+                grado += 1
+        return grado
+
+    def gradoDeSalida(self, vertice):
+        grado = 0
+        for j in range(self.__CantidadV):
+            if self.__matriz[vertice][j] == 1: #type: ignore
+                grado += 1
+        return grado
+    # Nodo Fuente: nodo que tiene grado de entrada 0
+    def NodoFuente(self):
+        for i in range(self.__CantidadV):
+            if self.gradoDeEntrada(i) == 0:
+                return i
+        return -1
+    # Nodo Sumidero: nodo que tiene grado de salida 0
+    def NodoSumidero(self):
+        for i in range(self.__CantidadV):
+            if self.gradoDeSalida(i) == 0:
+                return i
+        return -1
+    
+    # Operaciones Extra    
     def mostrarDigrafo(self):
         print("Grafo: ")
 
@@ -126,52 +127,17 @@ class Digrafo:
             print()
 
 
-    # Operaciones ADICIONALES de Digrafo
-
-    def gradoDeEntrada(self, vertice):
-        grado = 0
-        for i in range(self.__CantidadV):
-            if self.__matriz[i][vertice] == 1:
-                grado += 1
-        return grado
-
-    def gradoDeSalida(self, vertice):
-        grado = 0
-        for j in range(self.__CantidadV):
-            if self.__matriz[vertice][j] == 1:
-                grado += 1
-        return grado
-
-    # Nodo Fuente: nodo que tiene grado de entrada 0
-    def NodoFuente(self):
-        for i in range(self.__CantidadV):
-            if self.gradoDeEntrada(i) == 0:
-                return i
-        return -1
-    # Nodo Sumidero: nodo que tiene grado de salida 0
-    def NodoSumidero(self):
-        for i in range(self.__CantidadV):
-            if self.gradoDeSalida(i) == 0:
-                return i
-        return -1
-    
-
-
 if __name__ == '__main__':
-    digrafo = Digrafo(5)
+    os.system('cls')
+    digrafo = DigrafoSecuencial(4)
+
     digrafo.crearArista(0, 1)
-    digrafo.crearArista(2, 1)
-    digrafo.crearArista(3, 1)
-    
-
+    digrafo.crearArista(0, 2)
+    digrafo.crearArista(1, 3)
+    digrafo.crearArista(2, 3)
     digrafo.mostrarDigrafo()
-    #digrafo.esConexo()
-    print("Es Aciclico: ", digrafo.esAciclico())
-    #print("Camino desde 0 hasta 2: ", digrafo.camino(0, 2))
 
-    print("Grado de entrada de 1: ", digrafo.gradoDeEntrada(1))
-    print("Grado de salida de 1: ", digrafo.gradoDeSalida(1))
-
-    print("Nodo Fuente: ", digrafo.NodoFuente())
-    print("Nodo Sumidero: ", digrafo.NodoSumidero())
-    
+    print("Recorrido en anchura: ", digrafo.rea(0))
+    print("Recorrido en profundidad: ", digrafo.rep(0))
+    print("Es conexo: ", digrafo.esConexo())
+    print("Camino entre 0 y 3: ", digrafo.camino(0, 3))
