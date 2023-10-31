@@ -14,16 +14,11 @@ class GrafoEncadenado:
         for i in range(cantidadV):
             self.__arreglo[i] = listaEncadenada()
     
-    def agregarArista(self, origen, destino):
+    def insertarArista(self, origen, destino):
         self.__arreglo[origen].insertar(destino) # Insertar en la lista de origen
         self.__arreglo[destino].insertar(origen) # Insertar en la lista de destino
-        
-    def eliminarArista(self, origen, destino):
-        self.__arreglo[origen].eliminar(destino)
-        self.__arreglo[destino].eliminar(origen)
-    
+            
     def getAdyacentes(self, vertice):
-        
         lista = None
         
         if vertice >= 0 and vertice < self.__cantidadV:
@@ -33,98 +28,79 @@ class GrafoEncadenado:
         
         return lista
 
-    def esConexo(self):
-        i=0
-        band= True
+    def esConexo(self): #Si todos los vertices estan conectados
+        return len(self.rea(0)) == self.__cantidadV
 
-        while i < self.__cantidadV and band == True:
-            if self.__arreglo[i].vacio() or self.__arreglo[i].getCantidad() != self.__cantidadV:
-                band = False
-            i+=1
+    def esAciclico(self): #Si no tiene ciclos
+        for i in range(self.__cantidadV):
+            if self.esAciclicoRecursivo(i, [False] * self.__cantidadV, -1):
+                return False
+        return True
 
-        return band
+    def esAciclicoRecursivo(self, vertice, visitados, padre):
+        visitados[vertice] = True
 
-    def esAciclico(self):
-        i = 0
-        band = False
+        # Iterar a través de la lista encadenada del vértice
+        nodo = self.__arreglo[vertice].getCabeza()
+        while nodo is not None:
+            vecino = nodo.getDato()
 
-        while i < self.__cantidadV and band == False:
-            if self.__arreglo[i].vacio() or self.__arreglo[i].buscar(i) == -1:
-                    band = True                  
-            i += 1
+            # Si el vecino no ha sido visitado, intentar encontrar un ciclo desde él
+            if not visitados[vecino]:
+                if self.esAciclicoRecursivo(vecino, visitados, vertice):
+                    return True
 
-        return band
+            # Si el vecino ya ha sido visitado y no es el padre del vértice actual, se encontró un ciclo
+            elif vecino != padre:
+                return True
 
-    def rea (self, verticeInicial = 0): #Recorrido en anchura 
-        visitados = [False] * self.__cantidadV
-        self.reaRecursivo(verticeInicial, visitados)
+            nodo = nodo.getSiguiente()
 
-    def reaRecursivo(self, verticeInicial, visitados):
+        return False
+    
+    def rea (self, verticeInicial): #Recorrido en anchura 
         lista = []
-        visitados[verticeInicial] = True
-        lista.append(verticeInicial)
+        visitados = [False] * self.__cantidadV
+        cola = [verticeInicial]
 
-        while len(lista) > 0:
-            vertice = lista.pop(0)
-            print(vertice, end = " ")
+        while cola:
+            vertice = cola.pop(0)
+            lista.append(vertice)
+            visitados[vertice] = True
             
+            # Iterar a través de la lista encadenada del vértice
             nodo = self.__arreglo[vertice].getCabeza()
-            
             while nodo is not None:
                 vecino = nodo.getDato()
                 if not visitados[vecino]:
+                    cola.append(vecino)
                     visitados[vecino] = True
-                    lista.append(vecino)
                 nodo = nodo.getSiguiente()
+        
+        return lista
             
-    def rep (self, verticeInicial = 0): #Recorrido en profundidad
-        visitados = [False] * self.__cantidadV
-        self.repRecursivo(verticeInicial, visitados)
+    def rep (self, verticeInicial): #Recorrido en profundidad
+        lista = []
+        self.repRec(verticeInicial, [False] * self.__cantidadV, lista)
+        return lista
 
-    def repRecursivo(self, verticeInicial, visitados):
+    def repRec(self, verticeInicial, visitados, lista):
         visitados[verticeInicial] = True
-        print(verticeInicial, end = " ")
+        lista.append(verticeInicial)
         
         # Iterar a través de la lista encadenada del vértice
         nodo = self.__arreglo[verticeInicial].getCabeza()
         while nodo is not None:
             vecino = nodo.getDato()
             if not visitados[vecino]:
-                self.repRecursivo(vecino, visitados)
+                self.repRec(vecino, visitados, lista)
             nodo = nodo.getSiguiente()
     
     def camino(self, origen, destino):
-        lista = []  # Lista para almacenar el camino
-        visitados = [False] * self.__cantidadV  # Lista para marcar los vértices visitados
-        self.caminoRecursivo(origen, destino, visitados, lista)
-        return lista
+        return destino in self.rep(origen)
 
-    def caminoRecursivo(self, actual, destino, visitados, lista):
-        # Marcar el vértice actual como visitado y agregarlo a la lista
-        visitados[actual] = True
-        lista.append(actual)
-
-        # Caso base: si se alcanza el destino, se encontró un camino
-        if actual == destino:
-            return True
-
-        # Recorrer los vecinos del vértice actual
-        nodo = self.__arreglo[actual].getCabeza()
-        while nodo is not None:
-            vecino = nodo.getDato()
-
-            # Si el vecino no ha sido visitado, intentar encontrar un camino desde él
-            if not visitados[vecino]:
-                if self.caminoRecursivo(vecino, destino, visitados, lista):
-                    return True
-
-            nodo = nodo.getSiguiente()
-
-        # Si no se encontró un camino desde este vértice, desmarcarlo y retroceder
-        lista.pop()
-        return False
-        
-    def mostrar(self):
+    # Otras metodos:        
+    def mostrarGrafo(self):
         for i in range(self.__cantidadV):
             print(f'{i} --> ', end='')
 
@@ -136,46 +112,16 @@ class GrafoEncadenado:
             print("None")  # Marcar el final de los vecinos
 
 if __name__ == '__main__':
-    os.system("cls")
-    grafo = GrafoEncadenado(5)
-    #Grafo conexo
+    os.system('cls')
+    grafo = GrafoEncadenado(4)
 
-    grafo.agregarArista(0,1)
-    grafo.agregarArista(0,2)
-    grafo.agregarArista(1,3)
-    grafo.agregarArista(2,3)
+    grafo.insertarArista(0, 1)
+    grafo.insertarArista(0, 2)
+    grafo.insertarArista(1, 3)
+    grafo.insertarArista(2, 3)
+    grafo.mostrarGrafo()
 
-
-    grafo.mostrar()
-    
-    print("\n\n")
-    #print(f"Aciclico (significa que no tiene ciclos): {grafo.esAciclico()} <-- si es True, es aciclico")
-    #print(f"Conexo (significa que todos los vertices estan conectados): {grafo.esConexo()} <-- si es True, es conexo")
-    
-    #print("Recorrido en anchura")
-    #grafo.rea()
-    #print("\n")
-    #print("Recorrido en profundidad")
-    #grafo.rep()
-
-    print("Camino de 0 a 3: ",grafo.camino(0,3))
-    print("Camino de 0 a 0: ",grafo.camino(0,0))
-    print("Camino de 0 a 4: ",grafo.camino(0,4))
-
-
-
-    """  
-  0
- / \
-1   2
-/   
-3
-Recorrido en Anchura (BFS):Comenzando desde el vértice A, 
-el recorrido BFS visitaría los vértices en el siguiente orden: 
-0, 1, 2, 3. El recorrido BFS explora todos los 
-vecinos de un vértice antes de pasar al siguiente nivel.
-
-Recorrido en Profundidad (DFS):Comenzando desde el vértice A, 
-el recorrido DFS visitaría los vértices en el siguiente orden: 
-0, 1, 3, 2. El recorrido DFS explora profundamente un camino 
-antes de retroceder y explorar otros caminos."""
+    print("Recorrido en anchura: ", grafo.rea(0))
+    print("Recorrido en profundidad: ", grafo.rep(0))
+    print("Es conexo: ", grafo.esConexo())
+    print("Camino entre 0 y 3: ", grafo.camino(0, 3))

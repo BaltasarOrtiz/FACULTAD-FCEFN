@@ -2,17 +2,17 @@ import numpy as np
 import os 
 
 class GrafoSecuencial:
-    __CantidadV = 0
-    __matriz = None
+    __CantidadV : int
+    __matriz : np.ndarray
 
     def __init__(self, n):
         self.__CantidadV = n
         self.__matriz = np.zeros((n, n), dtype=int)
 
-    def crearArista(self, i, j):
-        if (i <= self.__CantidadV and j <= self.__CantidadV) and (i >= 0 and j >= 0):
-            self.__matriz[i][j] = 1 #type: ignore
-            self.__matriz[j][i] = 1 #type: ignore
+    def crearArista(self, origen, destino):
+        if (origen <= self.__CantidadV and destino <= self.__CantidadV) and (origen >= 0 and destino >= 0):
+            self.__matriz[origen][destino] = 1 #type: ignore
+            self.__matriz[destino][origen] = 1 #type: ignore
         else:
             print("Error: vertices no validos")
 
@@ -24,92 +24,64 @@ class GrafoSecuencial:
         return adyacentes
 
     def esConexo(self):
-        band = True
-        i = 0
-        while band and i < self.__CantidadV:
-            if len(self.obtenerAdyacentes(i)) == 0:
-                band = False
-            else:
-                i+=1
-        if band:
-            print("El grafo es conexo")
-        else:
-            print("El grafo no es conexo")
+        return len(self.rea(0)) == self.__CantidadV
 
-    #Funciones para saber si es aciclico
     def esAciclico(self):
         for i in range(self.__CantidadV):
-            if self.esAciclicoRec(i, visitados=[False] * self.__CantidadV, padre=-1):
+            if self.esAciclicoRecursivo(i, [False] * self.__CantidadV, -1):
                 return False
         return True
     
-    #Un ciclo es un camino simple cerrado de longitud 3 o mas. Un ciclo de longitud k se llama k-ciclo.
-    def esAciclicoRec(self, vertice, visitados, padre):
+    def esAciclicoRecursivo(self, vertice, visitados, padre):
         visitados[vertice] = True
 
+        # Iterar a través de la lista del vértice
         for i in self.obtenerAdyacentes(vertice):
+            # Si el vecino no ha sido visitado, intentar encontrar un ciclo desde él
             if not visitados[i]:
-                if self.esAciclicoRec(i, visitados, vertice):
+                if self.esAciclicoRecursivo(i, visitados, vertice):
                     return True
+            # Si el vecino ha sido visitado y no es el padre del vértice actual, entonces hay un ciclo
             elif i != padre:
                 return True
         return False
     
-    def rea(self, verticeInicial): #Recorrido en anchura
+    def rea(self, verticeInicial):
         visitados = [False] * self.__CantidadV
         lista = []
+
+        cola = [verticeInicial]
         visitados[verticeInicial] = True
-        lista.append(verticeInicial)
-        while len(lista) > 0:
-            vertice = lista.pop(0)
-            print(vertice, end=' ')
+
+        while cola:
+            vertice = cola.pop(0)
+            lista.append(vertice)
+
             for i in self.obtenerAdyacentes(vertice):
                 if not visitados[i]:
+                    cola.append(i)
                     visitados[i] = True
-                    lista.append(i)
-        print()
-
+        
+        return lista
+    
     def rep(self, verticeInicial):
         visitados = [False] * self.__CantidadV
-        self.repRecursivo(verticeInicial, visitados)
-        print()
+        lista = []
+        self.repRecursivo(verticeInicial, visitados, lista)
+        return lista
 
-    def repRecursivo(self, vertice, visitados):
+    def repRecursivo(self, vertice, visitados, lista):
         visitados[vertice] = True
-        print(vertice, end=' ')
-        for i in self.obtener_adyacentes(vertice):
+        lista.append(vertice)
+
+        for i in self.obtenerAdyacentes(vertice):
             if not visitados[i]:
-                self.recorrido_en_profundidad_aux(i, visitados)
+                self.repRecursivo(i, visitados, lista)
     
     def camino(self, origen, destino):
-        visitados = [False] * self.__CantidadV #Lista de visitados: False = no visitado, True = visitado
-        return self.caminoAux2(origen, destino, visitados, camino=[]) #Se llama a la funcion auxiliar y se devuelve el camino
-    
-    #En este primer camino se devuelve un booleano
-    def caminoAux(self, origen, destino, visitados):
-        visitados[origen] = True
-        if origen == destino:
-            return True
-        for i in self.obtener_adyacentes(origen):
-            if not visitados[i]:
-                if self.caminoAux(i, destino, visitados):
-                    return True
-        return False
+        return destino in self.rep(origen)
 
-    #En este segundo camino se inserta en una lista el camino que se va recorriendo
-    def caminoAux2(self, origen, destino, visitados, camino):
-        visitados[origen] = True #Se marca como visitado
-        camino.append(origen) #Se agrega a la lista camino
-        
-        if origen == destino: #Si el origen es igual al destino, se devuelve el camino
-            return camino #Se devuelve el camino
-        
-        for i in self.obtenerAdyacentes(origen): #Se recorren los adyacentes del origen
-            if not visitados[i]: #Si no esta visitado
-                if self.caminoAux2(i, destino, visitados, camino): #Se llama recursivamente
-                    return camino #Se devuelve el camino
-        camino.pop() #Si no se encuentra el camino, se elimina el ultimo elemento de la lista
-
+    #Otros métodos: 
     def mostrarGrafo(self):
         print("Grafo: ")
 
@@ -125,17 +97,16 @@ class GrafoSecuencial:
             print()
 
 if __name__ == '__main__':
-    os.system("cls")
+    os.system('cls')
+    grafo = GrafoSecuencial(4)
 
-    grafo = GrafoSecuencial(5)
-    grafo.crearArista(0,1)
-    grafo.crearArista(1,2)
-    grafo.crearArista(2,0)
-
+    grafo.crearArista(0, 1)
+    grafo.crearArista(0, 2)
+    grafo.crearArista(1, 3)
+    grafo.crearArista(2, 3)
     grafo.mostrarGrafo()
-    print("Es Aciclico: ", grafo.esAciclico())
-    #un grafo es aciclico si no tiene ciclos
 
-
-    #print("Camino entre 1 y 3: ", grafo.camino(1, 3))
-    print("\n\n")
+    print("Recorrido en anchura: ", grafo.rea(0))
+    print("Recorrido en profundidad: ", grafo.rep(0))
+    print("Es conexo: ", grafo.esConexo())
+    print("Camino entre 0 y 3: ", grafo.camino(0, 3))
