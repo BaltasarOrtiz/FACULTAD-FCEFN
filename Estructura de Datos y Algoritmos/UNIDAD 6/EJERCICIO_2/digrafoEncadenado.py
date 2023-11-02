@@ -31,7 +31,7 @@ class DigrafoEncadenado:
         return lista
     
     def esConexo(self):
-        visitados = self.rep(0)
+        visitados = self.rep(self.NodoFuente())
         if len(visitados) == self.__cantidadV:
             return True
         else:
