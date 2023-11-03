@@ -33,7 +33,7 @@ class DigrafoEncadenado:
     def esConexo(self):
         visitados = self.rep(self.NodoFuente())
         if len(visitados) == self.__cantidadV:
-            return True
+            return True 
         else:
             return False
         
@@ -105,13 +105,13 @@ class DigrafoEncadenado:
     
     #Nodo fuente: evalua si vertice es nodo funete
     def nodoFuente(self, vertice):
-        if self.gradoEntrada(vertice) == 0:
+        if self.gradoEntrada(vertice) == 0 and self.gradoSalida(vertice) > 0:
             return True
         return False
     
     #Nodo sumidero: evalua si vertice es nodo sumidero
     def nodoSumidero(self, vertice):
-        if self.gradoSalida(vertice) == 0:
+        if self.gradoSalida(vertice) == 0 and self.gradoEntrada(vertice) > 0:
             return True
         return False
     
