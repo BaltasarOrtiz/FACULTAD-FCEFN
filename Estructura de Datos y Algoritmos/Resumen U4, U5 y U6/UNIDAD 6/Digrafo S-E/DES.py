@@ -211,13 +211,13 @@ class DigrafoSecuencial:
    
     def NodoFuente(self):
         for i in range(self.__CantidadV):
-            if self.gradoDeEntrada(i) == 0:
+            if self.gradoDeEntrada(i) == 0 and self.gradoDeSalida(i) > 0:
                 return i
         return -1
     
     def NodoSumidero(self):
         for i in range(self.__CantidadV):
-            if self.gradoDeSalida(i) == 0:
+            if self.gradoDeSalida(i) == 0 and self.gradoDeEntrada(i) > 0:
                 return i
         return -1
     

@@ -40,17 +40,13 @@ class GrafoEncadenado:
     def esAciclicoRecursivo(self, vertice, visitados, padre):
         visitados[vertice] = True
 
-        # Iterar a través de la lista encadenada del vértice
         nodo = self.__arreglo[vertice].getCabeza()
         while nodo is not None:
             vecino = nodo.getDato()
-
-            # Si el vecino no ha sido visitado, intentar encontrar un ciclo desde él
+            
             if not visitados[vecino]:
                 if self.esAciclicoRecursivo(vecino, visitados, vertice):
                     return True
-
-            # Si el vecino ya ha sido visitado y no es el padre del vértice actual, se encontró un ciclo
             elif vecino != padre:
                 return True
 
@@ -138,13 +134,10 @@ class GrafoSecuencial:
     def esAciclicoRecursivo(self, vertice, visitados, padre):
         visitados[vertice] = True
 
-        # Iterar a través de la lista del vértice
         for i in self.obtenerAdyacentes(vertice):
-            # Si el vecino no ha sido visitado, intentar encontrar un ciclo desde él
             if not visitados[i]:
                 if self.esAciclicoRecursivo(i, visitados, vertice):
                     return True
-            # Si el vecino ha sido visitado y no es el padre del vértice actual, entonces hay un ciclo
             elif i != padre:
                 return True
         return False
