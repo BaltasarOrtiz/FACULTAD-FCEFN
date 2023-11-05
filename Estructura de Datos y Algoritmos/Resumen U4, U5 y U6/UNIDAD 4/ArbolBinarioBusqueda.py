@@ -228,4 +228,40 @@ class ArbolBinarioBusqueda:
         if nodo != None:
             lista.append(nodo.getDato())
             self.mostrarSucesoresRec(nodo.getIzquierdo(),lista)
-            self.mostrarSucesoresRec(nodo.getDerecho(),lista)   
+            self.mostrarSucesoresRec(nodo.getDerecho(),lista)
+
+
+    def antecesoresIterativo(self, dato):
+            subArbol = self.__raiz
+            if subArbol != None:
+                antecesores = []
+                if subArbol.getDato() != dato:
+                    antecesores.append(subArbol.getDato())
+                    if subArbol.getDato() > dato:
+                        subArbol = subArbol.getIzquierdo()
+                    else:
+                        subArbol = subArbol.getDerecho()
+                    while subArbol != None and subArbol.getDato() != dato:
+                        antecesores.append(subArbol.getDato())
+                        if subArbol.getDato() > dato:
+                            subArbol = subArbol.getIzquierdo()
+                        else:
+                            subArbol = subArbol.getDerecho()
+                    
+                    return antecesores
+            else:
+                print("El arbol no existe")
+
+    def antecesores(self, dato):
+        lista=[]
+        return self.antecesoresRecursivo(self.__raiz, dato, lista)
+
+    def antecesoresRecursivo(self, subArbol, dato, lista):
+        if subArbol != None:
+            if subArbol.getDato() != dato:
+                lista.append(subArbol.getDato())
+                if subArbol.getDato() > dato:
+                    self.antecesoresRecursivo(subArbol.getIzquierdo(), dato, lista)
+                else:
+                    self.antecesoresRecursivo(subArbol.getDerecho(), dato, lista)
+            return lista
