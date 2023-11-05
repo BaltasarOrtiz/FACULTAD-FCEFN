@@ -199,25 +199,51 @@ class ArbolBinarioBusqueda:
 
         mostrarArbolBinRec(self.__raiz, "")
 
+    def antecesoresIterativo(self, dato):
+        subArbol = self.__raiz
+        if subArbol != None:
+            antecesores = []
+            if subArbol.getDato() != dato:
+                antecesores.append(subArbol.getDato())
+                if subArbol.getDato() > dato:
+                    subArbol = subArbol.getIzquierdo()
+                else:
+                    subArbol = subArbol.getDerecho()
+                while subArbol != None and subArbol.getDato() != dato:
+                    antecesores.append(subArbol.getDato())
+                    if subArbol.getDato() > dato:
+                        subArbol = subArbol.getIzquierdo()
+                    else:
+                        subArbol = subArbol.getDerecho()
+                
+                return antecesores
+        else:
+            print("El arbol no existe")
+
+    def antecesores(self, dato):
+        lista=[]
+        return self.antecesoresRecursivo(self.__raiz, dato, lista)
+
+    def antecesoresRecursivo(self, subArbol, dato, lista):
+        if subArbol != None:
+            if subArbol.getDato() != dato:
+                lista.append(subArbol.getDato())
+                if subArbol.getDato() > dato:
+                    self.antecesoresRecursivo(subArbol.getIzquierdo(), dato, lista)
+                else:
+                    self.antecesoresRecursivo(subArbol.getDerecho(), dato, lista)
+            return lista
+        
 if __name__ == '__main__':
     os.system("cls")
     abb = ArbolBinarioBusqueda()
-    abb.insertar(10)
     abb.insertar(5)
-    abb.insertar(15)
     abb.insertar(3)
     abb.insertar(7)
-    abb.insertar(13)
-    abb.insertar(17)
-    abb.insertar(1)
-    abb.insertar(4)
-    abb.insertar(6)
-    abb.insertar(8)
-    abb.mostrarArbolBin()
+    abb.insertar(14)
 
-    print("\n#Eliminamos el nodo con clave 3\n")
-    abb.suprimir(3)
-    abb.mostrarArbolBin()
+    print("Antecesores de 14: ", abb.antecesoresIterativo(14))
+    print("Antecesores de 14: ", abb.antecesores(14))
 
 
 
