@@ -46,8 +46,8 @@ class ArbolBinarioBusqueda:
             return self.buscarRecursivo(subArbol.getDerecho(), dato)                  
 
     def camino(self, dato_desde, dato_hasta):
-        desde= self.buscar(dato_desde)
-        hasta= dato_hasta
+        desde = self.buscar(dato_desde)
+        hasta = dato_hasta
 
         while desde != None and desde.getDato() != hasta:
             if hasta < desde.getDato():
