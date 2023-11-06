@@ -15,9 +15,10 @@ class GrafoEncadenado:
             self.__arreglo[i] = listaEncadenada()
     
     def crearArista(self, origen, destino):
-        self.__arreglo[origen].insertar(destino) # Insertar en la lista de origen
-        self.__arreglo[destino].insertar(origen) # Insertar en la lista de destino
-
+        if (origen <= self.__cantidadV and destino <= self.__cantidadV) and (origen >= 0 and destino >= 0):
+            self.__arreglo[origen].insertar(destino) # Insertar en la lista de origen
+            self.__arreglo[destino].insertar(origen) # Insertar en la lista de destino
+        
     def obtenerAdyacentes(self, vertice):
         lista = []
         aux = self.__arreglo[vertice].getCabeza()
