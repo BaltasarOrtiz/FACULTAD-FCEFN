@@ -19,33 +19,32 @@ class DigrafoEncadenado:
             print("Error: vertices no validos")
 
     def obtenerAdyacentes(self, vertice):
-        lista = None
-        if vertice >= 0 and vertice < self.__cantidadV:
-            lista = self.__arreglo[vertice]
-        else:
-            print("Error: vertice no valido")
+        lista = []
+        aux = self.__arreglo[vertice].getCabeza()
+
+        while aux is not None:
+            lista.append(aux.getDato())
+            aux = aux.getSiguiente()
         
         return lista
     
-    def esConexo(self):
-        return len(self.rep(self.NodoFuente())) == self.__CantidadV
-        
     def esAciclico(self):
         for i in range(self.__cantidadV):
-            if self.esAciclicoRec(i, visitados=[False] * self.__cantidadV, padre=-1):
+            if self.esAciclicoRec(i, [False] * self.__cantidadV, -1):
                 return False
         return True
     
     def esAciclicoRec(self, vertice, visitados, padre):
         visitados[vertice] = True
         
-        v = self.__arreglo[vertice].getCabeza()
-        while v is not None:
-            if not visitados[v.getDato()]:
-                if self.esAciclicoRec(v.getDato(), visitados, vertice):
+        for i in self.obtenerAdyacentes(vertice):
+            if self.obtenerAdyacentes(i) != []:
+                if not visitados[i]:
+                    if self.esAciclicoRec(i, visitados, vertice):
+                        return True
+                elif i != padre:
                     return True
-            elif padre != v.getDato():
-                return True
+        
         return False
     
     def rea(self, verticeInicial): 
@@ -59,13 +58,11 @@ class DigrafoEncadenado:
             lista.append(vertice)
             visitados[vertice] = True
             
-            v = self.__arreglo[vertice].getCabeza()
-            while v is not None:
-                if not visitados[v.getDato()]:
-                    cola.append(v.getDato())
-                    visitados[v.getDato()] = True
-                v = v.getSiguiente()
-        
+            for i in self.obtenerAdyacentes(vertice):
+                if not visitados[i]:
+                    cola.append(i)
+                    visitados[i] = True
+                
         return lista
     
     def rep(self, verticeInicial):
@@ -77,11 +74,12 @@ class DigrafoEncadenado:
         visitados[vertice] = True
         lista.append(vertice)
         
-        cabeza = self.__arreglo[vertice].getCabeza()
-        while cabeza is not None:
-            if not visitados[cabeza.getDato()]:
-                self.repRec(cabeza.getDato(), visitados, lista)
-            cabeza = cabeza.getSiguiente()
+        for i in self.obtenerAdyacentes(vertice):
+            if not visitados[i]:
+                self.repRec(i, visitados, lista)
+
+    def esConexo(self):
+        return len(self.rep(self.NodoFuente())) == self.__CantidadV #type: ignore
  
     def camino(self, verticeInicial, verticeFinal):
         return verticeFinal in self.rep(verticeInicial)
@@ -95,22 +93,18 @@ class DigrafoEncadenado:
         return grado
     
     def gradoSalida(self, vertice):
-        return self.__arreglo[vertice].getCantidad()
+        return len(self.obtenerAdyacentes(vertice))
     
     def nodoFuente(self, vertice):
-        if self.gradoEntrada(vertice) == 0:
+        if self.gradoEntrada(vertice) == 0 and self.gradoSalida(vertice) > 0:
             return True
         return False
     
     def nodoSumidero(self, vertice):
-        if self.gradoSalida(vertice) == 0:
+        if self.gradoEntrada(vertice) > 0 and self.gradoSalida(vertice) == 0:
             return True
         return False
     
-
-    
-#-------------------------------------------------------------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------
 
 class DigrafoSecuencial:
@@ -192,7 +186,6 @@ class DigrafoSecuencial:
     def camino(self, verticeInicial, verticeFinal):
         return verticeFinal in self.rep(verticeInicial)
 
-
     # Operaciones ADICIONALES de Digrafo
     def gradoDeEntrada(self, vertice):
         grado = 0
@@ -202,13 +195,8 @@ class DigrafoSecuencial:
         return grado
 
     def gradoDeSalida(self, vertice):
-        grado = 0
-        for j in range(self.__CantidadV):
-            if self.__matriz[vertice][j] == 1: #type: ignore
-                grado += 1
-        return grado
-    
-   
+        return len(self.obtenerAdyacentes(vertice))
+       
     def NodoFuente(self):
         for i in range(self.__CantidadV):
             if self.gradoDeEntrada(i) == 0 and self.gradoDeSalida(i) > 0:
@@ -217,9 +205,6 @@ class DigrafoSecuencial:
     
     def NodoSumidero(self):
         for i in range(self.__CantidadV):
-            if self.gradoDeSalida(i) == 0 and self.gradoDeEntrada(i) > 0:
+            if self.gradoDeEntrada(i) > 0 and self.gradoDeSalida(i) == 0:
                 return i
         return -1
-    
-# Metodos iguales en ambos Digrafos:
-#rep(pero se diff en el recursivo),Es Conexo, Camino

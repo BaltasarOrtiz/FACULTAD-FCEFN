@@ -107,7 +107,7 @@ class ArbolBinarioBusqueda:
             else:
                 return False
 
-    def padre(self, datoHijo, datoPadre):
+    def padre(self, datoPadre, datoHijo):
         return self.hijo(datoPadre, datoHijo)
       
     def hoja(self, dato):

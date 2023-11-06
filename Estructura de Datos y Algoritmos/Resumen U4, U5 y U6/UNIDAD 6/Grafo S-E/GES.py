@@ -17,43 +17,32 @@ class GrafoEncadenado:
     def crearArista(self, origen, destino):
         self.__arreglo[origen].insertar(destino) # Insertar en la lista de origen
         self.__arreglo[destino].insertar(origen) # Insertar en la lista de destino
-            
+
     def obtenerAdyacentes(self, vertice):
-        lista = None
-        
-        if vertice >= 0 and vertice < self.__cantidadV:
-            lista = self.__arreglo[vertice]
-        else:
-            print("Error: vertice no valido")
-        
+        lista = []
+        aux = self.__arreglo[vertice].getCabeza()
+        while aux is not None:
+            lista.append(aux.getDato())
+            aux = aux.getSiguiente()
         return lista
 
-    def esConexo(self): #Si todos los vertices estan conectados
-        return len(self.rea(0)) == self.__cantidadV
-
-    def esAciclico(self): #Si no tiene ciclos
+    def esAciclico(self):
         for i in range(self.__cantidadV):
             if self.esAciclicoRecursivo(i, [False] * self.__cantidadV, -1):
                 return False
         return True
-
+    
     def esAciclicoRecursivo(self, vertice, visitados, padre):
         visitados[vertice] = True
 
-        nodo = self.__arreglo[vertice].getCabeza()
-        while nodo is not None:
-            vecino = nodo.getDato()
-            
-            if not visitados[vecino]:
-                if self.esAciclicoRecursivo(vecino, visitados, vertice):
+        for i in self.obtenerAdyacentes(vertice):
+            if not visitados[i]:
+                if self.esAciclicoRecursivo(i, visitados, vertice):
                     return True
-            elif vecino != padre:
+            elif i != padre:
                 return True
-
-            nodo = nodo.getSiguiente()
-
         return False
-    
+
     def rea (self, verticeInicial): #Recorrido en anchura 
         lista = []
         visitados = [False] * self.__cantidadV
@@ -63,19 +52,13 @@ class GrafoEncadenado:
         while cola:
             vertice = cola.pop(0)
             lista.append(vertice)
-            visitados[vertice] = True
-            
-            # Iterar a través de la lista encadenada del vértice
-            nodo = self.__arreglo[vertice].getCabeza()
-            while nodo is not None:
-                vecino = nodo.getDato()
-                if not visitados[vecino]:
-                    cola.append(vecino)
-                    visitados[vecino] = True
-                nodo = nodo.getSiguiente()
-        
+
+            for i in self.obtenerAdyacentes(vertice):
+                if not visitados[i]:
+                    cola.append(i)
+                    visitados[i] = True
         return lista
-            
+              
     def rep (self, verticeInicial): #Recorrido en profundidad
         lista = []
         self.repRec(verticeInicial, [False] * self.__cantidadV, lista)
@@ -85,19 +68,15 @@ class GrafoEncadenado:
         visitados[verticeInicial] = True
         lista.append(verticeInicial)
         
-        # Iterar a través de la lista encadenada del vértice
-        nodo = self.__arreglo[verticeInicial].getCabeza()
-        while nodo is not None:
-            vecino = nodo.getDato()
-            if not visitados[vecino]:
-                self.repRec(vecino, visitados, lista)
-            nodo = nodo.getSiguiente()
+        for i in self.obtenerAdyacentes(verticeInicial):
+            if not visitados[i]:
+                self.repRec(i, visitados, lista)
     
     def camino(self, origen, destino):    
         return destino in self.rep(origen)
-
-#-------------------------------------------------------------------------------------------------------------------------------------
-#-------------------------------------------------------------------------------------------------------------------------------------
+    
+    def esConexo(self): #Si todos los vertices estan conectados
+        return len(self.rea(0)) == self.__cantidadV #type: ignore
 #-------------------------------------------------------------------------------------------------------------------------------------
 
 class GrafoSecuencial:
