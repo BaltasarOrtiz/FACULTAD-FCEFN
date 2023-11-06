@@ -9,7 +9,7 @@ class GrafoEncadenado:
     def __init__(self, cantidadV: int):
         self.__cantidadV = cantidadV
         self.__arreglo = np.empty(cantidadV, dtype=listaEncadenada)
-
+    
         # Inicializar cada lista
         for i in range(cantidadV):
             self.__arreglo[i] = listaEncadenada()
@@ -101,9 +101,6 @@ class GrafoSecuencial:
                 adyacentes.append(j)
         return adyacentes
 
-    def esConexo(self):
-        return len(self.rea(0)) == self.__CantidadV
-
     def esAciclico(self):
         for i in range(self.__CantidadV):
             if self.esAciclicoRecursivo(i, [False] * self.__CantidadV, -1):
@@ -153,6 +150,9 @@ class GrafoSecuencial:
     
     def camino(self, origen, destino):
         return destino in self.rep(origen)
+
+    def esConexo(self):
+        return len(self.rea(0)) == self.__CantidadV
 
 
 # Metodos iguales
