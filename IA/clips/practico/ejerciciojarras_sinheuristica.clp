@@ -9,23 +9,6 @@
 
 ;"C:/Users/balta/Documents/GitHub/FACULTAD-FCEFN/IA/clips/practico/ejerciciojarras.clp"
 
-;(defrule estado
-;    (slot x (type INTEGER) (default 0))
-;    (slot y (type INTEGER) (default 0))
-;   (slot z (type INTEGER) (default 0))
-;    (slot w (type INTEGER) (default 0))
-;)
-
-; Inicializa la base de hechos
-;(deffacts estado_inicial_jarras
-;    (estado (24 0 0 0))
-;    ; Para tomar la jarra origen y destino
-;    (jarra 1)
-;    (jarra 2)
-;    (jarra 3)
-;    (jarra 4)
-;)
-
 (defrule estado_inicial_jarras
     =>
     (assert (estado 24 0 0 0)) ; Estado inicial de las jarras
@@ -42,6 +25,30 @@
     (jarra ?jarraDestino ?capacidadDestino) ; Jarra destino
     (test (neq ?jarraOrigen ?jarraDestino)) ; Asegura que no se vuelque en la misma jarra
     =>
+    ; Obtiene la capacidad de las jarras origen y destino
+    (bind ?capacidadOrigen 
+    (if (= ?jarraOrigen 1) then 24 
+        else 
+            (if (= ?jarraOrigen 2) then 5 
+                else 
+                    (if (= ?jarraOrigen 3) then 11 
+                        else 13
+                    )
+            )
+        )
+    )
+
+    (bind ?capacidadDestino 
+        (if (= ?jarraDestino 1) then 24 
+            else 
+                (if (= ?jarraDestino 2) then 5 
+                    else 
+                        (if (= ?jarraDestino 3) then 11 
+                            else 13
+                        )
+                )
+        )
+    )
     (bind ?x (nth$ ?jarraOrigen ?valores)) ; Cantidad de litros en la jarra origen
     (bind ?y (nth$ ?jarraDestino ?valores)) ; Cantidad de litros en la jarra destino
 
@@ -55,7 +62,7 @@
     (assert (estado $?nuevoEstado)) ; Agrega el nuevo estado a la base de hechos
 )
 
-
+ 
 (defrule comprobar
     (declare (salience 1000)) ; Prioridad máxima para esta regla
     (estado 8 0 8 8)

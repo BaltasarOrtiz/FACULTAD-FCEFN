@@ -101,3 +101,21 @@
                 )
         )
     )
+
+
+    ;(defrule estado
+;    (slot x (type INTEGER) (default 0))
+;    (slot y (type INTEGER) (default 0))
+;   (slot z (type INTEGER) (default 0))
+;    (slot w (type INTEGER) (default 0))
+;)
+
+; Inicializa la base de hechos
+;(deffacts estado_inicial_jarras
+;    (estado (24 0 0 0))
+;    ; Para tomar la jarra origen y destino
+;    (jarra 1)
+;    (jarra 2)
+;    (jarra 3)
+;    (jarra 4)
+;)
