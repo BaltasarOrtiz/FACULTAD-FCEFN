@@ -7,7 +7,8 @@
 ;e) Realice una implementación en Clips que le permita encontrar la solución con alguna de las instancias ciegas y con la heurística propuesta en el punto d) Marque las diferencias en los tiempos de ejecución.
 ;De qué modo podrías dividir el contenido de una jarra de 24 litros en tres partes iguales, utilizando solamente la jarra original y otras tres de 5, 11 y 13 litros de capacidad respectivamente. (0,65)
 
-;(load "C:/Users/balta/Documents/GitHub/FACULTAD-FCEFN/IA/clips/practico/ejerciciojarras_sinheuristica.clp")
+; (load "C:/Users/balta/Documents/GitHub/FACULTAD-FCEFN/IA/clips/practico/ejerciciojarras_sinheuristica.clp")
+; (load "C://FACULTAD-FCEFN//IA//clips//practico//ejerciciojarras_sinheuristica.clp")
 
 (defrule estado_inicial_jarras
     =>
