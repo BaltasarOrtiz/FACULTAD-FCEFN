@@ -7,7 +7,7 @@
 ;e) Realice una implementación en Clips que le permita encontrar la solución con alguna de las instancias ciegas y con la heurística propuesta en el punto d) Marque las diferencias en los tiempos de ejecución.
 ;De qué modo podrías dividir el contenido de una jarra de 24 litros en tres partes iguales, utilizando solamente la jarra original y otras tres de 5, 11 y 13 litros de capacidad respectivamente. (0,65)
 
-;"C:/Users/balta/Documents/GitHub/FACULTAD-FCEFN/IA/clips/practico/ejerciciojarras.clp"
+;(load "C:/Users/balta/Documents/GitHub/FACULTAD-FCEFN/IA/clips/practico/ejerciciojarras_sinheuristica.clp")
 
 (defrule estado_inicial_jarras
     =>
@@ -23,6 +23,8 @@
     (estado $?valores) ; Estado actual de las jarras
     (jarra ?jarraOrigen ?capacidadOrigen) ; Jarra origen
     (jarra ?jarraDestino ?capacidadDestino) ; Jarra destino
+    ; La jarra origen no puede tener contenido 0
+    (test (> (nth$ ?jarraOrigen ?valores) 0)) ; Asegura que la jarra origen no esté vacía
     (test (neq ?jarraOrigen ?jarraDestino)) ; Asegura que no se vuelque en la misma jarra
     =>
     ; Obtiene la capacidad de las jarras origen y destino
@@ -67,6 +69,6 @@
     (declare (salience 1000)) ; Prioridad máxima para esta regla
     (estado 8 0 8 8)
     =>
-    (printout "Se ha encontrado la solucion: 8, 8, 8, 0" crlf)
+    (printout "Se ha encontrado la solucion: 8, 0, 8, 8" crlf)
     (halt)
 )

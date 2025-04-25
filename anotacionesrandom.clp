@@ -119,3 +119,82 @@
 ;    (jarra 3)
 ;    (jarra 4)
 ;)
+
+;EJERCICIO FUNCIONANDO CORRECTAMENTE DEL MISMO PROBLEMA
+
+; Definición de una plantilla para representar un estado del juego de las jarras
+(deftemplate estado
+    (multislot contenido (type INTEGER) (range 0 24) (cardinality 4 4))
+    (slot heuristica (type INTEGER))
+)
+
+; Definición de las capacidades de las jarras como una variable global
+(defglobal ?*capacidades* = (create$ 24 5 11 13))
+
+(deffunction calcularHeuristica (?contenidos)
+    ; La heurística es la suma de las diferencias absolutas con el estado final (8,8,8,0)
+    (+
+        (abs (- 8 (nth$ 1 ?contenidos)))
+        (abs (- 8 (nth$ 2 ?contenidos)))
+        (abs (- 8 (nth$ 3 ?contenidos)))
+        (nth$ 4 ?contenidos)
+    )
+)
+
+(defrule estado_inicial_jarras
+    =>
+    (assert (estado (contenido 24 0 0 0) (heuristica 32)))
+    (assert (numero 1))
+    (assert (numero 2))
+    (assert (numero 3))
+    (assert (numero 4))
+)
+
+(defrule estadoFinal
+    (declare (salience 10000))
+    (estado (contenido 8 8 8 0) (heuristica 0))
+    =>
+    (printout t "Estado Final alcanzado: (8 8 8 0)" crlf)
+    (halt)
+)
+
+; Regla para volcar el contenido de una jarra en otra
+(defrule volcar
+    (numero ?origen)
+    (numero ?destino)
+    (test (neq ?origen ?destino))
+    (estado (contenido $?contenidos) (heuristica ?heu))
+    (test (> (nth$ ?origen ?contenidos) 0)) ; La jarra origen debe tener contenido
+    (test (< (nth$ ?destino ?contenidos) (nth$ ?destino ?*capacidades*))) ; La jarra destino no debe estar llena
+    (not (estado (heuristica ?h2&:(< ?h2 ?heu))))
+    (not (estadoSinSalida $?contenidos))
+    =>
+    ; Obtener contenidos actuales
+    (bind ?conOrigen (nth$ ?origen ?contenidos))
+    (bind ?conDestino (nth$ ?destino ?contenidos))
+    (bind ?capDestino (nth$ ?destino ?*capacidades*))
+    
+    ; Calcular cuánto volcar
+    (bind ?litros (min ?conOrigen (- ?capDestino ?conDestino)))
+    
+    ; Actualizar contenidos
+    (bind ?nuevosContenidos (replace$ ?contenidos ?origen ?origen (- ?conOrigen ?litros)))
+    (bind ?nuevosContenidos (replace$ ?nuevosContenidos ?destino ?destino (+ ?conDestino ?litros)))
+    
+    ; Calcular nueva heurística y crear nuevo estado
+    (bind ?nuevaHeuristica (calcularHeuristica ?nuevosContenidos))
+    (assert (estado (contenido ?nuevosContenidos) (heuristica ?nuevaHeuristica)))
+    
+    ; Imprimir los pasos (opcional, para depuración)
+    (printout t "Moviendo " ?litros " litros de jarra " ?origen " a jarra " ?destino ": " ?nuevosContenidos " (h=" ?nuevaHeuristica ")" crlf)
+)
+
+(defrule eliminarEstadosSinSalida
+    (declare (salience -50))
+    ?fact <- (estado (heuristica ?heu) (contenido $?contenido))
+    (not (estado (heuristica ?h2&:(< ?h2 ?heu))))
+    =>
+    (retract ?fact)
+    (assert (estadoSinSalida ?contenido))
+    (printout t "Estado sin salida: " ?contenido crlf)
+)
