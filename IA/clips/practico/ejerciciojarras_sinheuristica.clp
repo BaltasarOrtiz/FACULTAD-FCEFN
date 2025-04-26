@@ -1,15 +1,3 @@
-;Ejercicio 2) CLIPS
-;Item 2.1) Problemas de jarras:
-;a) Representar, en reglas, el conocimiento que permite realizar los diferentes movimientos de líquidos entre jarras y sus llenados y vaciamiento.
-;b) Realizar todo ese espacio de búsqueda (ForwarChaining) enumerando los nodos en una búsqueda hacia lo profundo y hacia lo ancho.
-;c) En cada forma de búsqueda exprese los pasos hasta encontrar la solución.
-;d) Utilice y explique una heurística que le permita moverse solamente por el camino más promisorio!!
-;e) Realice una implementación en Clips que le permita encontrar la solución con alguna de las instancias ciegas y con la heurística propuesta en el punto d) Marque las diferencias en los tiempos de ejecución.
-;De qué modo podrías dividir el contenido de una jarra de 24 litros en tres partes iguales, utilizando solamente la jarra original y otras tres de 5, 11 y 13 litros de capacidad respectivamente. (0,65)
-
-; (load "C:/Users/balta/Documents/GitHub/FACULTAD-FCEFN/IA/clips/practico/ejerciciojarras_sinheuristica.clp")
-; (load "C://FACULTAD-FCEFN//IA//clips//practico//ejerciciojarras_sinheuristica.clp")
-
 (defrule estado_inicial_jarras
     =>
     (assert (estado 24 0 0 0)) ; Estado inicial de las jarras

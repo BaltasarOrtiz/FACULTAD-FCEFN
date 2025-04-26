@@ -1,14 +1,3 @@
-;Ejercicio 2) CLIPS
-;Item 2.1) Problemas de jarras:
-;a) Representar, en reglas, el conocimiento que permite realizar los diferentes movimientos de líquidos entre jarras y sus llenados y vaciamiento.
-;b) Realizar todo ese espacio de búsqueda (ForwarChaining) enumerando los nodos en una búsqueda hacia lo profundo y hacia lo ancho.
-;c) En cada forma de búsqueda exprese los pasos hasta encontrar la solución.
-;d) Utilice y explique una heurística que le permita moverse solamente por el camino más promisorio!!
-;e) Realice una implementación en Clips que le permita encontrar la solución con alguna de las instancias ciegas y con la heurística propuesta en el punto d) Marque las diferencias en los tiempos de ejecución.
-;De qué modo podrías dividir el contenido de una jarra de 24 litros en tres partes iguales, utilizando solamente la jarra original y otras tres de 5, 11 y 13 litros de capacidad respectivamente. (0,65)
-
-;(load "C:/Users/balta/Documents/GitHub/FACULTAD-FCEFN/IA/clips/practico/ejerciciojarras_conheuristica.clp")
-
 ; Definicion de una plantilla para representar un estado del juego de las jarras en un momento especifico
 (deftemplate estado
 	(multislot contenido (type INTEGER) (range 0 24) (cardinality 4 4)) ; Puede verse como una "tupla" de 4 elementos que representan la cantidad de litros en cada jarra
@@ -55,7 +44,6 @@
     (not (estado (heuristica ?h2&:(< ?h2 ?heu)))) ; Verifica que no haya un estado con mejor heurística
     (not (estadoSinSalida ?contenido)) ; Verifica que no sea un estado sin salida
     =>
-	(printout t "Volcando de jarra " ?jarraOrigen " a jarra " ?jarraDestino crlf)
     (bind ?x (nth$ ?jarraOrigen ?contenidos)) ; Cantidad de litros en la jarra origen
     (bind ?y (nth$ ?jarraDestino ?contenidos)) ; Cantidad de litros en la jarra destino
 
