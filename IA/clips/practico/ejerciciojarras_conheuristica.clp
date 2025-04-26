@@ -21,25 +21,25 @@
 	; La heuristica se calcula como la suma de las diferencias absolutas entre la cantidad de litros en cada jarra en comparacion con estado final
 	(+
 		(abs (- 8 (nth$ 1 ?contenidos)))
-		(abs (- 8 (nth$ 2 ?contenidos)))
+		(nth$ 2 ?contenidos)
 		(abs (- 8 (nth$ 3 ?contenidos)))
-		(nth$ 4 ?contenidos)
+		(abs (- 8 (nth$ 4 ?contenidos)))
 	)
 )
 
 (defrule estado_inicial_jarras
     =>
-    (assert (jarra 1)) 
-    (assert (jarra 2)) 
-    (assert (jarra 3)) 
-    (assert (jarra 4))
+    (assert (jarra 1 24)) ; Jarra 1 con capacidad de 24 litros
+    (assert (jarra 2 5))  ; Jarra 2 con capacidad de 5 litros
+    (assert (jarra 3 11)) ; Jarra 3 con capacidad de 11 litros
+    (assert (jarra 4 13)) ; Jarra 4 con capacidad de 13 litros
     (assert (estado (contenido 24 0 0 0) (heuristica 32))) ; Estado inicial de las jarras
 )
 
 (defrule estadoFinal
 	; Regla que se ejecuta una vez se llego al estado final, se declara la prioridad maxima (10000) y se detiene el programa
 	(declare (salience 10000))
-	(estado (contenido 8 8 8 0) (heuristica 0))
+	(estado (contenido 8 0 8 8) (heuristica 0))
 	=>
 	(printout t "Estado Final" crlf)
 	(halt)
@@ -53,28 +53,23 @@
     (test (> (nth$ ?jarraOrigen ?contenidos) 0)) ; Asegura que la jarra origen no esté vacía
     (test (neq ?jarraOrigen ?jarraDestino)) ; Asegura que no se vuelque en la misma jarra
     (not (estado (heuristica ?h2&:(< ?h2 ?heu)))) ; Verifica que no haya un estado con mejor heurística
-    (not (estadoSinSalida $?contenidos)) ; Verifica que no sea un estado sin salida
+    (not (estadoSinSalida ?contenido)) ; Verifica que no sea un estado sin salida
     =>
+	(printout t "Volcando de jarra " ?jarraOrigen " a jarra " ?jarraDestino crlf)
     (bind ?x (nth$ ?jarraOrigen ?contenidos)) ; Cantidad de litros en la jarra origen
     (bind ?y (nth$ ?jarraDestino ?contenidos)) ; Cantidad de litros en la jarra destino
-	; Obtener la capacidad de la jarra destino
-	(bind ?capacidadDestino 
-        (if (= ?jarraDestino 1) then 24 
-            else 
-                (if (= ?jarraDestino 2) then 5 
-                    else 
-                        (if (= ?jarraDestino 3) then 11 
-                            else 13
-                        )
-                )
-        )
-    )
 
 	; Se calcula la cantidad de litros a mover, que seria la cantidad de litros en la jarra origen o el faltante en la jarra destino para llenarse
     (bind ?litros (min ?x (- ?capacidadDestino ?y))) 
 	(bind ?contenidos (replace$ ?contenidos ?jarraOrigen ?jarraOrigen  (- ?x  ?litros))) ; Se actualiza la cantidad de litros en la jarra origen
 	(bind ?contenidos (replace$ ?contenidos ?jarraDestino ?jarraDestino (+ ?y ?litros))) ; Se actualiza la cantidad de litros en la jarra destino
-	(assert (estado (contenido $?contenidos) (heuristica (calcularHeuristica ?contenidos)))) ; Se agrega el nuevo estado a la base de hechos
+	; Verificar que no sea un estado sin salida
+	(if (not (any-factp ((?f estadoSinSalida))
+                    (eq ?f:implied $?contenidos)))
+    then 
+    (assert (estado (contenido ?contenidos) (heuristica (calcularHeuristica ?contenidos))))
+	)	
+
 )
 
 
