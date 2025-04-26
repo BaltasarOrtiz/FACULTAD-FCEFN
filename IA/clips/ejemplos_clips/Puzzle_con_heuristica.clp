@@ -1,3 +1,4 @@
+;(load "C:/Users/balta/Documents/GitHub/FACULTAD-FCEFN/IA/clips/ejemplos_clips/Puzzle_con_heuristica.clp")
 (deftemplate MAIN::nodo 
    (multislot estado) 
    (multislot camino) 
@@ -9,11 +10,11 @@
    ?*estado-final* = (create$ 4 H 2 3 5 7 8 1 6  )
 )
 
-;Heur√stica
+;HeurÔøΩstica
 (deffunction MAIN::heuristica ($?estado) 
    (bind ?res 0) 
    (loop-for-count (?i 1 9) 
-    (if (neq (nth ?i $?estado) (nth ?i ?*estado-final*)) 
+    (if (neq (nth$ ?i $?estado) (nth$ ?i ?*estado-final*)) 
          then (bind ?res (+ ?res 1)) 
      ) 
     ) 
@@ -57,7 +58,7 @@
 
 (defrule MAIN::derecha 
    (nodo (estado $?a H ?b 
-                 $?c&:(neq (mod (length $?c) 3) 2)) 
+                 $?c&:(neq (mod (length$ $?c) 3) 2)) 
           (camino $?movimientos) 
           (clase cerrado)) 
  => 
@@ -69,7 +70,7 @@
 
 
 (defrule MAIN::izquierda 
-   (nodo (estado $?a&:(neq (mod (length $?a) 3) 2) 
+   (nodo (estado $?a&:(neq (mod (length$ $?a) 3) 2) 
                    ?b H $?c) 
           (camino $?movimientos) 
           (clase cerrado)) 
@@ -104,7 +105,7 @@
 )
 
 
-;Soluci√≥n (se encuentra al tener la heur√stica con valor 0)
+;Soluci√≥n (se encuentra al tener la heurÔøΩstica con valor 0)
 (defrule MAIN::encuentra-solucion 
    (declare (auto-focus TRUE)) 
    ?nodo <- (nodo (heuristica 0) 
