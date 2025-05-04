@@ -37,6 +37,3 @@
     (printout t "Solucion: A = " ?a ", D = " ?d ", I = " ?i ", L = " ?l ", O = " ?o ", S = " ?s ", T = " ?t ", E = " ?e crlf)
     (assert (solucion ?a ?d ?i ?l ?o ?s ?t ?e))
 )
-
-; (load "C:/Users/balta/Documents/GitHub/FACULTAD-FCEFN/IA/clips/practico/criptoaritmetica.clp")
-; D = 5, E = 3, L = 7, O = 6, T = 9, A = 1, I = 0, S = 8, R1 = 1, R2 = 1, R3 = 0, R4 = 1
