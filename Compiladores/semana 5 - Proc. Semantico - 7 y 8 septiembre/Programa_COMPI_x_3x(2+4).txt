@@ -1,0 +1,11 @@
+// Programa fuente para la herramienta COMPI
+// Expresion a analizar:  x = 3 * (2 + 4)
+class Cl
+{
+    void Main()
+    {
+        int x;
+        x = 3 * (2 + 4);
+        write(x, 3);
+    }
+}
