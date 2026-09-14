@@ -1,0 +1,563 @@
+[00:00] Entonces vamos a ver qué es lo que ocurre internamente para que se produzca esta gramática, por un lado, y cuándo y en qué momento arroja las instrucciones del CIL.
+[00:14] La gramática, resumida, es más compleja, pero la parte esencial de la gramática es esta que está acá.
+[00:21] Entonces, esa gramática, acuérdense que aquí está como producciones extended BNF, sin embargo, aquí está como producciones BNF.
+[00:36] No usa estas llavecitas, por ejemplo, para indicar cero o más veces, sino que lo hace de la forma que han visto ustedes en las materias anteriores.
+[00:52] Bien, entonces a esta que es la gramática, le vamos a hacer, o sea, estas son las producciones, vamos a agregarle atributos por un lado y acciones semánticas por otro lado.
+[01:05] Entonces, los atributos van a ser los parámetros
+[01:09] En este caso son todos de salida
+[01:12] Y las acciones semánticas van a ser
+[01:15] Esto que es códigos sellar
+[01:19] Vamos a ver cómo funciona esto
+[01:21] Y este es el árbol de derivación
+[01:24] Que va a terminar produciendo esta cadena que está aquí
+[01:28] Empezamos por expresión
+[01:32] Entonces cuando llama a acá
+[01:35] no pongo la implementación
+[01:37] lo pongo acá porque acá es mucho más fácil
+[01:39] verlo, total con lo que hemos visto
+[01:41] antes, ya la implementación
+[01:43] la tiene más o menos clara
+[01:45] cada vez que veo expresión
+[01:47] tengo que crear un método que se llame
+[01:49] igual, porque es no terminal
+[01:50] los terminales por otro lado
+[01:53] van a parar a un check
+[01:56] en la implementación
+[01:58] y estas variables de salida
+[02:00] se le pone un out
+[02:01] y cuando sale de aquí
+[02:03] tiene que, por ejemplo este term
+[02:05] terminar con un valor
+[02:08] de salida
+[02:11] en este argumento
+[02:12] entonces cuando empieza con la expresión
+[02:14] en el árbol
+[02:16] de derivación corresponde a esta
+[02:18] la raíz
+[02:19] luego sigue por
+[02:23] un término
+[02:26] que en el árbol de derivación
+[02:29] es ese término
+[02:31] luego le sigue
+[02:33] ahora cuando veo la llamada
+[02:36] de un término tengo que ver como está definido
+[02:37] término. Entonces me voy a la definición de término, que es este que está acá abajo,
+[02:44] y término empieza siempre con un factor. Entonces si lo veo aquí en el árbol, el
+[02:53] término lo primero que tiene es un factor. Ahora tengo que ver cómo está definido factor.
+[03:00] Acá tengo la definición de factor, y factor puede ser o un número o una expresión entre
+[03:08] paréntesis bien verlo intuitivamente es un número en este caso tres o una expresión entre paréntesis
+[03:15] que termina produciendo me un número sé que todo esto una expresión metida dentro de paréntesis
+[03:22] también puede ser un factor entonces ahora como sé cuál de estas dos usar una posibilidad es
+[03:31] number u otra posibilidad es una expresión entre paréntesis cuál de las dos utiliza la
+[03:36] La primera o la segunda.
+[03:41] Bueno, como yo tengo un factor y estoy ubicado acá,
+[03:47] ¿cómo sé si tengo que empezar por número por esta opción o si tengo que empezar por esta opción?
+[03:52] Si empezara por la segunda, tendría que leer, en el Look in a Head, tendría que leer un paréntesis.
+[04:00] ¿De acuerdo?
+[04:00] Ese sería el caso que todo empiece por paréntesis.
+[04:03] Si yo empiezo, si todo empieza por un número, entonces la opción que va a tomar es la primera.
+[04:14] ¿De acuerdo?
+[04:15] Entonces, como lo que tengo no es un paréntesis, sino que es un número, entonces elige esta primera.
+[04:26] Y esto que está aquí es la acción semántica que hace cuando entra por este lado.
+[04:32] dice val igual a token.val
+[04:35] entonces para ver que entra
+[04:38] este number
+[04:40] se acuerdan que llamaba
+[04:42] al principio el LA
+[04:44] apunta al 3
+[04:45] el number llamaba a un
+[04:48] check number que lo que hace es
+[04:50] chequear si efectivamente
+[04:52] en la cadena hay un number
+[04:54] que en este caso es el 3
+[04:55] y esto llama al check
+[04:58] que es lo que hace el check
+[05:00] hace avanzar el LA al siguiente token
+[05:03] y entonces el LA ahora apunta al siguiente
+[05:08] y si el LA, si el looking ahead token apunta al asterisco
+[05:13] el token a que apunta? al 3
+[05:15] entonces token queda apuntando al number, de acuerdo?
+[05:21] es decir, en este momento el LA token
+[05:25] siempre pongo la manito, es siempre el looking ahead token
+[05:28] entonces el looking ahead token es 3, pero una vez que hace el check de este number
+[05:33] entonces el looking at head token pasa para adelante
+[05:37] y el token queda con 3
+[05:40] entonces como el token queda con 3
+[05:43] después de haber hecho este number
+[05:45] que llamó al check
+[05:46] entonces ahora ese 3 lo mete en val
+[05:51] esa es la acción semántica que hace en este caso
+[05:56] y como este es un argumento de salida
+[05:58] entonces mete ese 3 aquí en val
+[06:02] Y en val me queda un 3
+[06:06] ¿De acuerdo?
+[06:08] Entonces termina obteniendo un 3
+[06:11] Entonces, toma este 3
+[06:17] Que es variable de salida
+[06:19] Y como este factor lo llamó
+[06:22] Esta es la definición del método
+[06:27] ¿Está bien?
+[06:28] En cambio, esta es la llamada del método
+[06:29] Por lo tanto, este 3 que obtuvo
+[06:33] En esta definición lo lleva acá arriba y por lo tanto esta llamada termina con el valor 3, que intuitivamente es esto que está acá, el factor termina con 3.
+[06:45] Entonces dice, suba este factor 3 hasta aquí.
+[06:52] Bien, luego intuitivamente, nos vamos a adelantar un poco, lo que va a hacer es cuando tenga factor por factor, lo que va a hacer es multiplicarlo.
+[07:02] Y cuando tenga término más término lo que va a hacer es sumarlo
+[07:06] Y cuando tenga término menos término lo que va a hacer es restarlo
+[07:09] Entonces va a ir construyendo, va a ir obteniendo este 18
+[07:14] ¿Se entiende?
+[07:17] Bien
+[07:17] ¿Qué diferencia esencial ven entre esto que está aquí y el compilador que acabamos de ver recién?
+[07:30] El compilador real
+[07:31] ¿Qué diferencia esencial están viendo?
+[07:37] ¿En qué sentido?
+[07:37] Bien, acá cuando sigamos ejecutando va a subir este 3, después va a venir y va a subir este 2 y luego va a subir este 4 y luego cuando termine de conseguir estos numeritos, el 2 y el 4 los va a sumar.
+[08:02] entonces esta expresión va a terminar valiendo, va a tener como variable de salida
+[08:10] el resultado de esta suma que es 2 más 4 es 6
+[08:13] entonces este factor va a valer 6 y una vez que tenga aquí un 3 y aquí un 6
+[08:19] va a ser 3 por 6 y va a conseguir el 18 aquí en este término
+[08:27] y luego va a subirlo acá entonces va a terminar produciendo el 18
+[08:31] Ahora, esto es lo que hace realmente el compilador que mostramos recién
+[08:38] Hay algo que les hace ruido
+[08:41] Lo vamos a preguntar de otra manera
+[08:56] Cuando pasa por acá la gramática
+[09:01] Ustedes le han metido la mano al árbol, ¿no es cierto?
+[09:03] O en clases anteriores
+[09:06] En clases anteriores hemos visto como iba expandiendo este árbol, ¿no es cierto?
+[09:13] Iba una llamada, de la llamada me venía la definición, iba, ahora, fíjense que aquí cuando pasa por acá, es decir, en este punto de la gramática, sube el número 3, que es este 3, cuando pase por acá, sube el número 2, cuando pasa, cuando termina de hacer esto en este momento, hace la suma de 2 más 4 y acá queda un 6.
+[09:43] eso es lo que estuvimos haciendo en el compilador recién
+[09:49] esa es la pregunta
+[09:50] antes de llegar al final del archivo
+[09:54] antes de llegar al final
+[09:55] yo sumaba el 2 más 4 y eso me da un 6
+[10:00] y iba apilando y sacando la cuenta
+[10:06] a medida que iba expandiendo este árbol de derivación
+[10:10] no, no, muy bien
+[10:14] o sea, a medida que voy expandiendo
+[10:20] voy subiendo estos numeritos y voy sumando y multiplicando bueno está
+[10:29] correcto esto que apiló primero esto apiló pero antes de apilar en que en qué
+[10:36] momento hizo en qué momento apiló en el tiempo de compilación cuando genere las
+[10:43] instrucciones del cil en tiempo de compilación o en tiempo de ejecución
+[10:48] cuando ejecute la máquina virtual porque había una etapa de había una etapa de
+[10:55] compilación y una etapa de la máquina virtual después en la compilación
+[11:07] generaba las instrucciones bien ahí estamos afinando la puntería en la
+[11:12] compilación estamos generando las instrucciones entonces quiere decir que
+[11:17] no que en la etapa de compilación que la que estamos haciendo aquí aquí estamos
+[11:21] haciendo la etapa de compilación no sube ningún 3 no sube ningún 3 el 3 va a subir
+[11:29] en la pila pero recién cuando se ejecuta la máquina virtual entonces cuando ejecuta la
+[11:36] máquina virtual sube este 3 a la pila pero acá no sube ningún 3 entonces cuando estoy en la etapa de
+[11:44] compilación que lo que tendría que hacer en este momento en vez de subir un 3 tendría que generar
+[11:54] una instrucción exactamente tiene que generar una instrucción que haga un load del 3 que no
+[12:03] es lo mismo que subir un 3 entonces si fuera un intérprete esto entonces inmediatamente subiría
+[12:10] subiría este 3 ahora como es un compilador en este momento no no sube ningún 3 sino que lo
+[12:19] que ocurre en este momento es que se genera un load constant integer 43 en otra palabra se
+[12:29] genera una instrucción del cil que cuando la ejecute la máquina virtual va a subir un 3 a
+[12:39] la pila está súper claro eso si no está claro eso se lo explica de otra manera porque es muy
+[12:47] importante porque no pueden mezclar compilación y ejecución está súper claro
+[12:57] que si yo me meto en el compilador de verdad acá no sube ningún 3 sino que lo
+[13:02] que hace es tirar y si ven esto que está aquí van a ver que por aquí se acuerdan
+[13:08] que entre corchetitos estaba estas instrucciones y acá no van a ver ningún
+[13:13] 3 lo que van a ver es un load content etcétera cuando cuando hace la suma de 2 más 4 6 no van
+[13:22] a ver ningún 6 acá de este lado lo que van a ver acá es una instrucción add que cuando la ejecute
+[13:32] la máquina virtual ahí recién va a ser la suma entonces en este momento si fuera un intérprete
+[13:40] Subiría un 3
+[13:42] Pero como es un compilador
+[13:46] Lo que hace en realidad es generar la instrucción
+[13:49] Que más tarde va a subir a la pila el 3
+[13:53] Bien, entonces
+[13:55] Llegamos hasta este punto
+[13:57] Ahora, terminó este factor que está acá
+[14:02] Porque era un número
+[14:04] O expresión entre paréntesis
+[14:07] Fue número, terminó
+[14:08] Por lo tanto terminó este método
+[14:11] cuando termina este método
+[14:13] me voy a quien lo llamo
+[14:16] y sigo por la línea siguiente
+[14:18] ¿no es cierto?
+[14:19] entonces tiene que evaluar si viene un por
+[14:22] o un dividido
+[14:22] entonces tengo que ver si viene un por o un dividido
+[14:26] entonces pide
+[14:28] un por
+[14:30] y que es lo que tengo en la cinta de entrada
+[14:32] un por
+[14:33] por lo tanto va a entrar por esta alternativa
+[14:36] ¿de acuerdo?
+[14:37] fíjense que acá hay un opcional
+[14:40] Puede ser o nada, o por, o dividido
+[14:45] Entonces como lo que encuentra es un por
+[14:47] Entonces, acá ven que lo que encuentra es un por
+[14:50] Entonces entra por acá
+[14:51] Lo reconoce a ese por
+[14:56] Y se lo come
+[14:58] Es decir, hace un scan y pasa de aquí a aquí
+[15:03] Entonces el look in a head queda apuntando al paréntesis que abre
+[15:08] Bien
+[15:10] Y paso a este factor
+[15:14] ya van a ver por qué la manito cambió de color a azul
+[15:17] entonces llama a factor
+[15:21] este factor que hace es una llamada
+[15:23] por lo tanto me tengo que ir a
+[15:27] bueno primero lo veo acá
+[15:30] ese factor corresponde a este factor
+[15:33] y como acá tengo factor me tengo que
+[15:36] esto es una llamada me tengo que ir a la definición
+[15:38] ¿dónde está la definición? está aquí
+[15:40] fíjense que hay una manito marrón y una manito azul
+[15:46] porque esta llamada es bien diferente a la otra llamada
+[15:52] cuando veamos más adelante los method state
+[15:55] o como le llamaban ustedes a los method state
+[15:58] como es que le llamaban Daniel
+[15:59] registro de activación
+[16:03] bueno, esta llamada suben a una pila mucho más grande
+[16:11] que la pila que habíamos explicado antes
+[16:14] suben registro de activación diferente
+[16:16] por eso le ponemos manitos distintas
+[16:19] Entonces, este factor con manito azul llama a este factor y este factor pregunta, o me tengo que venir por number o me tengo que venir por expresión entre paréntesis.
+[16:37] ¿Cómo hago para saber si me vengo por la primera o me vengo por la segunda?
+[16:43] Lo que tengo que hacer es ver qué es lo que tengo en la cinta
+[16:46] ¿Qué es lo que tengo en la cinta?
+[16:47] Un paréntesis que abre
+[16:48] Entonces ahora sí, como tengo un paréntesis que abre
+[16:52] Interpreto que o hay una expresión entre paréntesis o si no es error
+[16:57] Pero si empieza con paréntesis, sí o sí me tengo que venir por la segunda
+[17:01] Entonces ahora sí, me vengo por la segunda
+[17:04] Una vez que me viene por la segunda, me como ese paréntesis, quiere decir que esto va a apuntar al que sigue, apunta al que sigue, este pasa al que sigue y ahora llama a una expresión.
+[17:23] ¿Por qué esta expresión está con color gris?
+[17:27] Porque es bien diferente a esta expresión marrón.
+[17:32] ¿De acuerdo?
+[17:33] Son llamadas distintas.
+[17:35] Esta expresión era la raíz del árbol, mientras que esta expresión va a ser esta que está acá.
+[17:42] Entonces, esta expresión, vengo acá a la definición, que es esta, esta expresión color gris,
+[17:50] y esta expresión color gris va a ser esta que está aquí.
+[17:54] ¿Estamos de acuerdo? Entonces es bien diferente esta expresión inicial con esta expresión que está acá.
+[17:59] Esta expresión es chiquitita, es 2 más 4, mientras que esta expresión que está acá es 3 por paréntesis 2 más 4.
+[18:07] ¿Cómo seguimos? Esta expresión tengo que ver con qué empiezo.
+[18:14] Esta expresión sí o sí, acá no hay nada que decidir como en este caso, sí o sí tiene que empezar con un término.
+[18:21] Pero le vamos a poner magenta, término magenta, porque no tiene nada que ver este término magenta, me tengo que ir a la definición, me voy a la definición, este término que está aquí es bien diferente a este término que está aquí, por eso lo pinto con colores distintos.
+[18:44] Entonces, este término magenta viene acá
+[18:47] Y cómo está definido un término
+[18:52] Un término sí o sí tiene que empezar con un factor
+[18:54] Entonces, empiezo con un factor, pero ojo, con un factor que es bien diferente al factor marrón
+[19:03] Este es un factor magenta
+[19:04] Entonces, empiezo con un factor, que es este que está acá
+[19:09] Y factor, me tengo que ir a la definición de factor, que es esta que está acá
+[19:13] ven que ya hay una, dos, tres llamadas a factor
+[19:16] entonces
+[19:18] este factor magenta
+[19:20] genera
+[19:22] la duda
+[19:24] o utilizo
+[19:27] la primera que es number
+[19:28] o expresión entre paréntesis
+[19:30] díganme ustedes cual de las dos
+[19:33] tiene que seguir, number
+[19:34] o expresión entre paréntesis
+[19:36] number, están todos de acuerdo
+[19:39] simplemente porque la manito
+[19:42] está apuntando un number
+[19:43] si la manito estuviera apuntando un paréntesis
+[19:45] Y me hubiera ido por esta
+[19:46] Entonces, como estoy apuntando un number
+[19:49] Entonces, pero ojo
+[19:51] Es un number magenta
+[19:53] Bien diferente
+[19:54] Al number marroncito de antes
+[19:57] Entonces, number
+[19:59] ¿Qué es lo que hacía number?
+[20:01] Llamaba al check.number
+[20:03] Y avanzaba
+[20:05] El cursor, por lo tanto va a pasar
+[20:07] Del 2 al más
+[20:08] ¿De acuerdo? Va a pasar del 2 al más
+[20:11] Y
+[20:12] Y si el looking ahead quedó aquí, el looking ahead token quedó aquí, el token quedó un lugar atrás, o sea que quedó apuntando al 2.
+[20:22] Por lo tanto, cuando termina esto que está acá, ese 2 token.val que vale 2 lo mete en val y este val sube por acá, entonces el factor magenta sale retornando un 2.
+[20:39] ¿Ven la diferencia que hay entre este 3 y este 2? Este 3 es el valor que retornó el factor marrón, el de esta manita, mientras que este 2 magenta, que es este que está acá, es el valor con el que retornó el factor magenta.
+[21:06] Son dos registros de activación diferentes, porque son llamadas a métodos, es el mismo nombre del método, pero son llamadas diferentes, son instancias diferentes.
+[21:20] entonces este 2 va a subir y ahora otra vez si fuera un intérprete lo que subiría por acá sería un 2
+[21:31] pero como no es un intérprete sino que es un compilador en realidad más que subir un 2 como variable de salida
+[21:38] lo que va a hacer es un load constante 2 para que cuando la máquina virtual lo ejecute suba un 2 a la pila
+[21:49] Después de haber subido el 3.
+[21:51] ¿Estamos de acuerdo hasta acá?
+[21:53] Entonces, ya cargué este 2.
+[21:58] ¿Qué pasó?
+[22:00] Terminó este factor.
+[22:02] Porque ya vino por number.
+[22:05] Hizo la acción de meter ese 2 en val.
+[22:09] Con lo cual, largó esta variable de salida que es 2.
+[22:16] Y terminó factor.
+[22:18] Entonces, como terminó factor, viene a quien llamó a factor, que es este,
+[22:25] y me sale el 2 magenta como variable de salida.
+[22:29] ¿Están de acuerdo?
+[22:31] Entonces, como ya terminó este factor, ahora fíjense que le sigue,
+[22:39] le sigue o un por, o un dividido, o que otra cosa.
+[22:45] Como está entre llaves, le puede seguir ninguna de las dos.
+[22:49] ¿De acuerdo? Entonces, como lo que yo estoy apuntando es un más, que no es ni por ni dividido, quiere decir que ya no entra más por acá, con lo cual interpreta que terminó este término.
+[23:11] ¿De acuerdo? Si acá hubiera habido más por y más dividido, hubiera seguido con por y el otro, con dividido, y por y dividido, y por y dividido.
+[23:20] Pero como no es ni por ni dividido, sino que lo que estoy apuntando ahora es un más, entonces esto termina y este 2 magenta de este factor lo va a subir y termino, va a terminar con este val igual a 2.
+[23:39] ¿De acuerdo?
+[23:41] Es decir, este mismo val
+[23:43] Entonces este término termina con el valor 2
+[23:47] Es decir, que este 2 sube hasta acá
+[23:50] Y término termina con el valor 2
+[23:53] Otra vez, estos numeritos que están apareciendo aquí
+[23:57] Es lo que sucedería si fuera un intérprete
+[24:00] Que me sirve para ayudar a entender
+[24:02] Pero lo que realmente sucede
+[24:04] No es que este 2 está subiendo
+[24:06] Sino que lo único que hizo fue esto que está acá
+[24:08] Tienen que siempre tener esa diferencia
+[24:11] Bien, entonces terminó de ejecutarse este término
+[24:18] Por lo tanto, cuando terminó de ejecutarse todo este término
+[24:23] Tengo que ir a quien me llamó
+[24:24] Entonces, ese 2 vino acá
+[24:36] Que es este 2 que está acá
+[24:38] Y con lo cual terminó este término magenta
+[24:42] Que es este 2
+[24:43] Entonces ahora, después de este término, ¿qué viene?
+[24:48] Viene o más, o menos, o nada
+[24:51] Porque llavecita puede significar nada
+[24:53] ¿Cómo sé por dónde tengo que seguir?
+[24:57] ¿A qué está apuntando la manito?
+[25:00] A un más, por lo tanto me tengo que venir por esta alternativa
+[25:03] ¿De acuerdo?
+[25:04] Entonces me vengo por el más
+[25:06] Pido un más
+[25:08] Va a haber un expected
+[25:10] Pido un más y lo que tengo en la cinta es un más
+[25:14] Por lo tanto, me lo como al más, es decir, avanzo al siguiente, y este avanza al siguiente término, pero que es bien diferente a este término magenta.
+[25:29] Por eso lo pinto de color morado.
+[25:34] Entonces, como encuentro un term, me tengo que ir a la definición de término.
+[25:40] Tengo que ir a la definición de término, que es esta que está acá abajo, pero, que corresponde a este término que está acá, que está acá abajo, pero fíjense que es diferente a la magenta, por eso lo distingo.
+[25:54] Se ve bien en el
+[25:55] Lo ven bien chicos
+[25:57] Que hay dos cosas diferentes acá
+[25:59] Bien, entonces acá hay un término color magenta
+[26:02] Ese término color magenta
+[26:04] Si o si empieza
+[26:06] Llamando a quien, díganmelo ustedes
+[26:08] A quien empieza llamando
+[26:10] El término
+[26:13] A un factor, exacto
+[26:14] Pero, que ojo
+[26:16] Va a ser un factor que le vamos a poner magenta
+[26:19] Para diferenciarlo del factor
+[26:21] Eh, perdón
+[26:23] Va a ser un factor morado
+[26:26] Para diferenciarlo
+[26:27] Del factor magenta
+[26:29] ¿De acuerdo?
+[26:31] Va a ser un factor morado
+[26:32] Y como dice factor morado
+[26:35] Que es este que está acá
+[26:37] Entonces este factor va a ir a la definición
+[26:40] Se va a venir acá a la definición
+[26:42] Pero cuidado
+[26:43] Va a ser un factor morado
+[26:45] Entonces este factor morado
+[26:48] Ahora si tengo una duda
+[26:50] ¿Va por número?
+[26:51] o va por expresión entre paréntesis
+[26:53] díganmelo ustedes, muy bien
+[26:55] por number, entonces como estoy apuntando
+[26:57] un number va por number, entonces que hace
+[26:59] entran en el number
+[27:01] el number, acuérdense que
+[27:03] number llama a check
+[27:05] number, entonces una vez que lo chequeó
+[27:07] esto pasó
+[27:09] a la siguiente
+[27:10] y al pasar este a la siguiente
+[27:15] el looking ahead token, el token
+[27:17] quedó un lugar atrás, por lo tanto
+[27:19] como el token quedó
+[27:20] Con 4
+[27:22] Entonces token.val
+[27:25] Este 4 entra aquí
+[27:26] Y acá sale
+[27:29] Un 4 pero con color morado
+[27:31] ¿De acuerdo?
+[27:34] Sale con color morado
+[27:35] Porque es este que está acá
+[27:36] Entonces cuando termina
+[27:39] Este factor con el valor 4
+[27:41] ¿Por dónde vino? Vino por acá
+[27:43] Fue
+[27:44] El que me llamó
+[27:47] Fue este que está aquí, este morado
+[27:49] Por lo tanto, por acá
+[27:51] va a salir un 4
+[27:53] y entonces
+[27:57] sube un 4, pero subiría
+[27:59] un 4 si fuera un intérprete
+[28:01] como es un compilador
+[28:03] lo que en realidad sucede
+[28:05] es que carga
+[28:06] arroja
+[28:10] esta instrucción
+[28:11] que cuando se ejecute la máquina
+[28:14] virtual va a meter
+[28:16] un 4 en la pila, pero por ahora
+[28:18] lo único que hace es incluir esta instrucción
+[28:20] bien
+[28:22] entonces este 4
+[28:24] lo saca por acá
+[28:29] bueno, lo saca en rigor primero por factor
+[28:34] y después de factor sube a término
+[28:36] entonces término termina con 4
+[28:37] entonces término termina con 4
+[28:39] este 4 sube acá si fuera un intérprete
+[28:43] y ahora viene la parte tal vez más importante
+[28:46] termina este término color morado con 4
+[28:55] que es este término color morado con 4
+[28:57] cuando termine este término con valor morado por 4
+[29:02] entonces va a quien me llamó, que fue este
+[29:04] y por lo tanto este 4 viene
+[29:09] y esta es la llamada
+[29:11] ¿se acuerdan cuando vimos el out
+[29:15] que pusimos una definición arriba y una llamada abajo
+[29:21] y la llamada de abajo terminaba con un valor retornando
+[29:25] bueno, como acá en la implementación va a decir out
+[29:28] va a terminar saliendo un 4
+[29:31] que es con lo que terminó
+[29:33] una vez que se ejecutó
+[29:35] este método term
+[29:36] entonces entra con 4
+[29:39] y ahora viene la parte importante
+[29:41] una vez que termina
+[29:45] esto que está acá
+[29:47] que es cuando llegó
+[29:49] hasta este punto
+[29:50] ahora la acción semántica
+[29:53] que hace es esta que está aquí
+[29:55] dice al valor
+[29:57] que tiene val
+[29:58] agréguele val 1
+[30:02] entonces
+[30:03] val está valiendo 2
+[30:07] val 1
+[30:09] está valiendo 4
+[30:10] entonces lo que hace es 2 más 4
+[30:13] por lo tanto val queda con cuánto
+[30:16] con 6
+[30:17] ¿de acuerdo?
+[30:20] otra vez, lo voy a repetir 20 veces
+[30:22] porque es muy importante
+[30:24] este 2 más 4 es 6
+[30:26] es lo que haría
+[30:28] si fuera un intérprete
+[30:30] Como no es un intérprete sino que es un compilador, entonces ahora en vez de subir aquí un 6, en vez de subir ese 6, ¿qué es lo que va a hacer el compilador en este momento?
+[30:44] Si fuera un intérprete, entonces aquí subiría 2 más 4, ese 6 lo subiría acá y esta expresión gris, que no hay que confundirla con esta expresión marrón que es la raíz del árbol.
+[31:03] Esta expresión gris termina valiendo 6
+[31:07] Que es esto que está acá, 2 más 4
+[31:09] Entonces por acá va a salir un 6
+[31:12] Pero ojo, va a salir un 6 si es un intérprete
+[31:17] Pero como es un compilador, lo que hace no es subir un 6
+[31:21] Sino que agrega un add
+[31:25] Por lo tanto, tengo un load3, un load2, un load4 y un add
+[31:32] Entonces ahora, una vez que arrojó add, entonces ahora, ¿qué sucede? Terminó esta expresión gris, ¿de acuerdo?
+[31:45] Por lo tanto, una vez que hace 2 más 4, 6, ese 6 viene acá y infiere que termina la expresión gris con 6.
+[32:04] ¿Quién llamó a esta expresión gris?
+[32:08] ¿Quién llamó a este método?
+[32:10] Lo llamó este que está acá abajo.
+[32:11] Por lo tanto, como este fue el que lo llamó, este val, variable de salida, va a tener este 6, y por lo tanto, esta expresión, que es la que está entre paréntesis, termina con este 6, que es este 6, pero el compilador lo que hace realmente es insertar la instrucción add.
+[32:39] Bien, entonces ya se terminó de ejecutar esta expresión
+[32:46] Ahora, como terminó de ejecutarse esta expresión
+[32:49] Que fue esta gris que está acá
+[32:51] Entonces tiene que irse a lo que le sigue a la expresión
+[32:57] Que es este paréntesis que cierra
+[32:59] Entonces busca un paréntesis que cierra
+[33:01] Y fíjense que si acá uno no hubiera puesto este paréntesis que cierra
+[33:07] Entonces hubiera aparecido un error de sintaxis
+[33:10] Porque acá dice
+[33:11] Pido
+[33:12] Un paréntesis que cierra
+[33:15] Y si no lo tengo en la cadena de entrada
+[33:17] Da error
+[33:18] Entonces pido paréntesis que cierra
+[33:21] Y en la cadena tengo paréntesis que cierra
+[33:24] Por lo tanto
+[33:26] Que va a hacer
+[33:27] Va a avanzar
+[33:30] El cursor
+[33:32] Va a avanzar
+[33:33] La ventana doble
+[33:35] Y el look in a head token
+[33:37] va a quedar apuntando al end on file
+[33:39] ¿de acuerdo?
+[33:41] y entonces ahora
+[33:42] terminó este factor
+[33:45] terminó este factor
+[33:47] ¿correcto?
+[33:51] entonces
+[33:51] este factor termina
+[33:53] y este
+[33:56] valor es
+[33:58] el valor que termina
+[34:00] retornando este factor
+[34:03] ¿de acuerdo? que es el factor
+[34:05] azul ¿de acuerdo?
+[34:06] entonces el factor azul
+[34:08] que fue uno de los primeros que se ejecutó
+[34:11] hace rato, termina
+[34:13] obteniendo un 6, que fíjense
+[34:15] que si lo vemos acá
+[34:17] dice el resultado de
+[34:19] todo esto es
+[34:21] 2 más 4 es 6, de acuerdo
+[34:23] pero otra vez
+[34:25] este 6 sería si fuera
+[34:28] un intérprete, lo único que hizo
+[34:30] fue agregar este add
+[34:31] que cuando se ejecute la máquina virtual
+[34:34] ahí va a
+[34:36] sumar el 2 y el 4 y va a dejar
+[34:38] en la pila el 6
+[34:39] Bien, entonces con esto terminó de ejecutarse el color del factor que terminó de ejecutarse
+[34:50] El marrón, el magenta, el morado o el azul
+[34:57] El azul, todo el mundo tiene claro
+[35:00] Entonces terminó de ejecutarse el azul, que es este que está acá
+[35:04] Por lo tanto me tengo que ir al factor azul que me llamó
+[35:09] Y el factor azul que me llamó es este que está aquí
+[35:13] Este fue el que me llamó
+[35:15] Por lo tanto, este factor azul que dice val1
+[35:19] Aquí va a salir este 6
+[35:22] Este 6 va a subir y va a ser la variable out
+[35:27] La variable de salida de este factor
+[35:29] Entonces por acá va a venir un 6
+[35:31] ¿Estamos de acuerdo?
+[35:33] Y entonces, ahora lo que va a hacer es
+[35:36] Entonces, el val de quien, del marrón, de este factor que es 3, este 3, que es este val, le va a multiplicar este val 1, que vale 6, y va a ser 3 por 2, 18, por lo tanto, acá en val, en vez de quedarme 3, me va a quedar 3 por 6, 18, quiere decir que acá me queda 18.
+[36:05] Ese 18 es el valor con que va a retornar este término de la manita marrón
+[36:14] Entonces por acá va a subir un 18
+[36:18] Cuando termine este term me tengo que ir a quien llamó
+[36:27] ¿Quién es quien llamó?
+[36:29] Es esta manita marrón, llamó a este término
+[36:34] Por lo tanto, por acá sube un 18, ¿de acuerdo?
+[36:39] Entonces, este 18, fíjense que acá es este 18, y acá hizo una multiplicación,
+[36:52] mientras eso sí fuera un intérprete, pero como es un compilador,
+[36:56] lo que hace no es esta multiplicación que está acá, 6 por 3, 18,
+[37:03] sino que lo que hace es incluir la instrucción MUL
+[37:07] entonces, conclusión, sube el 3
+[37:11] o sea, una vez que se ejecute la máquina virtual
+[37:14] sube el 3 a la pila, sube el 2 a la pila, sube el 4 a la pila
+[37:19] hace la suma de 2 más 4 y deja en la pila el 6
+[37:24] y en la pila me va a quedar el 3 y el 6
+[37:26] y este MUL toma el 3, lo multiplica por 6 y me da el 18
+[37:31] y entonces sube un 18 y termina la expresión
+[37:36] entonces este 18 sube por acá y termina la expresión
+[37:42] pero por última vez no sube ningún 18 en el compilador real
+[37:46] eso si fuera un intérprete
+[37:48] lo único que hizo fue incluir todas estas instrucciones del lenguaje SIL que están en verde
+[37:55] bueno, como ven es bastante complicadito
+[38:00] y en el compilador de verdad es un poco más complejo todavía
+[38:05] ¿por qué? porque acá fíjense que yo estoy utilizando
+[38:07] el Extended BNF que me permite simplificarlo
+[38:12] y verlo en forma más conceptual
+[38:14] si esto yo lo hago con el BNF no Extended
+[38:20] sino con las que están acá ya es más complicado
+[38:22] ya se complica bastante
+[38:26] y a eso hay que meterle todas las colgadas
+[38:29] este y todo

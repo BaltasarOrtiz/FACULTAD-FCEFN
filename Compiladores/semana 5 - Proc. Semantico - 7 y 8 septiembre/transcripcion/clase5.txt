@@ -1,0 +1,293 @@
+[00:03] bueno vamos a continuar entonces con procesamiento semántico o sea hasta
+[00:12] que vimos la introducción de qué consistía la materia que lo que era un
+[00:19] compilador sus distintas etapas de manera
+[00:25] muy introductoria después vimos el escáner
+[00:32] y la clase anterior vimos parser y ahora vamos a ver
+[00:37] procesamiento semántico básicamente como le damos acción semántica a la
+[00:45] gramática y al compilador fíjense que este lado tenemos había un reflejo de
+[00:56] cada uno de los módulos que están en compi por ejemplo para el escáner
+[01:00] teníamos escáner.cs para el parser el parser.cs y en cambio el
+[01:07] procesamiento semántico acá ponemos que no tiene código pero
+[01:13] en realidad está inserto en el código del parser y vamos a ver cómo está inserto entonces
+[01:27] volvemos a lo que hemos visto al principio del escáner donde teníamos un conjunto de tokens
+[01:36] una lista de tokens que era nuestro programa fuente que iba a ser compilado esa lista tenía
+[01:47] dos variables TOKEN y LATOKEN que conformaban una ventanita. El LATOKEN miraba un TOKEN hacia
+[01:59] delante y el TOKEN era el TOKEN que estaba siendo analizado por el parser. Después teníamos
+[02:09] por un lado la gramática, la cual básicamente la usamos de verificador, o sea, en el compilador la
+[02:26] usamos básicamente para verificar si, o sea, para hacer el análisis sintáctico mediante el parser y
+[02:38] ver si está bien formada, bien formado, si el programa corresponde a ese lenguaje o si daría
+[02:49] una compilación exitosa en caso de compilar ese programa fuente. Acá una cosa importante creo yo
+[02:59] que que compile bien no quiere decir que el programa sea incorrecto ¿no? se entiende esa
+[03:08] diferencia, normalmente lo que hacemos para saber si lo que hemos programado es justamente lo que
+[03:21] queremos es ejecutarlo o depurarlo, sigamos entonces, entonces acá teníamos la gramática
+[04:10] por un lado, el programa fuente que iba a ser analizado, ese programa se transformaba en una
+[04:18] sucesión o una lista de tokens y para saber si estaba bien formado yo tomaba un token y en función
+[04:28] de la posición donde estoy en el programa venía la gramática y verificaba si ese token era el que
+[04:35] tendría que venir o no tendría que venir por otro lado iba armando un arbolito de derivación eso lo
+[04:45] hacíamos con el parser y en el escáner lo que iba haciendo era ir tomando cada uno de estos tokens
+[04:52] sigamos viendo esa forma
+[05:00] ahora en el procesamiento semántico
+[05:02] lo que vamos a hacer
+[05:04] es ponerle acciones
+[05:06] a esta gramática
+[05:11] el primer ejemplito
+[05:14] por ejemplo acciones tales como
+[05:16] la más común es
+[05:18] la suma de números
+[05:20] números enteros
+[05:23] entonces por un lado
+[05:24] yo tengo una gramática
+[05:27] que utilizo en el parser
+[05:29] por ejemplo la expresión
+[05:31] voy a adelantar un poquito
+[05:35] a ver si sale lo que quiero explicar acá
+[05:37] yo tengo una gramática
+[05:42] en este caso expresada
+[05:44] en EBNF
+[05:46] o sea en BNF extendido
+[05:47] y por otro lado tengo una gramática
+[05:52] que estoy utilizando
+[05:53] en Compi
+[05:55] o mejor dicho Compi está basado en esta gramática
+[05:58] que si abrimos
+[06:00] la herramienta aparece
+[06:02] en una de las ventanas
+[06:03] pero esta gramática está en BNF
+[06:07] o sea, tengo una
+[06:32] volviendo al
+[06:34] pegamos esta partecita nomás
+[06:36] porque pensé que la había escrito en el
+[06:38] que estaba al principio y no está
+[06:40] entonces tengo la gramática que está expresada
+[06:42] en BNF extendido
+[06:45] y la gramática de COMPI
+[06:46] estaría expresada en BNF, que sería
+[06:48] este caso, ¿no?
+[06:51] una expresión básicamente
+[06:53] del tipo SUMA
+[06:56] eso sería la gramática
+[06:58] entonces
+[07:07] esta gramática
+[07:09] sin
+[07:10] acción semántica
+[07:13] yo la podía reconocer
+[07:16] mediante el parcel que ya hemos visto
+[07:17] utilizando esta función
+[07:20] no se ve la diapositiva
+[07:22] profe
+[07:24] muy bien, continuamos
+[07:26] entonces yo les decía que por un lado
+[07:28] teníamos esta gramática que
+[07:30] en realidad no es la que ocupa
+[07:32] el compilador porque está
+[07:34] en bnf extendido
+[07:36] lo que ocupa el compilador es la gramática que está en BNF
+[07:41] me fui a una filmina que vamos a ver más adelante
+[07:45] para cómo se expresa esto en BNF
+[07:47] y cómo en realidad es como la toma el compilador
+[07:54] bueno, volviendo a este caso de una gramática
+[08:01] que básicamente son expresiones del tipo suma
+[08:04] o sea, yo quiero sumar números enteros en este caso
+[08:09] por ejemplo 1 más 2 más 3
+[08:12] es 47 más 1
+[08:14] etcétera, ¿no?
+[08:16] de este tipo, entonces
+[08:25] se expresaría con esta gramática
+[08:28] teniendo en cuenta
+[08:30] que el término en este caso
+[08:32] es un número entero
+[08:33] para hacerla bien fácil
+[08:36] para
+[08:39] parciar esta gramática
+[08:46] utilizaba
+[08:47] la función
+[08:49] de este estilo
+[08:51] o sea
+[08:56] tengo la expresión voy busco el término y después todos los términos que estén acá lo hago mediante
+[09:08] este form hasta que termine la cadena una vez que termine la cadena arrojo el resultado ahora esto
+[09:24] no arroja ningún resultado lo que analiza es si esta cadena es correcta o sea si viene un 1 después
+[09:30] viene un más otro número después más otro número eso es lo que está analizando acá no va a arrojar
+[09:37] ningún resultado bueno esta función que ya la vimos que lo que hacía el scan osea tomaba dejaba
+[09:47] en token lo que tenía el LA token el LA token escaneaba osea saltaba hacia el siguiente y
+[09:55] después ponía el kind en LA el tipo de token que es el LA token después tenía una función que era
+[10:18] en el esto ya yendo más a lo que es compina bien función que hacía el check que básicamente el
+[10:26] cheque lo que hacía iba era como buscaba lo que tenía que venir desde la gramática o sea si va
+[10:35] por acá por una parte del programa este caso en clase y se estudia acá entonces lo que tiene que
+[10:41] venir es un clash y hago un check-in de ese token, si ese token exactamente a lo que tiene que venir
+[10:50] acá le ponía lo que tiene que venir y adentro estaba comparado con el LA adentro del check
+[10:56] si era correcto pasaba y si no daba un error, esa era la idea, esperemos, voy a hacer una consulta
+[11:08] ahora vamos a suponer una acción semántica muy simple
+[11:36] a ver, aguanten un minuto, que no sé por qué
+[11:40] una acción semántica que es, vamos a contar la cantidad de términos que tiene esta cadena
+[11:48] es una acción semántica
+[11:51] si bien no la suma, sino decir 1, 2, 3 términos
+[11:54] 1, 2 términos
+[11:56] el 909, 1 término
+[11:58] entonces, esa acción semántica estaría en rojito
+[12:04] Y consistiría básicamente, cuando viene un término, lo conduzco en 1 y el siguiente lo sumo a esa variable que defino como n.
+[12:18] Al final de la batalla, imprimo la cantidad de términos.
+[12:27] Esto sería la expresión de la acción semántica en la gramática.
+[12:33] O sea, siendo, por ejemplo, asociado al término término, estaría la definición de la variable.
+[12:37] asociado a este término estaría a más términos estaría en n más más o sea incrementar en 1 y al
+[12:48] final cuando termine de evaluar todo imprimo esto como se implementa o como se implementaría en un
+[12:57] analizador o en el compiladorcito que tenemos en compi sería algo parecido a esto o sea acá
+[13:02] defino un entero n más 1 y aquí en el for voy
+[13:10] incrementando ese valor por tantos términos vayan apareciendo y al final
+[13:15] imprimo entonces ahí fíjese cómo se va moviendo arriba la manito ahí pasa al 2
+[13:29] vuelve de vuelta y así sucesivamente ahora para manejar las acciones
+[13:41] semántica vamos a introducir el concepto de atributos un atributo está asociado
+[13:52] normalmente a un término esos atributos pueden ser
+[14:00] de salida o de entrada es una variable en este caso en el caso de supongamos en
+[14:10] el caso que ahora la acción semántica fuera de suma la selección semántica
+[14:15] anterior no necesitaba ningún atributo porque era interno, no necesitaba ni salida,
+[14:23] intentaba porque voy contando los términos pero en el caso de la suma si voy a
+[14:28] necesitar porque voy a ir sumando los términos a medida que van
+[14:34] apareciendo o sea la idea es que tomo el 1 que sería
+[14:48] que el término sum, mejor dicho defino sum y VALT como parte de como parte de mi función expresión
+[15:11] mando a, llamo a term y term lo que me va a dar al final de la batalla es el sum entonces llama
+[15:27] term y lo que va a entregar primero es 1 cuando vuelve a llamar de vuelta o sea una vez que viene
+[15:35] lo sumo
+[15:37] perdón, tomo 1
+[15:41] a la segunda vez
+[15:42] vuelvo a llamarlo
+[15:44] y voy a tomar 2
+[15:46] viene 2, entonces
+[15:49] al valor que tenía term
+[15:51] le sumo
+[15:53] el valor actual que me entregué a term
+[15:55] y así sucesivamente hasta obtener
+[15:58] la suma
+[15:59] en este caso
+[16:01] 1, 2, más 3, este es el caso
+[16:03] que se compara con
+[16:05] el caso anterior
+[16:06] que el caso anterior contaba términos
+[16:11] y en este caso estoy sumando términos
+[16:14] o sea, acá no necesitaba tener ningún atributo de entrada ni de salida
+[16:20] en cambio acá necesito un atributo de salida
+[16:25] para poder ejecutar esa acción semántica
+[16:30] es muy fácil la acción semántica
+[16:33] básicamente es llamo, sumo, llamo, sumo
+[16:38] o sea, vas trayendo el valor
+[16:39] Y a su vez lo voy sumando
+[16:42] Y lo voy dejando en una variable que se llama sum
+[16:45] Mientras que acá no necesito ningún atributo de salida en la gramática
+[17:00] En el caso de los atributos de entrada
+[17:14] En vez de que el atributo sea
+[17:19] Digamos, lo que haga es
+[17:22] Básicamente recibir la salida de una operación
+[17:26] o en este caso, en el caso de la suma de la lectura que hago del número que está en la cadena
+[17:33] lo que va a hacer es recibir un parámetro para ejecutar una acción
+[17:39] por ejemplo, en este ejemplo es
+[17:41] si viene este atributo que se llama printHex
+[17:48] es verdadero, entonces imprima en hexadecimal el valor
+[17:53] y si es falso, lo imprime en decimal
+[17:57] Es básicamente, digamos, la idea es que cuando es de entrada, es un modificador sobre la acción que está ejecutándose en esa función que implementa ese término, no terminal, esa gramática.
+[18:22] Y cuando es de salida, lo que está haciendo básicamente es obteniendo, pasando el resultado hacia la expresión o función que lo está llamando.
+[18:56] Entonces, resumiendo, la gramática de contributos me permite implementar las acciones semánticas,
+[19:06] que no necesariamente, para una acción semántica como hemos visto
+[19:10] no necesariamente necesito atributos
+[19:12] pero en el caso de las expresiones
+[19:15] todas las expresiones van a necesitar
+[19:19] que yo vaya pasando valores para arriba
+[19:23] o sea, hacia arriba o hacia abajo
+[19:26] en este caso, cuando van hacia arriba es porque son atributos de salida
+[19:30] y cuando van en el árbol, ¿no?
+[19:32] cuando van hacia arriba en el árbol
+[19:34] son atributos de salida
+[19:36] y cuando van hacia abajo son atributos de entrada
+[19:39] como hemos visto
+[19:40] es el caso de la función de recién
+[19:43] que era
+[19:43] si venía cierto término imprimida en
+[19:46] hexadecimal
+[19:47] el pasaje de parámetro es hacia abajo
+[19:50] y en el caso de la suma el pasaje de parámetro
+[19:52] es hacia arriba
+[19:54] bueno, como dije anteriormente
+[20:01] tenía que las producciones de
+[20:03] BNF extendido
+[20:04] normalmente se utilizan para la parte
+[20:07] teórica y
+[20:08] en la implementación
+[20:10] del compilador
+[20:12] se utilizan
+[20:15] las expresiones
+[20:16] BNF, que es la que utiliza
+[20:20] básicamente compi
+[20:22] ahora por ejemplo vamos a ver el caso
+[20:33] de var declaration
+[20:35] donde
+[20:37] en una línea puedo declarar
+[20:40] más de una
+[20:42] variable, en este caso
+[20:44] lo que estamos viendo acá es
+[20:46] declarar por ejemplo
+[20:48] tres variables enteras
+[20:50] entonces veamos
+[20:57] esta sería
+[20:59] la gramática
+[21:01] esta que está acá
+[21:05] tiene un tipo
+[21:06] y al tipo le sigue una lista de identificadores
+[21:10] y al final un punto y coma
+[21:12] la lista de identificadores
+[21:16] es un
+[21:17] idem
+[21:22] seguido de varios identificadores
+[21:28] o sea coma
+[21:29] otro identificador, coma
+[21:31] este caso
+[21:34] entero, que sería el tipo
+[21:36] y var1, var2, var3
+[21:39] sería la lista de identificadores
+[21:40] la cual básicamente tiene esta forma
+[21:43] un identificador
+[21:45] coma, otro identificador
+[21:47] coma, otro identificador
+[21:49] y podría así haber
+[21:51] infinitos
+[21:54] infinitas variables
+[21:55] del tipo entero
+[21:56] las acciones semánticas en este caso
+[22:00] serían
+[22:05] primero, le tengo que pasar
+[22:08] a type
+[22:09] o mejor dicho, de type
+[22:11] viene el tipo o sea de cuando llama al terminal type como salida me va a entregar el tipo y acá
+[22:25] fíjese que como entrada a la lista identificadora entra el tipo y cuando estoy en la lista
+[22:36] identificadores lo que voy a hacer es insertar ese identificador en la tabla de símbolos que
+[22:47] vamos a ver más adelante en la otra clase en qué consiste la tabla de símbolos que básicamente lo
+[22:54] que nos va a permitir es almacenar justamente la variable y el alcance de la misma y lo más
+[23:03] importante creo que la tabla de símbolos es la estructura de datos en sí que soporta la tabla de
+[23:08] símbolos pero sus operaciones son básicamente insertar generar un alcance o un scope para saber
+[23:16] si esa variable luego es válida
+[23:18] o cuando hago una operación
+[23:19] si esa operación es válida o no
+[23:22] con esa variable, acuérdense que
+[23:23] dependiendo del alcance
+[23:25] cuando yo declaro
+[23:28] en una función
+[23:30] o en la función llamadora
+[23:33] declaro la misma variable, son
+[23:34] diferentes variables
+[23:36] eso lo vamos a ver más después, pero acá
+[23:41] simplemente nos atraemos
+[23:44] de la tabla de símbolos
+[23:45] y la acción semántica únicamente que vamos a hacer
+[23:48] cuando hagamos
+[23:50] esta declaración de variable es insertar esa variable en la tabla de símbolos en donde voy
+[23:58] a almacenar el nombre de la variable que sería var1 en token.stl y el tipo que es el que en este
+[24:06] caso int que es el que va a entrar como atributo de entrada acá podemos ver el uso de los atributos
+[24:16] para implementar este tipo de declaración como se implementaría esto básicamente en compi de
+[24:48] la siguiente forma o sea tengo una función que se llama var declaration donde voy a definir un
+[24:58] struct que va a contener al tipo type ese type esa variable digamos me la va a devolver type y
+[25:11] ese type lo voy a usar como variable de entrada hay listas identificadores listas identificadores
+[25:21] va a ser el proceso de leer cada una de estas variables
+[25:25] y cada vez que lea una variable va a ser una inserción en la tabla de símbolos al
+[25:34] principio meto var después acá dentro del while mientras vaya encontrando coma
+[25:40] y chequeando que identificador voy a ir leyendo todas las variables hasta que no
+[25:52] vengan más comas o sea que hasta este momento si no viene una coma me está
+[26:00] indicando que ya no hay más variables, entonces salto acá,
+[26:03] y lo que tendría que venir es el punto y coma.
+[26:19] ¿Se entiende?
