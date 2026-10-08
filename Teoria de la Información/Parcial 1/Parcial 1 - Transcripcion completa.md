@@ -17,6 +17,7 @@
 | `Parcial N°1 de ... Johana Arce-CORREGIDO.pdf` | Otro parcial: Shannon/Huffman, encriptación, canal |
 | `Parcial1-Galdame-2023.pdf` | Recuperatorio Tema 2 (reprobado), con correcciones |
 | `Parcial_1_-_VISTO-KLE.pdf` y `Condicional.pdf` | Parcial de Nanni Rebollo (5 símbolos, canal ternario, Huffman/aritmético) y examen condicional (PCM/DPCM) |
+| `Parcial N°1 Teoria de la Informacion (1).pdf` (16 págs.) | **Parcial del 07-10-2025, Tema 1** (Moya Lisandro): Huffman, Markov, canal, discretización PCM/ADPCM. Ver PARTE 11 |
 
 ---
 
@@ -43,8 +44,16 @@
 2. Sumar las dos menores, reinsertar la suma en el orden, repetir hasta llegar a 1. Asignar 0/1 a cada rama.
 3. Leer el código desde la raíz. Es **instantáneo** (ningún código es prefijo de otro) y de **doble lectura** (primero se cuentan frecuencias, después se codifica).
 
-## 0.4 Huffman dinámico
-Árbol arranca con el nodo NYT (“no transmitido todavía”). Cada símbolo nuevo se emite como `código del NYT + código fijo del símbolo`; los repetidos se emiten con su código actual. Después de cada símbolo se actualiza el peso y se verifica la **Sibling Property** (los nodos, recorridos de abajo hacia arriba y de izquierda a derecha, deben tener pesos no decrecientes); si no se cumple, se intercambian nodos. El objetivo de la propiedad es garantizar que el árbol siga siendo un árbol de Huffman óptimo tras cada actualización.
+## 0.4 Huffman dinámico y Sibling Property
+Árbol arranca con el nodo NYT (“no transmitido todavía”, peso 0). Cada símbolo nuevo se emite como `código del NYT + código fijo del símbolo` y el NYT se abre en un nuevo NYT (izquierda) y la hoja del símbolo (derecha, peso 1); los repetidos se emiten con su código actual. Después de cada símbolo se suma 1 a la hoja y a todos sus ancestros hasta la raíz, verificando la **Sibling Property**.
+
+**Sibling Property (Gallager, 1978).** Un árbol binario con pesos la cumple si (1) todo nodo interno tiene dos hijos y (2) los nodos se pueden numerar —**nivel por nivel de abajo hacia arriba y, dentro de cada nivel, de izquierda a derecha**— con pesos **no decrecientes**, con los hermanos en números consecutivos y los padres con número mayor que los hijos.
+- **Objetivo** (lo que piden en el Tema 2): un árbol binario es de Huffman **si y solo si** cumple la sibling property; mantenerla tras cada símbolo garantiza que el árbol siga siendo un **árbol de Huffman óptimo** para las frecuencias vistas hasta ese momento (el símbolo más frecuente tiene el código más corto), **sin reconstruirlo desde cero**, y que emisor y receptor queden sincronizados sin transmitir tablas.
+- **Cuándo se aplica**: para cada nodo de la cadena hoja→raíz, **antes de sumarle 1**, se busca el nodo de **mayor número con su mismo peso** (el “líder” del bloque). Si no es él mismo ni su padre → **swap** (con todo su subárbol). Si no se hiciera, el nodo quedaría más pesado que uno numerado después y la lista de pesos bajaría. Sucede típicamente al repetir un símbolo cuya hoja tiene igual peso que otras hojas a su derecha, y al abrir el NYT cuando hay hojas de peso 1 a la derecha del nodo que sube. No se aplica si el nodo ya es el líder de su bloque.
+- **Chequeo**: tras cada símbolo escribir los pesos en el orden de numeración; si baja en algún punto, falta un swap.
+- Variantes: FGK (la descripta) y Vitter (además numera las hojas antes que los nodos internos de igual peso). Los desempates dan árboles distintos pero todos de Huffman.
+- **[Completado] Ejemplo Tema 2 (2023), primeros 5 caracteres `a e i e o`** (fijo a=000, e=001, i=010, o=011, u=100): paso 1 `000` (sin swap); paso 2 `0001` (sin swap); paso 3 `00010` (**swap** del nodo que contiene al NYT con a); paso 4 `11` (**swap** e↔a); paso 5 `100011` (**swap** del nodo que contiene al NYT con a). Total 20 bits vs. 15 del código fijo de 3 bits (compresión −33,3 %: con 5 símbolos domina el costo de aprendizaje). Respuesta: se aplica en los pasos 3, 4 y 5. Desarrollo completo, con numeración, en el Apunte Maestro (6.7.1).
+- En `ABRACADABRA` el balanceo ocurre en los pasos 3, 5, 7 y 9 (35 bits en total).
 
 ## 0.5 Fuente de Markov de primer orden
 1. **Matriz de transición**: `P(sj | si) = (nº de veces que sj sigue a si) / (nº de veces que aparece si)`. Cada fila suma 1. (Se cuentan los pares consecutivos.)
@@ -549,3 +558,68 @@ El examen figura **“Reprobado”**.
 6. **Markov**: dividir cada fila por las apariciones del estado origen (no por n), y declarar “no ergódico” si hay ceros que impiden acceder a todos los estados.
 7. **Fano ≠ Huffman**: leer cuál algoritmo piden.
 8. **Contestar todas las preguntas** (Arce perdió puntos por no responderlas).
+
+---
+
+# PARTE 11 — Parcial 07-10-2025, Tema 1 (`Parcial N°1 Teoria de la Informacion (1).pdf`, Moya Lisandro, E010-42)
+
+> El PDF es una resolución de alumno (sin correcciones del docente). Las marcas **[Nota]** y **[Corrección]** de esta parte son mías: verifiqué todas las cuentas por computadora.
+
+## Enunciado
+Fuente de vocales `….UAIEA-AEIOUUOIEAOOUUAAEEIIAAOAEOAUAIEA-AEI….` (n = 32, q = 5).
+- **Como fuente independiente**: A1) calcular la redundancia; A2) codificar por **Huffman** y comparar el grado de compresión con el código de menor longitud fija necesario para ese universo de símbolos.
+- **Como fuente dependiente de primer orden**: B1) calcular la entropía de la fuente, decir si el proceso es ergódico y escribir la matriz de transición de primer orden; B2) codificar por Huffman y compararlo con el encontrado como fuente independiente.
+- **Capacidad de canal**: BSC con P(0/0)=0,9: encontrar C “en forma manual mediante la utilización del software desarrollado para la práctica”; indicar las probabilidades condicionales del **peor canal ternario uniforme**, escribir su matriz y comprobar el valor de C.
+- **Discretización**: señal entre −5 V y +5 V codificada en PCM con 10 bits: error de discretización en cada segmento respecto de su valor medio. B) Con ADPCM y rango dinámico de la señal (diferencia muestra–predicción) de 1 V (−0,5 V a +0,5 V): ¿cuántos bits para mantener el error del PCM original?
+
+## Resolución del alumno (resumen fiel)
+**A1)** Frecuencias A=10, E=6, I=5, O=6, U=5 (sobre 32). `H = 2,2669` bits/símbolo; `Hmax = log2 5 = 2,3219`; `R = 1 − 2,266/2,3219 = 2,37 %`. Conclusión: redundancia baja, distribución casi uniforme.
+**A2)** Orden: A 10, E 6, O 6, I 5, U 5. Une I+U (10/32), E+O (12/32), A+(I+U) (20/32) y raíz. Códigos: A=00, I=010, U=011, E=10, O=11. Longitud fija 3 bits → 96 bits; Huffman 32·2,3125 = 74 bits; compresión `(96−74)/96 = 22,92 %`.
+**B1)** Conteo sobre `AEIOUUOIEAOOUUAAEEIIAAOAEOAUAIEA` **sin cierre circular** (31 transiciones): A→E 3, A→O 2, A→A 2, A→U 1, A→I 1 (9); E→I 2, E→A 2, E→E 1, E→O 1 (6); I→O 1, I→E 2, I→I 1, I→A 1 (5); O→U 2, O→I 1, O→O 1, O→A 2 (6); U→U 2, U→O 1, U→A 2 (5).
+
+| | →A | →E | →I | →O | →U |
+|---|---|---|---|---|---|
+| A→ | 2/9 | 3/9 | 1/9 | 2/9 | 1/9 |
+| E→ | 2/6 | 1/6 | 2/6 | 1/6 | 0 |
+| I→ | 1/5 | 2/5 | 1/5 | 1/5 | 0 |
+| O→ | 2/6 | 0 | 1/6 | 1/6 | 2/6 |
+| U→ | 2/5 | 0 | 0 | 1/5 | 2/5 |
+
+Entropías por fila: H(A)=2,196; H(E)=1,920; H(I)=1,921; H(O)=1,920; H(U)=1,522. Pondera con π = frecuencias (0,3125; 0,1875; 0,15625; 0,1875; 0,15625) ⇒ `Ht = 1,944` bits/símbolo. **Ergódico**: verifica irreducibilidad (todos los estados se comunican: ej. E→A→U, I→A→U, O→A→E, U→A→E, U→A→I) y aperiodicidad (todos tienen bucle).
+**B2)** Usa **bigramas** (pares solapados): 20 pares distintos de 31; AE 3; AA, AO, EA, EI, IE, OA, OU, UA, UU 2 (son 9); diez pares de 1. Armó el árbol agrupando los diez pares de peso 1 en un solo nodo (10/31) y encadenando AA+AO → +EA → +EI → +IE; por otro lado OA+OU → +UA → +UU → +AE; luego unió 20/31 y 11/31. Códigos: AE 10, UU 110, UA 1110, OU 11110, OA 11111, IE 000, EI 0010, EA 0011, AO 01010, AA 01011 y los diez de peso 1 con 6 bits (010000 … 011001). `L_bigrama = 142/31 = 4,58`; por símbolo `4,58/2 ≈ 2,29`. Compara con 2,3125: mejora `1 − 2,29/2,3125 = 1,02 %`; 32·2,29 = 73,28 bits (reducción 23,67 % vs. 96 bits). Concluye que la codificación dependiente es mejor.
+**Canal.** BSC con P(0/0)=0,9: matriz [[0,9; 0,1],[0,1; 0,9]]; `H(0,1) = 0,3322 + 0,1368 = 0,469`; `C = 1 − 0,469 = 0,531` bits/uso. Ternario peor canal: todas las probabilidades 1/3; `H(Y|X) = 1,585`, `H(Y) = 1,585`, `I = 0` ⇒ `C = 0`.
+**Discretización.** PCM: Δ = 10 V/1024 = 9,766 mV; error máximo ±Δ/2 = ±4,883 mV (igual en todos los segmentos; agrega que el error RMS es Δ/(2√3) ≈ 2,82 mV). Da ejemplos de segmentos (0, 512 y 1023). B) ADPCM: mismo Δ ⇒ niveles = 1 V/0,009765625 = 102,4 → 103 ⇒ `⌈log2 103⌉ = 7 bits`.
+
+## Verificación y correcciones **[Corrección]**
+- **A1, A2, canal, ternario, discretización B (7 bits)**: correctos. [Nota] Con 7 bits el error real es 1/128/2 = 3,9 mV ≤ 4,88 mV; con 6 bits sería 7,8 mV (no alcanza).
+- **B1**: [Nota] mezcla convenciones. Su matriz no es circular (31 pares) pero pondera con π = frecuencias, que solo es la estacionaria con cierre circular (con su matriz lineal la estacionaria es 0,290; 0,194; 0,161; 0,194; 0,161). Con cierre circular (como en el Apunte Maestro): fila A = 3, 3, 1, 2, 1 sobre 10; π = (10, 6, 5, 6, 5)/32 exacto; H(A)=2,1710, H(E)=H(O)=1,9183, H(I)=1,9219, H(U)=1,5219 ⇒ **H(S_M) = 1,9359** bits/símbolo. [Nota] En su resolución H(E) y H(O) tienen que ser 1,918, no 1,920. La ergodicidad (**sí es ergódico**) y su justificación están bien.
+- **B2**: [Corrección] el código por bigramas **no es instantáneo**: AO=01010 es prefijo de II=010100 y de IA=010101; AA=01011 es prefijo de EO=010110 y de EE=010111; Kraft = 0,969 < 1 (árbol incompleto, no óptimo). Se deben unir los diez pares de peso 1 de a dos, no en un solo nodo. El Huffman óptimo sobre esos 31 pares da 131/31 = 4,2258 bits/par = **2,113** bits/símbolo (mejora 8,6 % y no 1,02 %); con cierre circular (32 pares) 135/32 = 4,21875 ⇒ 2,109 (8,8 %).
+- **[Completado] B2 con un código por estado** (método de los otros parciales de Markov): A {A .3, E .3, O .2, I .1, U .1} L=2,2; E L=2,0; I L=2,0; O L=2,0; U {A .4, U .4, O .2} L=1,6 ⇒ `L_M = (10·2,2 + 6·2 + 5·2 + 6·2 + 5·1,6)/32 = 64/32 = 2,000` bits/símbolo ⇒ 64 bits vs. 74 del independiente: mejora 13,5 % (33,3 % vs. el código fijo).
+- **Discretización**: [Nota] el segmento 512 no tiene valor medio 0 V; con 1024 segmentos no hay nivel en 0 V (los segmentos alrededor del 0 son [−Δ,0] y [0,Δ], de valores medios ∓4,883 mV). El error ±4,883 mV es correcto igual.
+- **Forma**: [Nota] en el ternario escribe `H(Y|X) = −∑ P(X=i)·H(Y|X=i)`; el signo menos de adelante sobra.
+- Resolución completa de este parcial, en el estilo del Apunte Maestro: sección 11.10 de `Apunte_Maestro_Parcial1_TDI`.
+
+---
+
+# PARTE 12 — Carpetas «Parciales 1_Extras 2025» y «Recuperatorio o Condicionales 2025»
+
+> Análisis de duplicados y contenido nuevo. Las resoluciones completas, verificadas, están en el Apunte Maestro (secciones 2.4.1 y 11.11 a 11.16).
+
+## Descartado por repetido
+| Archivo | Motivo |
+|---|---|
+| `Parciales 1_Extras 2025/Parcial_1_-_VISTO-KLE.pdf` | Copia idéntica (mismo tamaño y contenido) de `Parcial_1_-_VISTO-KLE.pdf` (Nanni Rebollo), ya transcripto en la PARTE 8 |
+| `Imagen de WhatsApp 2025-10-22 ... .jpg` | Es el enunciado del parcial **27/09/2022 Tema I** (`amnr$aaag`, Shannon/Huffman, BSC 0,85), ya transcripto en la PARTE 1 |
+| `tema1 (lichi).pdf` | Es la resolución de Moya Lisandro, Tema 1 del 07-10-2025, ya transcripta en la PARTE 11 |
+| `.$huffman_dinamico.drawio.bkp`, `inversa_BWT.docx`, `INVERSA DE BWT_Claude.docx`, `inversa_bwt.py` | Auxiliares de trabajo (el .py invierte BWT agregando la última columna y reordenando; es el mismo método del apunte); el `.docx` "_Claude" no termina la cuenta |
+| `Bulián_Melani.docx/.pdf`, `Parcial1_BuliánMelani.docx/.pdf` | Cada par `.docx`/`.pdf` es el mismo contenido en dos formatos; se transcribe una vez |
+
+## Contenido nuevo (resumen)
+- **`Parcial1_BuliánMelani` (07-10-2025, Tema 2)**: BWT inversa de `O$OOOOCLTMCRBO` → `BROTOCOMOLOCO$`; entropía de Markov de la cadena transformada (la alumna sumó las filas sin ponderar: 2,371; correcto 0,681); Huffman dinámico `0000001000101110001101100100` → `ROBODOS`; canal ternario con $p(0/0)=0,8$, $p(1/0)=0,15$ (puso 1/3 en las otras filas: I=0,158; correcto C=0,7008).
+- **`Bulián_Melani` (Recuperatorio 28-10-2025, Tema 1)**: Huffman dinámico de `CANTABALA` (36 bits, ✔); BWT de `AMARACHACATA$` → `ATHR$MCAACAAA`, Huffman estático L=2,385 vs. Markov L≈1,185; $K_{opt}=4$ (30/27/20/25 bits y fórmula $K/(1-p^{2^K-1})$: 6,059/4,940/4,624/5,081); canal ternario 0,9/0,05/0,05, C=1,016.
+- **`tema2 (pedro).pdf`** (07-10-2025, Tema 2, manuscrito): mismo enunciado; la captura del software marca C=0,6986 con distribución óptima no uniforme, señal de matriz mal cargada.
+- **`tema3 (matil)`** (PDF + xlsx): PPM-C de orden 2 sobre `ABRA`, teórica q=6 (propone 1/7 y una distribución de 7 símbolos: la uniforme no sirve), canal binario 0,95/0,3 (usa 1−H(p̄)=0,331: incorrecto, C=0,3731), discretización con error de 8 bits (correcto 7).
+- **`tema4 (matic)`** (PDF + xlsx + txt): PPM-C de orden 1 sobre `ABA` (último A en orden 0, p=1/4 ✔); $K_{opt}$ de `000010000001100000000000100001` (usó p=5/25 y exponente 2^(K−1): incorrecto, K=3); canal ternario 0,9/0,05/0,05, C=1,016 ✔; teóricas (la uniforme q=6 no sirve; Kraft es ≤ 1, no ≥).
+- **`Autocorreccion Parcial 1 TI-melisa-REVISION-KLENZI.xlsx`** (Temas 1–3): ver Apunte Maestro 11.16 (H(S_M)=2,41 > H(S): imposible; canales 0,8/0,1/0,1 y 0,7/0,2/0,1 con $C$ mal calculada por promediar una sola fila; discretización PCM 16 bits → ADPCM 13 bits).
+- **`resumen.docx`**: apunte-resumen de fórmulas (información, entropías, Kraft, Huffman, Shannon, Fano, aritmética binaria, lista de temas: LZ/LZW, PPM, predictivo, señales, BWT); no trae información que falte en el Apunte Maestro, salvo la lista de temas.
+- **Archivos `.drawio` / `.png` de Huffman estático y dinámico** (28-10-2025): diagramas de árboles; no se re-dibujaron.

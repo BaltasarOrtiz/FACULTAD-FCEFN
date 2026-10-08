@@ -1,0 +1,17 @@
+PRACTICA
+EJERCICIO 1 TRAYECTORIA DE CODIFICACION 
+Con la secuencia ABA; con un modelo PPM-C de orden 1: 
+a. Liste los contextos que se crean 
+b. Indique los eventos de codificacion (por ejemplo: [ESC-01][ESC-O0][A-1] etc.). 
+c. En que contexto se codifica el ultimo simbolo A y con que probabilidad. Justifique
+
+Ejercicio 2 dada la siguiente secuencia obtenida a la salida de la ORE de un codificador predictivo 000010000001100000000000100001 a) en forma manual encuentre el Kopt verifiquelo al aplicar la formula correspondiente para esa probabilidad de aciertos K/(1-p^(2^(k-1)))
+
+Ejercicio 3) Dado un canal ternario uniforme con {0,1,2} p(0/0)=0.9, p(1/0)=0.05 a) escriba la matriz representativa del canal b) encuentre la capacidad de canal (realice el calculo a mano).
+
+TEORICAS
+a) si secuencialmente y sobre un archivo de texto, se deben aplicar dos estrategias de compresion una estadistica del tipo huffman, shannon, y otra basada en disccionarios, cual se debe aplicar primero y por que? 
+
+b) a los efectos de lograr mayor compresion la fuente original debe contar con alta redundancia o alta entropia? 
+
+c) dada una fuente con q=6 (caras de un dado) proponga una distribucion probabilistica que garantice, para base dos, la igualdad de la longitud promedio de huffman y shannon. en ese caso cuanto vale la inecuacion de kraft? verifiquelo
