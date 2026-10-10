@@ -18,6 +18,7 @@
 | `Parcial1-Galdame-2023.pdf` | Recuperatorio Tema 2 (reprobado), con correcciones |
 | `Parcial_1_-_VISTO-KLE.pdf` y `Condicional.pdf` | Parcial de Nanni Rebollo (5 símbolos, canal ternario, Huffman/aritmético) y examen condicional (PCM/DPCM) |
 | `Parcial N°1 Teoria de la Informacion (1).pdf` (16 págs.) | **Parcial del 07-10-2025, Tema 1** (Moya Lisandro): Huffman, Markov, canal, discretización PCM/ADPCM. Ver PARTE 11 |
+| Parciales 2025 (Temas 1–4 + recuperatorio) | Enunciados ordenados por tema, incluido PPM-C: ver **PARTE 13** |
 
 ---
 
@@ -623,3 +624,70 @@ Entropías por fila: H(A)=2,196; H(E)=1,920; H(I)=1,921; H(O)=1,920; H(U)=1,522.
 - **`Autocorreccion Parcial 1 TI-melisa-REVISION-KLENZI.xlsx`** (Temas 1–3): ver Apunte Maestro 11.16 (H(S_M)=2,41 > H(S): imposible; canales 0,8/0,1/0,1 y 0,7/0,2/0,1 con $C$ mal calculada por promediar una sola fila; discretización PCM 16 bits → ADPCM 13 bits).
 - **`resumen.docx`**: apunte-resumen de fórmulas (información, entropías, Kraft, Huffman, Shannon, Fano, aritmética binaria, lista de temas: LZ/LZW, PPM, predictivo, señales, BWT); no trae información que falte en el Apunte Maestro, salvo la lista de temas.
 - **Archivos `.drawio` / `.png` de Huffman estático y dinámico** (28-10-2025): diagramas de árboles; no se re-dibujaron.
+
+---
+
+# PARTE 13 — Enunciados 2025 (Parcial 07-10-2025, Temas 1–4, y Recuperatorio 28-10-2025), con el PPM-C
+
+> Esta parte completa lo que faltaba: **los enunciados de 2025 ordenados por tema**, incluido el ejercicio de **PPM-C**, que en las Partes 11–12 solo figuraba como resumen de la resolución del alumno.
+> Fuentes: `tema2 (pedro).pdf` (enunciado impreso, sí figura en el PDF), `tema4 (matic).txt` (enunciado en texto), `Recuperatorio o Condicionales 2025/parcial_tema1.jpg` y la foto de WhatsApp (enunciado del recuperatorio), `Parcial1_BuliánMelani.pdf`, `tema1 (lichi).pdf`.
+> **[Nota]** Los PDF de los Temas 3 y 4 (Matil, Matías) traen solo la resolución del alumno, no el papel con el enunciado. El Tema 4 se recupera casi literal del `.txt` (es la consigna que el alumno copió). El Tema 3 lo **reconstruyo a partir de lo que respondió el alumno**: lo marco con *(reconstruido)*.
+
+## 13.1 Parcial 07-10-2025 — Tema 1 (Moya Lisandro)
+Ya transcripto completo en la **PARTE 11** (fuente `….UAIEA-AEIOUUOIEAOOUUAAEEIIAAOAEOAUAIEA-AEI….`, Huffman, Markov, BSC 0,9 + peor canal ternario, discretización PCM 10 bits / ADPCM).
+
+## 13.2 Parcial 07-10-2025 — Tema 2 (Pedro Rosas Aguilar / Bulián Melani)
+**Codificación de fuente**
+- **Ejercicio 1.** La cadena `O$OOOOCLTMCRBO` es producto de la transformada Burrows-Wheeler. Recupere la cadena original. Calcule la entropía como proceso de Markov de orden 1 de ambas cadenas y compare los resultados. Indique si hay alguna ganancia al codificar con Burrows-Wheeler y luego comprimir. Comprima la cadena transformada usando **LZW**; considere el universo de símbolos de cadena como el "ASCII".
+- **Ejercicio 2.** La secuencia de bits `0000001000101110001101100100` corresponde a una parte de la letra de la canción *OJO CON LOS OROZCO*, comprimida con **Huffman dinámico**: encuentre el texto descomprimido. Haga las modificaciones necesarias en el árbol al descomprimir el último símbolo distinto de la fuente. Tabla de símbolos "ASCII": R=000, O=001, B=010, D=011, S=100.
+
+**Capacidad de canal.** Canal ternario uniforme {0,1,2} con p(0/0)=0,8 y p(1/0)=0,15. a) Escriba la matriz representativa del canal. b) Encuentre la capacidad de canal (cálculo a mano y comprobación con el software desarrollado para el práctico; enviar captura de pantalla del resultado).
+
+*(Resoluciones: ver PARTE 12 y Apunte Maestro.)*
+
+## 13.3 Parcial 07-10-2025 — Tema 3 (Matil) *(reconstruido)*
+**Codificación de fuente — Ejercicio PPM-C.** Con la secuencia **ABRA** y un modelo **PPM-C de orden 2**:
+1. Liste los contextos que se crean.
+2. Indique los eventos de codificación (por ejemplo `ESC ESC ESC A(1/64)`).
+3. *(El alumno responde:)* si el alfabeto tiene 32 símbolos equiprobables, ¿cuántos bits hacen falta para representar el intervalo? → `⌈log2 32⌉ = 5 bits`. Esta pregunta tiene respuesta de “orden −1”, pero el alumno usó 1/64 en el orden −1 para ABRA (alfabeto de 64 símbolos), lo que no coincide con los 32 de la pregunta 3; probablemente son consignas distintas del mismo tema.
+4. Dada una fuente de **7 símbolos** (el alumno usa LU, MA, MI, JU, VI, SA, DO = días de la semana), proponga distribuciones de probabilidad para las cuales coinciden las longitudes de **Huffman, Fano y Shannon** (base 2).
+
+**Canal de comunicación.** Canal binario con matriz `[[0,95 ; 0,05],[0,3 ; 0,7]]` (p(0/0)=0,95; p(1/1)=0,7): a) ¿es simétrico?; b) qué símbolo conviene transmitir con mayor probabilidad para operar a la capacidad; c) capacidad de canal con el software.
+
+**Discretización.** Señal entre −5 V y +5 V codificada en PCM con **10 bits**: error de discretización respecto del valor medio de cada segmento. b) Con ADPCM y rango dinámico de 1 V (−0,5 V a +0,5 V), ¿cuántos bits para mantener el error del PCM original?
+
+## 13.4 Parcial 07-10-2025 — Tema 4 (Contreras Matías) — enunciado del `.txt`
+**PRÁCTICA**
+- **Ejercicio 1 — Trayectoria de codificación.** Con la secuencia **ABA** y con un modelo **PPM-C de orden 1**:
+  a. Liste los contextos que se crean.
+  b. Indique los eventos de codificación (por ejemplo: `[ESC-0 1][ESC-0 0][A-1]`, etc.).
+  c. ¿En qué contexto se codifica el último símbolo A y con qué probabilidad? Justifique.
+- **Ejercicio 2.** Dada la secuencia obtenida a la salida de la ORE (OREX) de un codificador predictivo `000010000001100000000000100001`: a) en forma manual encuentre el **Kopt**; verifíquelo al aplicar la fórmula correspondiente para esa probabilidad de aciertos, `L = K/(1 − p^(2^K − 1))`.
+- **Ejercicio 3.** Dado un canal ternario uniforme {0,1,2} con p(0/0)=0,9 y p(1/0)=0,05: a) escriba la matriz representativa del canal; b) encuentre la capacidad de canal (cálculo a mano).
+
+**TEÓRICAS**
+- a) Si secuencialmente, y sobre un archivo de texto, se deben aplicar dos estrategias de compresión —una estadística del tipo Huffman/Shannon y otra basada en diccionarios— ¿cuál se debe aplicar primero y por qué?
+- b) A los efectos de lograr mayor compresión, ¿la fuente original debe contar con alta redundancia o alta entropía?
+- c) Dada una fuente con q=6 (caras de un dado), proponga una distribución probabilística que garantice, para base dos, la igualdad de la longitud promedio de Huffman y Shannon. En ese caso, ¿cuánto vale la inecuación de Kraft? Verifíquelo.
+
+## 13.5 Resolución PPM-C de ABA (orden 1) y de ABRA (orden 2), verificada
+Convención de la cátedra (la usan los dos alumnos): contextos nuevos emiten `ESC` con p=1; al caer al orden −1 se codifica con `1/|alfabeto|` (acá 1/64); en cada contexto `ESC` vale (cantidad de símbolos distintos) / (total), el método C.
+
+**ABA, orden 1** — a) contextos: orden 1: `(A)`, `(B)`; orden 0.
+- A: orden 1 vacío → `ESC`; orden 0 vacío → `ESC`; orden −1 → `A(1/64)`: **`ESC ESC A(1/64)`**.
+- B: contexto (A) tiene solo `ESC` → `ESC`; orden 0 tiene `ESC 1/2, A 1/2` → `ESC`; orden −1 → `B(1/64)`: **`ESC ESC B(1/64)`**.
+- A (último): contexto (B) es nuevo → `ESC`; en orden 0 (`ESC 2/4, A 1/4, B 1/4`) → **`ESC A(1/4)`**.
+- c) **El último A se codifica en el contexto de orden 0 con probabilidad 1/4** (no 1: la resolución de Matías dice “probabilidad de 1” en el texto, pero su propia tabla y su evento `ESC A(1/4)` dicen 1/4; lo correcto es 1/4).
+
+**ABRA, orden 2** — contextos: orden 2: `(AB)`, `(BR)`; orden 1: `(A)`, `(B)`, `(R)`; orden 0.
+- A: `ESC ESC ESC A(1/64)`; B: `ESC ESC ESC B(1/64)`; R: `ESC ESC ESC R(1/64)`.
+- A (último): `(BR)` nuevo → ESC; `(R)` nuevo → ESC; orden 0 (`ESC 3/6, A 1/6, B 1/6, R 1/6`) → **`ESC ESC A(1/6)`** ✔ (así lo resuelve Matil).
+
+## 13.6 Recuperatorio Parcial N°1 — 28-10-2025, Tema 1 (Bulián Melani) — enunciado de la foto
+- **Ejercicio 1.** Dada la secuencia **CANTABALA**, comprímala usando **Huffman dinámico**. Considere como universo de símbolos los que figuran en la frase. Haga el cambio necesario en el árbol de compresión cuando llega la letra **L**, que es el último símbolo distinto del universo y que garantiza la máxima compresión. (Tabla ASCII: A=000, B=001, C=010, L=011, N=100, T=101.)
+- **Ejercicio 2.** Utilizando **BWT**, transforme la frase `AMARACHACATA$`. Codifique con Huffman estático la cadena resultante, considerando a la fuente con memoria nula y como proceso de Markov de orden 1. Compare los resultados en cuanto a longitud promedio de ambas codificaciones.
+- **Ejercicio 3.** Dada la siguiente secuencia posterior a la salida de la OREX en el sistema de codificación predictivo, y conocida la expresión de la longitud promedio `L = K/(1 − p^(2^K − 1))`, encuentre el **Kopt**. En forma manual, compruébelo con el obtenido desde L. Secuencia: `000000011000000000000100100000000000001`.
+- **Ejercicio 4.** Sea el siguiente canal ternario uniforme con `p(bj/ai)`, `p(1/0) = p(2/0) = 0,05`: encuentre la capacidad de canal C y verifíquelo mediante el software desarrollado, enviando por correo una captura de la pantalla con el cálculo. Exprese el valor de las probabilidades condicionales del **peor canal ternario**.
+- Indicación: de todo el parcial, enviar capturas (fotografías) por correo.
+
+> [Nota] La secuencia del Ejercicio 3 la leí de la foto; revisala contra el papel por si algún 0 se me escapó (en la foto los ceros están muy juntos). `parcial_tema1.jpg` y la foto de WhatsApp son el mismo enunciado.
