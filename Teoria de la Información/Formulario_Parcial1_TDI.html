@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<title>Formulario Parcial 1 - Teoría de la Información</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+@page{size:A4;margin:7mm 7mm}
+*{box-sizing:border-box}
+body{font-family:"Segoe UI",Arial,sans-serif;font-size:8.7pt;line-height:1.28;margin:0;color:#111}
+h1{font-size:13pt;margin:0 0 2px;text-align:center;border-bottom:1.5px solid #234;padding-bottom:1px}
+.cols{column-count:2;column-gap:7px}
+h2{font-size:9.6pt;margin:6px 0 2px;background:#234;color:#fff;padding:0 3px;break-after:avoid}
+h3{font-size:7.3pt;margin:2px 0 0;color:#234;break-after:avoid}
+.b{break-inside:avoid;margin-bottom:3px}
+p{margin:2px 0}
+.k{font-size:7.15pt}
+.katex{font-size:1.0em}
+.katex-display{margin:1px 0!important}
+.pr{border-left:2px solid #c60;padding-left:3px;margin:2px 0;font-size:8.4pt}
+ul{margin:0;padding-left:9px}
+li{margin:0}
+table{border-collapse:collapse;width:100%;font-size:8pt;margin:1px 0}
+td,th{border:.5px solid #777;padding:0 2px}
+th{background:#dde}
+</style></head><body>
+<h1>Formulario — Parcial 1 · Teoría de la Información (Unidades 1 a 5)</h1>
+<div class="cols">
+
+<h2>1. Información y entropía</h2>
+<div class="b">
+<p>$I_i=\log_2\frac1{p_i}$ [bits]. &nbsp; $H(S)=\sum_i p_i\log_2\frac1{p_i}$, &nbsp; $0\le H\le\log_2 q$ (máx. si equiprobables).</p>
+<p>$H_{max}=\log_2 q,\quad \eta=\frac{H}{H_{max}},\quad R=1-\eta$. &nbsp; Base $r$: $H_r=H_2/\log_2 r$ (y $H_{max}=\log_r q$).</p>
+<p>Compresión vs. código fijo: $L_{fijo}=\lceil\log_2 q\rceil$, &nbsp; $\text{compr.}=1-\frac{L}{L_{fijo}}$; bits totales $=n\cdot L$.</p>
+<p>Aditividad: $I(E_1\cap E_2)=I(E_1)+I(E_2)$ (indep.). &nbsp; Extensión de orden $n$: $H(S^n)=nH(S)$.</p>
+</div>
+
+<h2>2. Códigos de fuente</h2>
+<div class="b">
+<p><b>Kraft:</b> $\sum_i r^{-l_i}\le1$ (existe instantáneo). $=1$ ⇒ árbol lleno. Instantáneo ⊂ unívoco ⊂ no singular.</p>
+<p>$L=\sum p_il_i$, &nbsp; $\eta=\frac HL$, &nbsp; $R_c=1-\eta$. &nbsp; <b>Shannon 1.er teorema:</b> $H\le L\lt H+1$; &nbsp; $H\le\frac{L_n}{n}\lt H+\frac1n$.</p>
+<p>Compacto ($H=L$) ⇔ $p_i=r^{-l_i}$ (Huffman=Shannon=Fano; ej. $\frac12,\frac14,\frac18,\ldots$ con las dos últimas iguales).</p>
+<p>$L_{Huffman}\le L_{Fano}\le L_{Shannon}$.</p>
+</div>
+
+<h2>3. Algoritmos estáticos</h2>
+<div class="b">
+<p class="pr"><b>Huffman:</b> ordenar $p$ de mayor a menor; sumar los $r$ menos probables en un nodo, reinsertar la suma y repetir hasta la raíz (=1); etiquetar 0/1 en las ramas y leer raíz→hoja. Es óptimo y siempre instantáneo; hay varios árboles válidos con igual $L$.</p>
+<p class="pr"><b>Shannon:</b> ordenar de mayor a menor; $l_i=\lceil\log_2\frac1{p_i}\rceil$ (si $\log_2\frac1{p_i}$ es entero, $l_i$ es ese entero, no +1). $FA_i=\sum_{j\lt i}p_j$ ($FA_1=0$), pasarla a binario con ×2 sucesivos y tomar los primeros $l_i$ dígitos.</p>
+<p class="pr"><b>Fano:</b> ordenar de mayor a menor; cortar la lista en dos grupos con suma lo más cercana a 0,5, poner 0 al de arriba y 1 al de abajo, y repetir dentro de cada grupo hasta quedar con 1 símbolo (si hay dos cortes iguales, probar ambos).</p>
+</div>
+
+<h2>4. Codificación aritmética</h2>
+<div class="b">
+<p>Intervalo del símbolo: $[Q_s,R_s)$, $Q_s=\sum_{j\lt s}p_j$, $R_s=Q_s+p_s$ (siempre el mismo orden). Empezar en $[0,1)$.</p>
+<p>$\text{rango}=high-low;\quad low'=low+\text{rango}\cdot Q_s;\quad high'=low+\text{rango}\cdot R_s$.</p>
+<p>Salida: cualquier número del intervalo final (el de menos dígitos). Bits $\approx-\log_2(high-low)=-\log_2\prod p_i\approx nH$.</p>
+<p class="pr"><b>"3 decimales":</b> redondear cada cota a 3 decimales en cada paso; se codifica hasta el símbolo anterior a aquel donde $low=high$ (ahí falla por falta de precisión).</p>
+</div>
+
+<h2>5. Huffman dinámico (adaptativo) y PPM-C</h2>
+<div class="b">
+<p class="pr"><b>Huffman dinámico:</b> se arranca con solo el NYT (símbolo imaginario, peso 0). Símbolo ya visto: emitir su código actual y sumar 1 a hoja y ancestros. Símbolo nuevo: emitir código del NYT + código fijo ($\lceil\log_2q\rceil$ bits); el NYT se abre en NYT (izq., 0) y hoja nueva (der., peso 1). Antes de sumar 1 a cada nodo se revisa la <b>Sibling Property</b>: se numera de abajo hacia arriba y de izq. a der., y los pesos deben ser no decrecientes. Si hay otro nodo de igual peso con número mayor (que no sea el padre), se intercambia con él (con su subárbol) y recién entonces se suma 1. Objetivo: que el árbol sea siempre de Huffman (óptimo) sin reconstruirlo, con emisor y receptor en espejo. Decodificar = mismo algoritmo bit a bit (en el NYT leer el código fijo). Estático y dinámico no tienen por qué coincidir.</p>
+<p class="pr"><b>PPM-C:</b> se busca el símbolo en el contexto de mayor orden y si no está se emite ESC y se baja de orden, hasta el orden $-1$ (uniforme, $1/|\text{alfabeto}|$). Con $U$ = símbolos distintos vistos en el contexto y $T$ = total de apariciones: $P(s)=\frac{f_s}{T+U}$, &nbsp; $P(ESC)=\frac{U}{T+U}$. Las probabilidades de los eventos se pasan a un codificador aritmético (renormalización E1: $high\le.5$ emite 0; E2: $low\ge.5$ emite 1; E3: pendiente).</p>
+</div>
+
+<h2>6. Diccionario: LZ77, LZW</h2>
+<div class="b">
+<p class="pr"><b>LZ77 (ventana deslizante):</b> dos buffers, búsqueda (ya codificado, acotado por la ventana) y mirar-adelante. Se busca la coincidencia más larga con lo que sigue y se emite $(\text{desplazamiento hacia atrás},\ \text{longitud},\ \text{símbolo siguiente})$; sin coincidencia $(0,0,s)$. Se avanza $longitud+1$.</p>
+<p class="pr"><b>LZW:</b> diccionario inicial con el alfabeto. Se acumula $I$ mientras $I+x$ esté en el diccionario; cuando no está, se emite el índice de $I$, se agrega $I+x$ con el próximo índice libre y se reinicia $I=x$. Al final se emite el índice de $I$. Ancho del código $=\lceil\log_2(\text{tamaño final})\rceil$. Orden recomendado: LZW y después Huffman.</p>
+</div>
+
+<h2>7. BWT</h2>
+<div class="b">
+<p class="pr"><b>Directa:</b> agregar <span class="nm">$</span> (menor que toda letra), generar las $n$ rotaciones cíclicas, ordenarlas lexicográficamente y tomar la <b>última columna</b>. Agrupa símbolos iguales (mejora RLE, Huffman y Markov). <b>Inversa:</b> escribir la columna transformada, ordenarla (queda la 1.ª columna), pegar la transformada a la izquierda, reordenar y repetir $n$ veces; la fila que termina en <span class="nm">$</span> es el original.</p>
+</div>
+
+<h2>8. Fuente de Markov (orden 1)</h2>
+<div class="b">
+<p><b>Matriz:</b> contar pares consecutivos $s_is_j$ (cierre circular) y dividir cada fila por las apariciones de $s_i$ como origen: $P_{ij}=P(s_j|s_i)$, filas suman 1. Orden $m$: $q^m$ estados.</p>
+<p><b>Estacionaria:</b> $\pi P=\pi,\ \sum\pi_i=1$ (o elevar $P^k$ hasta que las filas coincidan).</p>
+<p><b>Ergódica</b> ⇔ irreducible (de todo estado se llega a todo estado) y aperiódica (alguna $P^k$ con todos los elementos $\gt0$). Un estado absorbente la rompe.</p>
+<p>$H(S_M)=\sum_i\pi_i\sum_jP_{ij}\log_2\frac1{P_{ij}}\ \le H(S)$, con igualdad si no hay dependencia.</p>
+<p>Prob. de cadena: $p(s_1\ldots s_k)=\pi_{s_1}P(s_2|s_1)\cdots P(s_k|s_{k-1})$.</p>
+<p class="pr"><b>Codificar como Markov:</b> un código (Huffman/Fano/Shannon) por fila con sus $P_{ij}\gt0$ (un único sucesor ⇒ 0 bits); el 1.er símbolo con código de bloque. $L_M=\sum_i\pi_iL_i,\ \ L_i=\sum_jP_{ij}l_{ij},\ \ \eta=\frac{H(S_M)}{L_M}$ (se compara con $H(S_M)$, no con $H(S)$). "Como fuente independiente" = usar frecuencias globales, sin matriz.</p>
+</div>
+
+<h2>9. Canal</h2>
+<div class="b">
+<p>Matriz $P(B|A)$, filas suman 1. &nbsp; $P(b_j)=\sum_iP(a_i)P(b_j|a_i)$, &nbsp; $P(a_i|b_j)=\frac{P(a_i)P(b_j|a_i)}{P(b_j)}$.</p>
+<p>$H(A)=\sum p(a_i)\log\frac1{p(a_i)}$; &nbsp; $H(B)$ con los $p(b_j)$ <i>calculados</i>.</p>
+<p><b>Ruido:</b> $H(B|A)=\sum_ip(a_i)\sum_jP(b_j|a_i)\log_2\frac1{P(b_j|a_i)}$ (promedio ponderado de las entropías de fila).</p>
+<p><b>Equivocación:</b> $H(A|B)=\sum_jp(b_j)\sum_ip(a_i|b_j)\log_2\frac1{p(a_i|b_j)}$.</p>
+<p>$H(A,B)=H(A)+H(B|A)=H(B)+H(A|B)$.</p>
+<p>$I(A;B)=H(A)-H(A|B)=H(B)-H(B|A)=H(A)+H(B)-H(A,B)$, &nbsp; $0\le I\le\min(H(A),H(B))$, nunca negativa.</p>
+<p><b>Capacidad:</b> $C=\max_{P(a)}I(A;B)$. &nbsp; BSC: $C=1-H(p)=1+p\log_2p+(1-p)\log_2(1-p)$. &nbsp; Uniforme/simétrico (entrada equiprobable): $C=\log_2q-H(\text{una fila})$. Asimétrico: maximizar sobre $P(a)$ (conviene enviar más el símbolo de fila con menos ruido).</p>
+<p>Mejor canal: identidad, $C=\log_2q$. Peor: todo $\frac1q$ (BSC $p=0{,}5$), $I=C=0$. Un BSC con $p=1$ es perfecto ($C=1$).</p>
+</div>
+
+<h2>10. Muestreo, cuantificación y predicción</h2>
+<div class="b">
+<p><b>Nyquist:</b> $f_s\ge2B$ (si no, aliasing). &nbsp; $L=2^n,\ \ \Delta=\frac{V_{max}-V_{min}}{L},\ \ |e_q|\le\frac\Delta2$. &nbsp; Tasa: $R=f_s\cdot n\cdot c$.</p>
+<p><b>Error máx. $\pm e$ con valor medio del segmento:</b> ancho $=2e$, niveles $=\frac{\text{rango}}{2e}$, $n=\lceil\log_2\text{niveles}\rceil$. PCM: rango de la señal; DPCM: rango de las diferencias (menos bits). Bits totales $=f_s\cdot n\cdot t$.</p>
+<p>PCM cuantifica cada muestra; DPCM la diferencia; ADPCM usa predictor adaptativo; delta = DPCM de 1 bit. Compansión: curva no lineal (ley $\mu$/A) que da más resolución a amplitudes chicas.</p>
+<p class="pr"><b>Predictiva (XOR) y $K$ óptimo:</b> XOR da 1 = error, 0 = acierto. Cada 1 se codifica con la racha de ceros previa en $K$ bits; el valor $2^K-1$ significa "la racha continúa" (se encadena otro contenedor); los ceros finales también cuentan. Se prueba $K=2,3,4,\ldots$ y se corta cuando $K+1$ empeora. Con $p$ = proporción de ceros: $L(K)=\frac{K}{1-p^{\,2^K-1}}$ y se elige el $K$ que lo minimiza.</p>
+</div>
+
+<h2>11. Atajos y chequeos</h2>
+<div class="b">
+<ul>
+<li>$\log_2x=\frac{\ln x}{\ln2}$. &nbsp; Entropía de fila $[0{,}8;0{,}15;0{,}05]$: 0,8842. &nbsp; $H(0{,}05)=0{,}2864$, $H(0{,}1)=0{,}469$.</li>
+<li>$L$ de Huffman $\le L$ de Fano $\le L$ de Shannon; todos $\ge H$. Si $\eta>100\%$ o $I<0$, hay un error de cuenta.</li>
+<li>Cifrado: primero comprimir y después encriptar; descifrar en orden inverso (Vigenère: restar la clave mod 26 y deshacer la permutación).</li>
+<li>Archivos comprimidos: mayor entropía por símbolo y menor redundancia.</li>
+<li>Instantáneo ⇒ unívoco; los estáticos son de doble lectura y sin pérdida; más redundancia ⇒ más compresión posible.</li>
+</ul>
+</div>
+
+<h2>12. Procedimientos de canal paso a paso</h2>
+<div class="b">
+<ul>
+<li>1) Fijar $p(a_i)$ (dada, o equiprobable si piden capacidad de canal uniforme). 2) $p(b_j)$ = vector $p(A)$ por la matriz (columna $j$). 3) $H(A)$ y $H(B)$. 4) Entropía de cada fila y promedio ponderado por $p(a_i)$ ⇒ $H(B|A)$. 5) $I=H(B)-H(B|A)$.</li>
+<li>Canal uniforme: todas las filas son permutaciones de la primera ⇒ $H(B|A)=H(\text{fila})$ (no dividir por $q$). Si piden $C$ y es simétrico, $C=\log_2q-H(\text{fila})$.</li>
+<li>Peor canal ternario: $H(B|A)=H(B)=\log_23$, $I=0$. Mejor canal ternario: $C=\log_23=1{,}585$.</li>
+</ul>
+</div>
+
+<h2>13. Valores numéricos que conviene tener a mano</h2>
+<div class="b">
+<table>
+<tr><th>$x$</th><td>$\frac12$</td><td>$\frac13$</td><td>$\frac14$</td><td>$\frac15$</td><td>$\frac16$</td><td>$\frac18$</td><td>$\frac1{10}$</td></tr>
+<tr><th>$\log_2\frac1x$</th><td>1</td><td>1,585</td><td>2</td><td>2,322</td><td>2,585</td><td>3</td><td>3,322</td></tr>
+<tr><th>$x\log_2\frac1x$</th><td>0,5</td><td>0,528</td><td>0,5</td><td>0,464</td><td>0,431</td><td>0,375</td><td>0,332</td></tr>
+</table>
+<table>
+<tr><th>$\log_2 q$</th><td>$q=2$: 1</td><td>$q=3$: 1,585</td><td>$q=4$: 2</td><td>$q=5$: 2,322</td><td>$q=6$: 2,585</td></tr>
+<tr><th>$H(p)$ binaria</th><td>$H(0{,}05)=0{,}286$</td><td>$H(0{,}1)=0{,}469$</td><td>$H(0{,}15)=0{,}610$</td><td>$H(0{,}2)=0{,}722$</td><td>$H(0{,}5)=1$</td></tr>
+</table>
+<table>
+<tr><th>Potencias de 2</th><td>$2^7=128$</td><td>$2^8=256$</td><td>$2^9=512$</td><td>$2^{10}=1024$</td><td>$2^{12}=4096$</td><td>$2^{16}=65536$</td></tr>
+</table>
+</div>
+
+<h2>14. Resumen de relaciones entre métodos</h2>
+<div class="b">
+<ul>
+<li>Bits totales de cualquier método estadístico $\ge n\cdot H(S)$ (cota de entropía); aritmética se acerca a esa cota ($\approx-\log_2$ del ancho del intervalo final).</li>
+<li>Shannon puede quedar peor que Fano y Huffman; Huffman es el óptimo de longitud entera por símbolo.</li>
+<li>Huffman dinámico, LZ77, LZW y PPM-C pagan un costo de aprendizaje: en mensajes cortos pueden quedar peor que el código de bloque.</li>
+<li>$H(S_M)\le H(S)$: usar el estado anterior reduce la longitud media; BWT previa mejora aún más la matriz de Markov (probabilidades cercanas a 1).</li>
+<li>Peor BSC: $p=0{,}5$ ($C=0$). Mejor canal: $p=0$ o $p=1$ ($C=1$).</li>
+</ul>
+</div>
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{renderMathInElement(document.body,{ignoredClasses:["nm"],delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false});document.title+=" ";});
+</script>
+</body></html>
