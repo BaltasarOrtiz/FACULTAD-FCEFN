@@ -101,6 +101,11 @@ th{background:#dde}
 <div class="b">
 <p><b>Nyquist:</b> $f_s\ge2B$ (si no, aliasing). &nbsp; $L=2^n,\ \ \Delta=\frac{V_{max}-V_{min}}{L},\ \ |e_q|\le\frac\Delta2$. &nbsp; Tasa: $R=f_s\cdot n\cdot c$.</p>
 <p><b>Error máx. $\pm e$ con valor medio del segmento:</b> ancho $=2e$, niveles $=\frac{\text{rango}}{2e}$, $n=\lceil\log_2\text{niveles}\rceil$. PCM: rango de la señal; DPCM: rango de las diferencias (menos bits). Bits totales $=f_s\cdot n\cdot t$.</p>
+<p class="pr"><b>Discretización PCM / DPCM / ADPCM (paso a paso).</b> Rango $R=V_{max}-V_{min}$ (PCM: de la señal; DPCM/ADPCM: de la diferencia muestra–predicción). Ancho del segmento $\Delta$; con valor medio $e=\frac\Delta2\Rightarrow\Delta=2e$.<br>
+<b>Dado $n$, pide error:</b> $\Delta=\frac{R}{2^n}$, &nbsp;$e=\frac\Delta2$. &nbsp; <b>Dado $e$, pide $n$:</b> $N=\frac{R}{2e}$, &nbsp;$n=\lceil\log_2N\rceil$ (siempre redondear <i>hacia arriba</i>).<br>
+<b>ADPCM "mantener el error del PCM":</b> mismo $\Delta$ ($\Delta_{PCM}=\frac{R_{PCM}}{2^{n}}$), $N=\frac{R_{dif}}{\Delta_{PCM}}=2^{n}\frac{R_{dif}}{R_{PCM}}$, $n_{ADPCM}=\lceil\log_2N\rceil$. Ej. 2025: $\Delta=\frac{10}{1024}=9{,}766$ mV, $e=\pm4{,}883$ mV; $N=\frac{1}{0{,}009766}=102{,}4\to103$, $n=\lceil6{,}69\rceil=7$ bits.<br>
+<b>Verificar:</b> $e_{real}=\frac{R}{2^n\cdot2}\le e_{pedido}$ (con 7 bits: 3,9 mV ✔; con 6: 7,8 mV ✘). Error: no confundir ancho con error (usar ancho $=e$ da 1 bit de más). Pasar todo a V (1 µV $=10^{-6}$ V).<br>
+<b>Con tiempo:</b> $f_s=2f_{max}$, muestras $=f_s\cdot t$, bits $=$ muestras $\cdot\,n$. Ej.: 2 kHz, 5 min $\Rightarrow$ 1,2·10⁶ muestras; PCM 24 bits = 28,8 Mbit; DPCM 20 bits = 24 Mbit.</p>
 <p>PCM cuantifica cada muestra; DPCM la diferencia; ADPCM usa predictor adaptativo; delta = DPCM de 1 bit. Compansión: curva no lineal (ley $\mu$/A) que da más resolución a amplitudes chicas.</p>
 <p class="pr"><b>Predictiva (XOR) y $K$ óptimo:</b> XOR da 1 = error, 0 = acierto. Cada 1 se codifica con la racha de ceros previa en $K$ bits; el valor $2^K-1$ significa "la racha continúa" (se encadena otro contenedor); los ceros finales también cuentan. Se prueba $K=2,3,4,\ldots$ y se corta cuando $K+1$ empeora. Con $p$ = proporción de ceros: $L(K)=\frac{K}{1-p^{\,2^K-1}}$ y se elige el $K$ que lo minimiza.</p>
 </div>
