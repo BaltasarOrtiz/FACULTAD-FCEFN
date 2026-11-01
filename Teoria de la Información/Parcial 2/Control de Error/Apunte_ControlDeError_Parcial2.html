@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<title>Apunte de repaso Parcial 2 - Control de error - Teoría de la Información</title>
+<style>
+@page{size:A4;margin:13mm 12mm 14mm 12mm}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font-family:"Segoe UI",Calibri,Arial,sans-serif;font-size:10pt;line-height:1.38;color:#161616;margin:0}
+h1{font-size:21pt;margin:0 0 2pt;color:#10294a;line-height:1.15}
+.sub{font-size:11.5pt;color:#35506f;margin:0 0 8pt}
+h2{font-size:14.5pt;color:#fff;background:#10294a;padding:3pt 8pt;margin:16pt 0 7pt;break-after:avoid;border-radius:2pt}
+h3{font-size:11.6pt;color:#10294a;margin:12pt 0 4pt;padding-bottom:1pt;border-bottom:1.2pt solid #b9c7da;break-after:avoid}
+h4{font-size:10.4pt;color:#7a3b00;margin:9pt 0 3pt;break-after:avoid}
+p{margin:3.5pt 0}
+ul,ol{margin:3pt 0 3pt 0;padding-left:16pt}
+li{margin:1.5pt 0}
+sup{font-size:70%;line-height:0}
+sub{font-size:70%;line-height:0}
+.bits,code{font-family:Consolas,"Courier New",monospace;font-size:9.4pt;letter-spacing:.2pt}
+.bits{background:#eef2f8;padding:0 2pt;border-radius:2pt;white-space:nowrap}
+pre.mat{font-family:Consolas,"Courier New",monospace;font-size:9.2pt;line-height:1.28;background:#f4f6fa;border:.6pt solid #c6d0de;border-radius:2pt;padding:4pt 8pt;margin:3pt 0;display:inline-block;vertical-align:top}
+.matcap{font-size:9pt;color:#35506f;margin-top:4pt}
+table{border-collapse:collapse;margin:5pt 0;font-size:9.1pt;width:100%}
+th{background:#dbe5f1;border:.6pt solid #98a8bd;padding:2pt 4pt;text-align:left;font-weight:600}
+td{border:.6pt solid #b4c0d0;padding:2pt 4pt;vertical-align:top}
+table.c td,table.c th{text-align:center}
+table.div td,table.div th{font-size:8.6pt;text-align:center}
+table.div td .bits{font-size:8.6pt}
+table.tight{width:auto}
+tr{break-inside:avoid}
+.box{border-left:3.4pt solid #3b6fb6;background:#f0f5fb;padding:4pt 9pt 5pt 9pt;margin:6pt 0;border-radius:0 3pt 3pt 0;break-inside:avoid}
+.box .bt{font-weight:700;font-size:9.8pt;margin-bottom:1.5pt;color:#10294a}
+.box.warn{border-color:#c2410c;background:#fff4ea}.box.warn .bt{color:#9a3412}
+.box.ok{border-color:#2f855a;background:#eefaf3}.box.ok .bt{color:#1f6b45}
+.box.ex{border-color:#6b46c1;background:#f5f0fd}.box.ex .bt{color:#4c2a94}
+.exam{display:inline-block;background:#6b46c1;color:#fff;font-size:8.2pt;padding:0 5pt;border-radius:8pt;margin-right:4pt;vertical-align:1pt}
+.two{display:flex;gap:10pt;break-inside:avoid}.two>div{flex:1}.matbox{break-inside:avoid}table.sm td,table.sm th{font-size:8.5pt;padding:1.5pt 4pt}
+.small{font-size:8.8pt;color:#33415c}
+.res{background:#e8f6ee;border:.8pt solid #2f855a;border-radius:3pt;padding:2pt 7pt;margin:5pt 0;font-weight:600;break-inside:avoid}
+.ans{background:#fff8e1;border:.8pt solid #d69e2e;border-radius:3pt;padding:2pt 7pt;margin:3pt 0}
+.pb{break-before:page}
+.svgwrap{text-align:center;margin:4pt 0;break-inside:avoid}
+.dot{color:#6b46c1;font-size:11pt}
+.toc{columns:2;font-size:9.4pt;margin:4pt 0}
+.toc div{margin:1pt 0}
+</style></head><body>
+<h1>Apunte de repaso · Parcial 2 — Control de error</h1>
+<p class="sub">Codificación de canal · Teoría de la Información · Ejercicios de los parciales 2010–2025 resueltos paso a paso</p>
+
+<div class="box "><div class="bt">Para qué sirve y cómo está armado</div>
+<p>Es el equivalente del apunte maestro, pero <b>solo de control de error</b> y construido desde los ejercicios reales de los parciales, ordenados de lo más simple a lo más complejo. La idea es que aprendas <b>haciendo</b>: cada ejercicio tiene una receta, el desarrollo completo y una verificación.</p>
+<div class="toc">
+<div><b>0.</b> Dónde estás, plan de repaso y mapa de qué cae</div>
+<div><b>1.</b> Caja de herramientas (lo mínimo de memoria)</div>
+<div><b>2.</b> ISBN y base prima</div>
+<div><b>3.</b> Hamming y arreglos geométricos</div>
+<div><b>4.</b> Códigos cíclicos: el corazón del parcial</div>
+<div><b>5.</b> Entrelazado y ráfagas</div>
+<div><b>6.</b> Reed–Solomon (la tabla)</div>
+<div><b>7.</b> Teóricas con respuesta</div>
+<div><b>8.</b> ⚠ Errores en resoluciones de alumnos</div>
+<div><b>9.</b> Ejercicios propuestos + soluciones</div>
+<div><b>10.</b> Chuleta de una página</div>
+</div>
+<p class="small"><b>Verificación:</b> todos los números (polinomios generadores, divisiones, pesos de <i>todas</i> las palabras, matrices con G·H<sup>T</sup>=0, síndromes, ISBN) fueron recalculados con un programa, no a mano. Donde una resolución de alumno no coincide con el cálculo está marcado con ⚠ y explicado en la sección 8.</p>
+<p class="small"><b>Fuentes:</b> parciales 2 de 2010, 2012 (T1, T2), 2013 (T1, T2), 2020 (resolución de J. Arce), 2025 (resolución de B. Melani), «Preguntas teóricas parcial 2», y las diapositivas del Área Temática 4 (Control de error 2026).</p>
+</div>
+<h2>0. Dónde estás parado, plan de repaso y mapa de qué cae</h2>
+<h3>0.1 Dónde estás</h3>
+<ul>
+<li><b>Ya visto en clase</b> (diapositivas del Área 4 hasta la 9, ISBN): idea de redundancia, distancia de Hamming, d<sub>min</sub> ≥ 2t+1, detector = d<sub>min</sub>−1, bit de paridad, Hamming (7,4), Hamming + bit de paridad, arreglos gráficos, ISBN de 10 y 13 dígitos y la base prima.</li>
+<li><b>Todavía sin práctica</b> (y es lo que más puntos mueve): matrices <b>G</b> y <b>H</b>, códigos <b>cíclicos</b> (obtener g(x) desde h(x), k, d<sub>min</sub>, chequeadores como combinación de bits de información), <b>decodificar con el resto/síndrome</b>, circuito de h(x), <b>entrelazado</b> y la <b>tabla Reed–Solomon</b>.</li>
+</ul>
+<p class="small">Nota: la diapositiva 9 con ISBN es del PDF del <b>Área 4</b> (Control de error). En el PDF del Área 1 esa misma página es «Canales de comunicación y capacidad».</p>
+<h3>0.2 Plan de repaso (en este orden)</h3>
+<table class="sm"><thead><tr><th>Etapa</th><th>Tema</th><th>Estás listo cuando…</th><th>Hacer</th></tr></thead><tbody><tr><td>E0</td><td>Notación y capacidad</td><td>pasás cadena de bits ↔ polinomio sin dudar y sabés de memoria la tabla d<sub>min</sub> → corrige / detecta</td><td>§1 y P0</td></tr><tr><td>E1</td><td>ISBN-10, ISBN-13, base prima</td><td>sacás el dígito faltante en 2 minutos y explicás por qué la base es prima</td><td>§2 · P1, P2</td></tr><tr><td>E2</td><td>Hamming (7,4) y Hamming + BP</td><td>codificás, calculás el síndrome y corregís; explicás los 4 casos (S, BP)</td><td>§3.1 · P3</td></tr><tr><td>E3</td><td>Arreglos geométricos</td><td>calculás d<sub>min</sub> = d<sub>1</sub>·d<sub>2</sub> y localizás errores por fila y columna</td><td>§3.2</td></tr><tr><td>E4</td><td>Cíclicos I: k, g(x), d<sub>min</sub></td><td>dado h(x) y n obtenés k, g(x) (división) y d<sub>min</sub> (enumerando palabras)</td><td>§4.1, 4.2 · P4, P5</td></tr><tr><td>E5</td><td>Cíclicos II: G, H, chequeadores</td><td>armás G (sistemática y por desplazamientos), H, las ecuaciones de cada chequeador y verificás G·H<sup>T</sup> = 0</td><td>§4.2 (pasos 5–6), 4.3</td></tr><tr><td>E6</td><td>Cíclicos III: decodificar</td><td>dividís R(x) por g(x), leés el resto como síndrome, corregís y explicás qué pasa con un error triple</td><td>§4.2 (7–8), 4.3, 4.4 · P4</td></tr><tr><td>E7</td><td>Circuito y entrelazado</td><td>dibujás el registro de h(x) y calculás la ráfaga t·L</td><td>§4.2 (10), §5</td></tr><tr><td>E8</td><td>Reed–Solomon y teóricas</td><td>completás la tabla RS y respondés las teóricas fijas sin mirar</td><td>§6, §7 · P6</td></tr><tr><td>E9</td><td>Simulacro</td><td>resolvés el control de error de 2020 y de 2025 completos, sin apuntes, en tiempo de examen</td><td>§9 · P8</td></tr></tbody></table>
+<p><b>Orden sugerido:</b> E0–E3 refuerzan lo que ya viste; E4–E6 son lo nuevo y es donde conviene invertir más tiempo (cae en <i>todos</i> los parciales); E7–E8 son rápidos una vez que dominás los cíclicos. Hacé primero el ejercicio sin mirar la solución y comparás.</p>
+<h3>0.3 Mapa de qué cae (por año)</h3>
+<table class="c"><thead><tr><th>Tipo de ejercicio</th><th>2010</th><th>2012 T1</th><th>2012 T2</th><th>2013 T1</th><th>2013 T2</th><th>2020</th><th>2025</th></tr></thead><tbody><tr><td>Capacidad: d<sub>min</sub>, t, detección</td><td>●</td><td>●</td><td>●</td><td>●</td><td>●</td><td>●</td><td>●</td></tr><tr><td>g(x) = (xⁿ+1)/h(x)</td><td>·</td><td>●</td><td>●</td><td>●</td><td>·</td><td>●</td><td>dado</td></tr><tr><td>Chequeadores = combinación de bits de información</td><td>●</td><td>●</td><td>●</td><td>●</td><td>●</td><td>·</td><td>·</td></tr><tr><td>Matrices G y/o H</td><td>·</td><td>·</td><td>·</td><td>·</td><td>● (G)</td><td>●</td><td>●</td></tr><tr><td>Decodificar R(x), detectar y corregir</td><td>●</td><td>●</td><td>●</td><td>●</td><td>·</td><td>·</td><td>●</td></tr><tr><td>Síndrome, error triple</td><td>·</td><td>·</td><td>·</td><td>·</td><td>·</td><td>●</td><td>·</td></tr><tr><td>Circuito de h(x)</td><td>●</td><td>·</td><td>·</td><td>·</td><td>·</td><td>·</td><td>·</td></tr><tr><td>Entrelazado / ráfagas</td><td>● (teór.)</td><td>●</td><td>●</td><td>●</td><td>●</td><td>·</td><td>●</td></tr><tr><td>ISBN (dígito faltante / validar)</td><td>·</td><td>·</td><td>● (teór.)</td><td>·</td><td>●</td><td>●</td><td>● (13)</td></tr><tr><td>Base prima</td><td>·</td><td>·</td><td>●</td><td>·</td><td>·</td><td>●</td><td>·</td></tr><tr><td>Arreglos geométricos</td><td>·</td><td>● (teór.)</td><td>·</td><td>·</td><td>·</td><td>·</td><td>●</td></tr><tr><td>Tabla Reed–Solomon</td><td>·</td><td>·</td><td>● (teór.)</td><td>·</td><td>·</td><td>·</td><td>·</td></tr><tr><td>Propiedades de g(x)</td><td>·</td><td>● (teór.)</td><td>·</td><td>·</td><td>·</td><td>·</td><td>·</td></tr></tbody></table>
+<div class="box "><div class="bt">Lo que se repite</div><p>Tres códigos explican casi todos los exámenes: <b>(12,3)</b> con h = x³+x²+x+1 (2010, 2013 T2, 2020), <b>(14,4)</b> con h = x⁴+x²+x+1 (2012 T2, 2013 T1, 2025) y <b>(15,4)</b> con h = x⁴+x+1 (2012 T1). Los resolvemos completos en la sección 4: si los dominás, los dominás a todos, y si cambia el polinomio el procedimiento es idéntico.</p></div>
+<h2 class="pb">1. Caja de herramientas</h2>
+<h3>1.1 Notación: «mayores potencias a la derecha»</h3>
+<p>En los parciales, una cadena de bits <span class="bits">b<sub>0</sub> b<sub>1</sub> b<sub>2</sub> … b<sub>n−1</sub></span> es el polinomio <b>b<sub>0</sub> + b<sub>1</sub>x + b<sub>2</sub>x² + … + b<sub>n−1</sub>xⁿ⁻¹</b>: el <b>primer bit es x⁰</b>.</p>
+<p>Ejemplo (2025): <span class="bits">11010001101</span> → posiciones con 1: 0, 1, 3, 7, 8, 10 → <b>1 + x + x³ + x⁷ + x⁸ + x¹⁰</b>.</p>
+<div class="box warn"><div class="bt">Regla para no perder puntos</div><p>Mantené una sola convención. Para <b>dividir a mano</b> conviene escribir el polinomio con la <b>mayor potencia a la izquierda</b> (invertí la cadena del enunciado); al final volvé a la convención del enunciado para escribir resultados. En este apunte las tablas de división están así y se aclara en cada una.</p></div>
+<h3>1.2 Aritmética módulo 2</h3>
+<p>Suma = XOR (0+0=0, 0+1=1, <b>1+1=0</b>); producto = AND. Restar es lo mismo que sumar. Sumar dos polinomios = XOR bit a bit de sus cadenas. En una división polinómica, cada paso es un XOR del divisor desplazado.</p>
+<h3>1.3 Parámetros del código</h3>
+<ul><li><b>n</b>: longitud de la palabra · <b>k</b>: bits de información · <b>n−k</b>: chequeadores (bits de control). Hay 2<sup>k</sup> palabras válidas entre 2<sup>n</sup> posibles.</li>
+<li><b>Redundancia</b> (como la usa la cátedra) = n/k; cuanto más cerca de 1, mejor. Tasa = k/n.</li>
+<li>Código <b>lineal</b>: suma de dos palabras válidas es válida. Entonces <b>d<sub>min</sub> = peso mínimo de una palabra válida no nula</b> (la distancia entre dos palabras es el peso de su suma, que también es válida).</li></ul>
+<h3>1.4 Capacidad del código</h3>
+<p>Con distancia mínima d<sub>min</sub>: <b>corrige t</b> errores con <b>d<sub>min</sub> ≥ 2t+1</b>, es decir <b>t = ⌊(d<sub>min</sub>−1)/2⌋</b>; como <b>detector</b> puro detecta <b>d<sub>min</sub>−1</b>. Si se usa a la vez para corregir t y detectar hasta s ≥ t: <b>d<sub>min</sub> ≥ t+s+1</b>.</p>
+<table class="c tight"><thead><tr><th>d<sub>min</sub></th><th>Solo detector (d<sub>min</sub>−1)</th><th>Solo corrector (t)</th><th>Corrector + detector</th></tr></thead><tbody><tr><td>2</td><td>1</td><td>0</td><td>—</td></tr><tr><td>3</td><td>2</td><td>1</td><td>corrige 1</td></tr><tr><td>4</td><td>3</td><td>1</td><td>corrige 1 y detecta 2</td></tr><tr><td>5</td><td>4</td><td>2</td><td>corrige 2</td></tr><tr><td>6</td><td>5</td><td>2</td><td>corrige 2 y detecta 3</td></tr><tr><td>7</td><td>6</td><td>3</td><td>corrige 3</td></tr><tr><td>8</td><td>7</td><td>3</td><td>corrige 3 y detecta 4</td></tr><tr><td>9</td><td>8</td><td>4</td><td>corrige 4</td></tr><tr><td>10</td><td>9</td><td>4</td><td>corrige 4 y detecta 5</td></tr></tbody></table>
+<p class='small'>Coincide con la tabla de la cátedra (p. ej. d<sub>min</sub> = 6 «corrige doble y detecta triple»; d<sub>min</sub> = 10 «corrige 4, detecta 5 / como detector detecta 9»).</p>
+<h3>1.5 Códigos cíclicos: qué es cada polinomio</h3>
+<table class=""><thead><tr><th>Símbolo</th><th>Qué es</th><th>Cómo se obtiene</th></tr></thead><tbody><tr><td>h(x)</td><td>polinomio de <b>chequeo</b>, grado <b>k</b></td><td>lo da el enunciado (los parciales viejos lo llaman «generador», pero luego piden g(x))</td></tr><tr><td>g(x)</td><td>polinomio <b>generador</b>, grado <b>n−k</b></td><td>g(x) = (xⁿ + 1) / h(x)  (división exacta)</td></tr><tr><td>V(x)</td><td>palabra válida (múltiplo de g)</td><td>no sistemática: V = i(x)·g(x) · sistemática: V = x<sup>n−k</sup>·i(x) + r(x), con r = x<sup>n−k</sup>·i(x) mod g</td></tr><tr><td>R(x)</td><td>palabra recibida</td><td>R = V + e (e = patrón de errores)</td></tr><tr><td>síndrome</td><td>resto de R(x) ÷ g(x)</td><td>0 ⇒ válida · ≠ 0 ⇒ hubo error; el resto identifica el patrón</td></tr></tbody></table>
+<div class="box ok"><div class="bt">Propiedades de g(x) (teórica fija del parcial)</div><ol><li>g(x) es de grado <b>n−k</b>.</li><li>g(x) es <b>factor de xⁿ+1</b>.</li><li>Tiene coeficiente 1 en el término independiente y en el de mayor grado.</li><li>Es el polinomio de <b>menor grado</b> del código (y primo, según la cátedra).</li><li>Toda palabra válida V(x) es <b>múltiplo de g(x)</b>, y todo múltiplo de g(x) de grado menor que n es palabra válida.</li><li>Todo <b>desplazamiento cíclico</b> de una palabra válida es otra palabra válida.</li></ol></div>
+<p><b>Atajo de la cátedra:</b> como g(x) es una palabra del código, d<sub>min</sub> ≤ <i>cantidad de términos de g(x)</i>. En los tres códigos de los parciales da igualdad (6, 6 y 8 términos), pero el atajo no es un teorema: la certeza sale de enumerar las palabras (lo hacemos abajo).</p>
+<p><b>Atajo de validez:</b> un polinomio <b>no nulo de grado menor que n−k</b> nunca es palabra válida (no puede ser múltiplo de g).</p>
+<h2 class="pb">2. ISBN y base prima (Etapa 1)</h2>
+<h3>2.1 Receta ISBN-10 con un dígito desconocido</h3>
+<div class="box ok"><div class="bt">Receta (código «pesado», base 11)</div><ol>
+<li>Escribí los 10 dígitos y marcá el desconocido <b>?</b>. El símbolo de control (posición 10) puede ser <b>X</b> = 10.</li>
+<li>Pesos: <b>10, 9, 8, …, 1</b> (la posición 1 pesa 10; la 10 pesa 1).</li>
+<li>Calculá dígito × peso y sumá los conocidos: <b>S</b>.</li>
+<li>Con el peso <b>w</b> de la posición del ?: resolvé <b>S + w·x ≡ 0 (mod 11)</b>, o sea x ≡ −S·w⁻¹ (mod 11).</li>
+<li>Verificá: la suma total debe ser múltiplo de 11. Si da 10 solo vale como X en el verificador.</li></ol>
+<p>Inversos módulo 11 (para no calcular cada vez): 1→1, 2→6, 3→4, 4→3, 5→9, 6→2, 7→8, 8→7, 9→5, 10→10.</p></div>
+<h3>2.2 Ejercicios resueltos</h3>
+<h4><span class="exam">2013 T2</span> ISBN <span class="bits">1-122-?3445-5</span>: encontrar el símbolo ? y la capacidad del código</h4>
+<table class="c"><thead><tr><th>Posición</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr></thead><tbody><tr><td>Dígito</td><td>1</td><td>1</td><td>2</td><td>2</td><td>?</td><td>3</td><td>4</td><td>4</td><td>5</td><td>5</td></tr><tr><td>Peso</td><td>10</td><td>9</td><td>8</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td></tr><tr><td>Dígito × peso</td><td>10</td><td>9</td><td>16</td><td>14</td><td>?</td><td>15</td><td>16</td><td>12</td><td>10</td><td>5</td></tr></tbody></table>
+<p>S = 10+9+16+14+15+16+12+10+5 = <b>107</b>; 107 = 9·11 + 8, así que S ≡ 8. El ? está en la posición 5, peso <b>6</b>.</p>
+<p>6x ≡ −8 ≡ 3 (mod 11) → x ≡ 3·6⁻¹ = 3·2 = 6.</p>
+<div class="res">? = 6 → ISBN 1-122-6<span class="dot"></span>3445-5. Verificación: 107 + 6·6 = 143 = 13·11 ✓</div>
+<h4><span class="exam">2020</span> ISBN <span class="bits">3-540-?3218-9</span> (versión de 10 dígitos)</h4>
+<table class="c"><thead><tr><th>Posición</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr></thead><tbody><tr><td>Dígito</td><td>3</td><td>5</td><td>4</td><td>0</td><td>?</td><td>3</td><td>2</td><td>1</td><td>8</td><td>9</td></tr><tr><td>Peso</td><td>10</td><td>9</td><td>8</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td></tr><tr><td>Dígito × peso</td><td>30</td><td>45</td><td>32</td><td>0</td><td>?</td><td>15</td><td>8</td><td>3</td><td>16</td><td>9</td></tr></tbody></table>
+<p>S = 30+45+32+0+15+8+3+16+9 = <b>158</b>; 158 = 14·11 + 4, S ≡ 4. Peso del ?: 6. 6x ≡ −4 ≡ 7 → x ≡ 7·2 = 14 ≡ <b>3</b>.</p>
+<div class="res">? = 3 → 3-540-<b>3</b>3218-9. Verificación: 158 + 18 = 176 = 16·11 ✓ (es justo la suma 176 que aparece en la diapositiva 9 para este ISBN)</div>
+<p class="small">⚠ La resolución de alumna del archivo llega a «6» por un error de suma (usa 113 en lugar de 158). Ver sección 8.</p>
+<h4><span class="exam">2012 T2</span> ISBN <span class="bits">234323?323</span></h4>
+<table class="c"><thead><tr><th>Posición</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th></tr></thead><tbody><tr><td>Dígito</td><td>2</td><td>3</td><td>4</td><td>3</td><td>2</td><td>3</td><td>?</td><td>3</td><td>2</td><td>3</td></tr><tr><td>Peso</td><td>10</td><td>9</td><td>8</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td></tr><tr><td>Dígito × peso</td><td>20</td><td>27</td><td>32</td><td>21</td><td>12</td><td>15</td><td>?</td><td>9</td><td>4</td><td>3</td></tr></tbody></table>
+<p>S = 20+27+32+21+12+15+9+4+3 = <b>143</b> = 13·11 → S ≡ 0. Peso del ?: 4 → 4x ≡ 0 (mod 11) → como 4 es invertible, x ≡ 0.</p>
+<div class="res">? = 0. Verificación: 143 + 0 = 143 = 13·11 ✓</div>
+<h3>2.3 Capacidad del código ISBN y base prima (teóricas fijas)</h3>
+<div class="box "><div class="bt">Capacidad del ISBN</div><ul>
+<li><b>d<sub>min</sub> = 2</b>: detecta <b>un</b> error (si cambia un solo dígito, la suma cambia en w·δ ≠ 0 mod 11 y deja de ser múltiplo de 11). Como los pesos son todos distintos, también detecta el <b>intercambio de dos dígitos adyacentes</b>.</li>
+<li><b>No corrige</b>: sabe que algo falló pero no dónde. Solo se corrige con una hipótesis (p. ej. «el erróneo es el verificador» o «sé cuál posición está mal», como en los ejercicios con ?).</li>
+<li>Dos errores que se compensan pasan inadvertidos: el código resultante es válido pero corresponde a <b>otro libro</b> (error indetectable).</li></ul></div>
+<div class="box "><div class="bt">¿Por qué base prima? (2012 T2 y 2020)</div><p>Para decodificar hay que resolver <b>w·x ≡ c (mod b)</b>. Si la base <b>b es prima</b>, cualquier peso w ≠ 0 tiene inverso y la solución es <b>única</b>: no hay ambigüedad al decodificar (la cátedra: «la base prima garantiza unicidad en el proceso de decodificación»).</p>
+<p>Contraejemplo con base 10: 2x ≡ 4 (mod 10) tiene dos soluciones, x = 2 y x = 7. Con base 11, 2x ≡ 4 → x = 2 y nada más.</p></div>
+<div class="box "><div class="bt">Base 37 (diapositiva 9)</div><p>Para códigos alfanuméricos (0–9, A–Z, espacio = 37 símbolos) se usa base 37 <b>sin pesos por posición</b>: se suman los valores de los caracteres y el verificador completa a múltiplo de 37. Ejemplo de la diapositiva: AZ9-? → 10 + 35 + 9 = 54; (54 + ?) mod 37 = 0 → ? = 20 = <b>K</b>.</p></div>
+<h3>2.4 ISBN-13 (2025)</h3>
+<h4><span class="exam">2025</span> ISBN-13 <span class="bits">978-1-80056-662-3</span>: ¿es válido? Si no, ¿se puede corregir?</h4>
+<div class="box ok"><div class="bt">Receta ISBN-13 (base 10)</div><p>Pesos <b>1, 3, 1, 3, …</b> (el último, posición 13, pesa 1). Válido ⇔ suma de dígito × peso ≡ 0 (mod 10). Dígito verificador = (10 − (suma de los 12 primeros mod 10)) mod 10.</p></div>
+<table class="c"><thead><tr><th>Posición</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th></tr></thead><tbody><tr><td>Dígito</td><td>9</td><td>7</td><td>8</td><td>1</td><td>8</td><td>0</td><td>0</td><td>5</td><td>6</td><td>6</td><td>6</td><td>2</td><td>3</td></tr><tr><td>Peso</td><td>1</td><td>3</td><td>1</td><td>3</td><td>1</td><td>3</td><td>1</td><td>3</td><td>1</td><td>3</td><td>1</td><td>3</td><td>1</td></tr><tr><td>Dígito × peso</td><td>9</td><td>21</td><td>8</td><td>3</td><td>8</td><td>0</td><td>0</td><td>15</td><td>6</td><td>18</td><td>6</td><td>6</td><td>3</td></tr></tbody></table>
+<p>Suma total = <b>103</b> → 103 mod 10 = 3 ≠ 0 ⇒ <b>el código NO es válido</b>.</p>
+<p><b>¿Corregir?</b> Solo con una hipótesis. Si el erróneo es el verificador: la suma de los 12 primeros es 100 → verificador = (10 − 0) mod 10 = <b>0</b> → <span class="bits">978-1-80056-662-0</span> es válido (verificación: 100 + 0 = 100 ≡ 0 ✓).</p>
+<p>Sin esa hipótesis solo se <b>detecta</b>: cada una de las 13 posiciones tiene exactamente un dígito que haría válido el código (en una posición de peso 1 hay que sumar 7 mod 10; en una de peso 3, restar 1 mod 10), así que hay 13 correcciones posibles y no se sabe cuál es la verdadera (con 978 fijo siguen quedando 10).</p>
+<p class="small">ISBN-13 usa módulo 10 (no primo) pero con pesos 1 y 3, que son coprimos con 10 y por eso invertibles. Detecta cualquier error simple; no detecta el intercambio de dos dígitos adyacentes que difieren en 5.</p>
+<h2 class="pb">3. Hamming y arreglos geométricos (Etapas 2 y 3)</h2>
+<h3>3.1 Hamming (7,4)</h3>
+<p>Posiciones 1 a 7: <span class="bits">C<sub>1</sub> C<sub>2</sub> I<sub>1</sub> C<sub>3</sub> I<sub>2</sub> I<sub>3</sub> I<sub>4</sub></span>. Los chequeadores ocupan las posiciones potencia de 2 (1, 2, 4). Cada síndrome mira las posiciones cuya numeración binaria tiene un 1 en ese bit:</p>
+<ul><li>S<sub>1</sub> = C<sub>1</sub> ⊕ I<sub>1</sub> ⊕ I<sub>2</sub> ⊕ I<sub>4</sub> (posiciones 1, 3, 5, 7)</li>
+<li>S<sub>2</sub> = C<sub>2</sub> ⊕ I<sub>1</sub> ⊕ I<sub>3</sub> ⊕ I<sub>4</sub> (posiciones 2, 3, 6, 7)</li>
+<li>S<sub>3</sub> = C<sub>3</sub> ⊕ I<sub>2</sub> ⊕ I<sub>3</sub> ⊕ I<sub>4</sub> (posiciones 4, 5, 6, 7)</li></ul>
+<p><b>(S<sub>3</sub> S<sub>2</sub> S<sub>1</sub>) en binario = posición del error</b>; si es 000 no hay error. d<sub>min</sub> = 3 → corrige 1, detecta 2. Es un código <i>perfecto</i>: 2<sup>3</sup> = 8 = 1 + 7 (cada síndrome sirve a una posición o a «sin error»).</p>
+<div class="box ex"><div class="bt">Ejemplo completo</div><p><b>Codificar</b> I<sub>1</sub>I<sub>2</sub>I<sub>3</sub>I<sub>4</sub> = 1 0 1 1: C<sub>1</sub> = I<sub>1</sub>⊕I<sub>2</sub>⊕I<sub>4</sub> = 1⊕0⊕1 = 0; C<sub>2</sub> = I<sub>1</sub>⊕I<sub>3</sub>⊕I<sub>4</sub> = 1⊕1⊕1 = 1; C<sub>3</sub> = I<sub>2</sub>⊕I<sub>3</sub>⊕I<sub>4</sub> = 0⊕1⊕1 = 0. Palabra: <span class="bits">0 1 1 0 0 1 1</span>.</p>
+<p><b>Canal</b> cambia la posición 6: recibido <span class="bits">0 1 1 0 0 0 1</span>.</p>
+<p><b>Decodificar</b>: S<sub>1</sub> = r<sub>1</sub>⊕r<sub>3</sub>⊕r<sub>5</sub>⊕r<sub>7</sub> = 0⊕1⊕0⊕1 = 0; S<sub>2</sub> = r<sub>2</sub>⊕r<sub>3</sub>⊕r<sub>6</sub>⊕r<sub>7</sub> = 1⊕1⊕0⊕1 = 1; S<sub>3</sub> = r<sub>4</sub>⊕r<sub>5</sub>⊕r<sub>6</sub>⊕r<sub>7</sub> = 0⊕0⊕0⊕1 = 1. (S<sub>3</sub>S<sub>2</sub>S<sub>1</sub>) = 110 = 6 → se invierte la posición 6 → <span class="bits">0110011</span> ✓.</p></div>
+<h3>Hamming + bit de paridad (d<sub>min</sub> = 4)</h3>
+<p>Se agrega BP = paridad de los 7 bits (código (8,4)). Con el síndrome de Hamming S y el control de BP se distinguen 1 y 2 errores:</p>
+<table class=""><thead><tr><th>Síndrome S</th><th>BP (¿falla la paridad total?)</th><th>Conclusión</th></tr></thead><tbody><tr><td>S = 0</td><td>no falla</td><td>sin error (o error múltiple muy improbable)</td></tr><tr><td>S = 0</td><td>falla</td><td>error simple en el propio BP</td></tr><tr><td>S ≠ 0</td><td>falla (número impar de errores)</td><td>error simple en la posición S → <b>se corrige</b></td></tr><tr><td>S ≠ 0</td><td>no falla (número par de errores)</td><td><b>doble error</b>: se detecta, no se corrige → pedir retransmisión</td></tr></tbody></table>
+<p>Resultado: d<sub>min</sub> = 4 → <b>corrector simple y detector doble</b> (idéntico a la fila d<sub>min</sub> = 4 de la tabla 1.4).</p>
+<h3>3.2 Arreglos geométricos (rectangular)</h3>
+<p><b>Regla:</b> en un código producto (arreglo rectangular) con código por filas de distancia <b>d<sub>1</sub></b> y código por columnas de distancia <b>d<sub>2</sub></b>, la distancia mínima es <b>d<sub>min</sub> = d<sub>1</sub>·d<sub>2</sub></b>.</p>
+<h4><span class="exam">2025</span> / <span class="exam">2012 T1</span> Arreglo de palabras Hamming con paridad por filas y por columnas</h4>
+<p>El arreglo tiene 3 filas; cada fila es una palabra Hamming de un bit de información (C<sub>1</sub> C<sub>2</sub> I) seguida de su bit de paridad de fila BP; debajo hay un bit de paridad por cada columna.</p>
+<div class="svgwrap">
+<table class="c tight"><tr><td>C<sub>10</sub></td><td>C<sub>20</sub></td><td>I<sub>10</sub></td><td style="background:#ffe9c7">BPP<sub>0</sub></td></tr>
+<tr><td>C<sub>11</sub></td><td>C<sub>21</sub></td><td>I<sub>11</sub></td><td style="background:#ffe9c7">BPP<sub>1</sub></td></tr>
+<tr><td>C<sub>12</sub></td><td>C<sub>22</sub></td><td>I<sub>12</sub></td><td style="background:#ffe9c7">BPP<sub>2</sub></td></tr>
+<tr><td style="background:#ffe9c7">BPP<sub>3</sub></td><td style="background:#ffe9c7">BPP<sub>4</sub></td><td style="background:#ffe9c7">BPP<sub>5</sub></td><td></td></tr></table></div>
+<p><b>Paso 1 – código de cada fila.</b> Hamming (3,1) tiene d = 3: sus únicas palabras son 000 y 111 (C<sub>1</sub> = C<sub>2</sub> = I). Al agregar la paridad de fila BP queda el (4,1) con <b>d<sub>1</sub> = 4</b> (0000 o 1111).</p>
+<p><b>Paso 2 – código de cada columna.</b> Paridad simple: <b>d<sub>2</sub> = 2</b>.</p>
+<p><b>Paso 3 – producto.</b> d<sub>min</sub> = d<sub>1</sub>·d<sub>2</sub> = 4·2 = <b>8</b> (con el bit de la esquina, la «paridad de las paridades»). Sin la esquina, como en el dibujo, queda 7. Lo comprobé enumerando las 8 palabras:</p>
+<table class="c tight"><thead><tr><th>Información (I<sub>10</sub> I<sub>11</sub> I<sub>12</sub>)</th><th>Peso sin esquina</th><th>Peso con esquina</th></tr></thead><tbody><tr><td>0 0 1</td><td>7</td><td>8</td></tr><tr><td>0 1 0</td><td>7</td><td>8</td></tr><tr><td>0 1 1</td><td>8</td><td>8</td></tr><tr><td>1 0 0</td><td>7</td><td>8</td></tr><tr><td>1 0 1</td><td>8</td><td>8</td></tr><tr><td>1 1 0</td><td>8</td><td>8</td></tr><tr><td>1 1 1</td><td>15</td><td>16</td></tr></tbody></table>
+<div class="res">d<sub>min</sub> = 8 (7 si no se agrega la esquina) → corrige <b>t = 3</b>, detecta 6 o 7.</div>
+<p class="small">⚠ La resolución de alumna usa d<sub>1</sub> = 3 (Hamming sin el bit de paridad de fila) y obtiene d<sub>min</sub> = 6, t = 2. Es una cota inferior válida (el código real tiene d<sub>min</sub> ≥ 7), pero no es ajustada. El enunciado dice «cada fila es una palabra Hamming y existen paridades por filas y por columnas»; como depende de cómo se lea el BP de fila, conviene confirmar con la cátedra qué valor esperan. Ver sección 8.</p>
+<p><b>Cómo se reconocen y corrigen los errores:</b></p>
+<ol><li><b>Por fila</b>: síndrome Hamming (S<sub>2</sub>S<sub>1</sub> = posición) + BP de fila (tabla de 3.1): corrige un error por fila y distingue 1 de 2 errores.</li>
+<li><b>Por columna</b>: la paridad de cada columna falla si tiene un número impar de errores.</li>
+<li><b>Cruce</b>: si falla una fila y una columna, el error está en su intersección; sirve cuando la fila no puede corregir sola (2 errores en la fila).</li></ol>
+<h4><span class="exam">2025</span> ¿Es válida esta palabra recibida?</h4>
+<div class="svgwrap"><table class="c tight">
+<tr><td>1</td><td>0</td><td>0</td><td style="background:#eee">1</td></tr>
+<tr><td>0</td><td>0</td><td>0</td><td style="background:#eee">1</td></tr>
+<tr><td>1</td><td>1</td><td>1</td><td style="background:#eee">1</td></tr>
+<tr><td style="background:#eee">0</td><td style="background:#eee">0</td><td style="background:#eee">0</td><td></td></tr></table></div>
+<ul>
+<li><b>Fila 1</b> (1 0 0 | 1): S<sub>1</sub> = C<sub>1</sub>⊕I = 1, S<sub>2</sub> = C<sub>2</sub>⊕I = 0 → Hamming «apunta» a la posición 1, pero la paridad de fila <b>sí</b> da par (1+0+0+1 = 0): contradicción → hay 2 errores en la fila.</li>
+<li><b>Fila 2</b> (0 0 0 | 1): S = 00 pero falla la paridad → el error está en el BP de la fila 2.</li>
+<li><b>Fila 3</b> (1 1 1 | 1): válida.</li>
+<li><b>Columnas</b>: col 1 = (1,0,1) con BP 0 → ok · col 2 = (0,0,1) con BP 0 → <b>falla</b> · col 3 = (0,0,1) con BP 0 → <b>falla</b>.</li></ul>
+<div class="res">No es válida (fallan filas 1 y 2 y las columnas 2 y 3). La alumna menciona solo la fila 2 y la columna 2; la columna 3 también falla.</div>
+<p><b>Corrección por mínima distancia:</b> las 8 palabras válidas están a distancias 3, 5, 5, 6… de lo recibido; la única a distancia ≤ t = 3 es la que corresponde a información 1 0 1 (filas 1111 / 0000 / 1111, paridades de columna 000). Distancia 3 ≤ t → corrección única. A mano se llega con el procedimiento fila–columna.</p>
+<h2 class="pb">4. Códigos cíclicos: el corazón del parcial (Etapas 4–7)</h2>
+<div class="box ok"><div class="bt">Receta general (aplica a TODOS los parciales)</div><ol>
+<li><b>k</b> = grado de h(x); chequeadores = n − k.</li>
+<li><b>g(x) = (xⁿ+1) / h(x)</b> por división polinómica (resto 0).</li>
+<li><b>d<sub>min</sub></b>: listá las 2<sup>k</sup>−1 palabras no nulas V = m(x)·g(x) y tomá el <b>peso mínimo</b>. Atajo: d<sub>min</sub> ≤ #términos de g.</li>
+<li><b>Capacidad</b>: t = ⌊(d<sub>min</sub>−1)/2⌋; detecta d<sub>min</sub>−1.</li>
+<li><b>Matriz generadora</b>: sistemática G = [P | I<sub>k</sub>] con la fila i de P = (x<sup>n−k+i</sup> mod g). O sin sistematizar: filas = g(x), x·g(x), x²·g(x), …</li>
+<li><b>Matriz chequeadora</b>: H = [I<sub>n−k</sub> | P<sup>T</sup>]. Comprobá <b>G·H<sup>T</sup> = 0</b>.</li>
+<li><b>Chequeadores</b>: la columna j de P dice qué bits de información suma el chequeador c<sub>j</sub>.</li>
+<li><b>Decodificar</b>: r(x) = R(x) mod g(x). r = 0 ⇒ válida. Si no, buscá el patrón de error e de peso ≤ t con e mod g = r y corregí V = R ⊕ e.</li>
+<li><b>Circuito</b>: registro de k celdas realimentado según h(x).</li>
+<li><b>Entrelazado</b>: con L palabras entrelazadas se corrigen ráfagas de t·L bits.</li></ol></div>
+<h3>4.1 Calentamiento: el cíclico (7,4) con g(x) = x³ + x + 1</h3>
+<p>Es el ejemplo de la cátedra; es chico y sirve para ver todos los pasos con cuentas cortas antes de ir a los códigos de los parciales.</p>
+<p><b>(a)</b> n = 7 y deg g = 3 ⇒ <b>k = 4</b>. Verificación de que g divide a x<sup>7</sup>+1 (cociente = h):</p>
+<table class="div"><thead><tr><th>Paso</th><th>Resto parcial (mayor potencia a la izquierda)</th><th>Término del cociente</th><th>Divisor desplazado</th><th>Resto nuevo (suma mod 2)</th></tr></thead><tbody><tr><td>1</td><td><span class="bits">10000001</span></td><td>x<sup>4</sup></td><td><span class="bits">10110000</span></td><td><span class="bits">00110001</span></td></tr><tr><td>2</td><td><span class="bits">00110001</span></td><td>x<sup>2</sup></td><td><span class="bits">00101100</span></td><td><span class="bits">00011101</span></td></tr><tr><td>3</td><td><span class="bits">00011101</span></td><td>x</td><td><span class="bits">00010110</span></td><td><span class="bits">00001011</span></td></tr><tr><td>4</td><td><span class="bits">00001011</span></td><td>1</td><td><span class="bits">00001011</span></td><td><span class="bits">00000000</span></td></tr></tbody></table>
+<p>Resto 0 ✓; el cociente es h(x) = x⁴ + x² + x + 1.</p>
+<p><b>(b)</b> d<sub>min</sub>: las 15 palabras no nulas pesan 3 (×7), 4 (×7) y 7 (×1) → <b>d<sub>min</sub> = 3, t = 1</b> (es el Hamming (7,4)).</p>
+<p><b>(c) Codificar</b> la información i(x) = 1 + x² (bits <span class='bits'>1010</span>):</p><ul><li>No sistemática: V = i·g = (1+x²)(1+x+x³) = <b>x<sup>5</sup> + x<sup>2</sup> + x + 1</b> → <span class='bits'>1110010</span>.</li><li>Sistemática: x³·i(x) = x³ + x⁵; dividiendo por g el resto es <b>x²</b>; V = x⁵ + x³ + x² → <span class='bits'>0011010</span> (chequeadores <span class='bits'>001</span> en las posiciones 0–2, información <span class='bits'>1010</span> en las 3–6).</li></ul>
+<p><b>(d) Síndromes de error simple</b> (resto de x<sup>i</sup> ÷ g): los 7 son distintos y no nulos, por eso corrige 1 error.</p>
+<table class="c tight"><thead><tr><th>Error en</th><th>x<sup>i</sup> mod g</th><th>Síndrome (bits)</th></tr></thead><tbody><tr><td>1</td><td>1</td><td>100</td></tr><tr><td>x</td><td>x</td><td>010</td></tr><tr><td>x<sup>2</sup></td><td>x<sup>2</sup></td><td>001</td></tr><tr><td>x<sup>3</sup></td><td>x + 1</td><td>110</td></tr><tr><td>x<sup>4</sup></td><td>x<sup>2</sup> + x</td><td>011</td></tr><tr><td>x<sup>5</sup></td><td>x<sup>2</sup> + x + 1</td><td>111</td></tr><tr><td>x<sup>6</sup></td><td>x<sup>2</sup> + 1</td><td>101</td></tr></tbody></table>
+<p><b>(e) Decodificar</b> R = <span class='bits'>0011110</span> (la palabra de (c) con un error). R(x) = x<sup>5</sup> + x<sup>4</sup> + x<sup>3</sup> + x<sup>2</sup> → resto de R ÷ g = <b>x<sup>2</sup> + x</b> ≠ 0 → no es válida. Ese resto es el de x⁴ en la tabla → error en la posición 4 → se invierte el bit 4: V = <span class='bits'>0011010</span>; información = <span class='bits'>1010</span> ✓.</p>
+<h3 class="pb">4.2 Código (12, 3) con h(x) = x³ + x² + x + 1 &nbsp;<span class="exam">2010</span><span class="exam">2013 T2</span><span class="exam">2020</span></h3>
+<p><b>Enunciado tipo (2020):</b> «Sea h(x) = x³+x²+x+1 de un código (12, k, d<sub>min</sub>). A) k. B) d<sub>min</sub> indicando cualidades como corrector y como detector. C) polinomio generador g(x). D) matriz generadora G y chequeadora H. E) qué sucede en la decodificación ante un <b>error triple</b>; y si se comparara el síndrome con las filas de H<sup>T</sup>.»<br>
+<b>2010:</b> capacidad, chequeadores como combinación de bits de información, decodificar 110011001110 con corrección, dibujar el circuito de h(x). <b>2013 T2:</b> capacidad, G y chequeadores, entrelazar 20 códigos.</p>
+<h4>Paso 1 · k</h4>
+<p>El grado de h(x) es 3 → <b>k = 3</b> bits de información; n − k = 12 − 3 = <b>9</b> chequeadores. Hay 2³ = 8 palabras válidas.</p>
+<h4>Paso 2 · polinomio generador g(x) = (x¹² + 1) / h(x)</h4>
+<p>Cada fila resta (suma mod 2) el divisor desplazado. Los términos del cociente son el polinomio buscado.</p>
+<table class="div"><thead><tr><th>Paso</th><th>Resto parcial (mayor potencia a la izquierda)</th><th>Término del cociente</th><th>Divisor desplazado</th><th>Resto nuevo (suma mod 2)</th></tr></thead><tbody><tr><td>1</td><td><span class="bits">1000000000001</span></td><td>x<sup>9</sup></td><td><span class="bits">1111000000000</span></td><td><span class="bits">0111000000001</span></td></tr><tr><td>2</td><td><span class="bits">0111000000001</span></td><td>x<sup>8</sup></td><td><span class="bits">0111100000000</span></td><td><span class="bits">0000100000001</span></td></tr><tr><td>3</td><td><span class="bits">0000100000001</span></td><td>x<sup>5</sup></td><td><span class="bits">0000111100000</span></td><td><span class="bits">0000011100001</span></td></tr><tr><td>4</td><td><span class="bits">0000011100001</span></td><td>x<sup>4</sup></td><td><span class="bits">0000011110000</span></td><td><span class="bits">0000000010001</span></td></tr><tr><td>5</td><td><span class="bits">0000000010001</span></td><td>x</td><td><span class="bits">0000000011110</span></td><td><span class="bits">0000000001111</span></td></tr><tr><td>6</td><td><span class="bits">0000000001111</span></td><td>1</td><td><span class="bits">0000000001111</span></td><td><span class="bits">0000000000000</span></td></tr></tbody></table>
+<div class="res">g(x) = x<sup>9</sup> + x<sup>8</sup> + x<sup>5</sup> + x<sup>4</sup> + x + 1 &nbsp;→ en bits (mayores potencias a la derecha): <span class="bits">1100110011</span> &nbsp;(grado 9 = n−k ✓, 6 términos)</div>
+<h4>Paso 3 · d<sub>min</sub> enumerando las palabras</h4>
+<p>Palabra = m(x)·g(x) (no sistemática). Se listan las 7 no nulas:</p>
+<table class="c tight"><thead><tr><th>Info m (bits)</th><th>m(x)</th><th>V = m·g (bits)</th><th>Peso</th></tr></thead><tbody><tr><td>100</td><td>1</td><td>1100 1100 1100</td><td>6</td></tr><tr><td>010</td><td>x</td><td>0110 0110 0110</td><td>6</td></tr><tr><td>110</td><td>1 + x</td><td>1010 1010 1010</td><td>6</td></tr><tr><td>001</td><td>x<sup>2</sup></td><td>0011 0011 0011</td><td>6</td></tr><tr><td>101</td><td>1 + x<sup>2</sup></td><td>1111 1111 1111</td><td>12</td></tr><tr><td>011</td><td>x + x<sup>2</sup></td><td>0101 0101 0101</td><td>6</td></tr><tr><td>111</td><td>1 + x + x<sup>2</sup></td><td>1001 1001 1001</td><td>6</td></tr></tbody></table>
+<div class="res">d<sub>min</sub> = 6 &nbsp;→&nbsp; t = ⌊5/2⌋ = 2 &nbsp;|&nbsp; detecta d<sub>min</sub>−1 = 5 &nbsp;|&nbsp; corrige 2 y detecta 3 a la vez (6 ≥ 2+3+1) &nbsp;|&nbsp; redundancia n/k = 4</div>
+<p>Coincide con el atajo: g tiene 6 términos. Control con la cota de Hamming: 1 + 12 + 66 = 79 ≤ 2⁹ = 512 ✓ (no es un código perfecto: sobran síndromes).</p>
+<h4>Paso 4 · G y H en forma sistemática y chequeadores</h4>
+<p>Con «mayores potencias a la derecha» los chequeadores quedan en las posiciones 0–8 y la información en las 9–11 (x⁹, x¹⁰, x¹¹). La fila i de P es <b>x<sup>9+i</sup> mod g</b>:</p>
+<table class="c tight"><thead><tr><th>Bit de información</th><th>x<sup>9+i</sup> mod g</th><th>Fila de P (9 bits)</th></tr></thead><tbody><tr><td>x<sup>9</sup></td><td>x<sup>8</sup> + x<sup>5</sup> + x<sup>4</sup> + x + 1</td><td>110011001</td></tr><tr><td>x<sup>10</sup></td><td>x<sup>8</sup> + x<sup>6</sup> + x<sup>4</sup> + x<sup>2</sup> + 1</td><td>101010101</td></tr><tr><td>x<sup>11</sup></td><td>x<sup>8</sup> + x<sup>7</sup> + x<sup>4</sup> + x<sup>3</sup> + 1</td><td>100110011</td></tr></tbody></table>
+<div class="two"><div><div class="matbox"><div class="matcap"><b>G</b> (3 × 12) = [ P | I<sub>3</sub> ]</div><pre class="mat">1 1 0 0 1 1 0 0 1 | 1 0 0
+1 0 1 0 1 0 1 0 1 | 0 1 0
+1 0 0 1 1 0 0 1 1 | 0 0 1</pre></div></div><div><div class="matbox"><div class="matcap"><b>H</b> (9 × 12) = [ I<sub>9</sub> | P<sup>T</sup> ]</div><pre class="mat">1 0 0 0 0 0 0 0 0 | 1 1 1
+0 1 0 0 0 0 0 0 0 | 1 0 0
+0 0 1 0 0 0 0 0 0 | 0 1 0
+0 0 0 1 0 0 0 0 0 | 0 0 1
+0 0 0 0 1 0 0 0 0 | 1 1 1
+0 0 0 0 0 1 0 0 0 | 1 0 0
+0 0 0 0 0 0 1 0 0 | 0 1 0
+0 0 0 0 0 0 0 1 0 | 0 0 1
+0 0 0 0 0 0 0 0 1 | 1 1 1</pre></div></div></div>
+<p>Verificación: cada fila de G por cada fila de H da 0 mod 2 (G·H<sup>T</sup> = 0) ✓.</p>
+<p><b>Cada chequeador como combinación de los bits de información</b> (i<sub>0</sub>, i<sub>1</sub>, i<sub>2</sub> = bits en las posiciones 9, 10, 11):</p>
+<table class="c"><thead><tr><th>c<sub>0</sub></th><th>c<sub>1</sub></th><th>c<sub>2</sub></th><th>c<sub>3</sub></th><th>c<sub>4</sub></th><th>c<sub>5</sub></th><th>c<sub>6</sub></th><th>c<sub>7</sub></th><th>c<sub>8</sub></th></tr></thead><tbody><tr><td>i<sub>0</sub> ⊕ i<sub>1</sub> ⊕ i<sub>2</sub></td><td>i<sub>0</sub></td><td>i<sub>1</sub></td><td>i<sub>2</sub></td><td>i<sub>0</sub> ⊕ i<sub>1</sub> ⊕ i<sub>2</sub></td><td>i<sub>0</sub></td><td>i<sub>1</sub></td><td>i<sub>2</sub></td><td>i<sub>0</sub> ⊕ i<sub>1</sub> ⊕ i<sub>2</sub></td></tr></tbody></table>
+<p>Es decir: c<sub>0</sub>=c<sub>4</sub>=c<sub>8</sub> = i<sub>0</sub>⊕i<sub>1</sub>⊕i<sub>2</sub>; c<sub>1</sub>=c<sub>5</sub> = i<sub>0</sub>; c<sub>2</sub>=c<sub>6</sub> = i<sub>1</sub>; c<sub>3</sub>=c<sub>7</sub> = i<sub>2</sub>. (Con G sin sistematizar —filas g, x·g, x²·g— el código es el mismo conjunto de 8 palabras; cambia qué mensaje corresponde a cada una.)</p>
+<div class="box "><div class="bt">G sin sistematizar (como en la resolución 2025)</div><div class="matbox"><div class="matcap">Filas = g(x), x·g(x), x²·g(x)</div><pre class="mat">1 1 0 0 1 1 0 0 1 1 0 0
+0 1 1 0 0 1 1 0 0 1 1 0
+0 0 1 1 0 0 1 1 0 0 1 1</pre></div><p>Funciona igual para generar el código; la desventaja es que la información queda mezclada con los chequeadores y no se lee directo.</p></div>
+<h4>Paso 5 · Decodificar el flujo recibido (2010)</h4>
+<p>Recibido: <span class='bits'>110011001110</span> → R(x) = x<sup>10</sup> + x<sup>9</sup> + x<sup>8</sup> + x<sup>5</sup> + x<sup>4</sup> + x + 1.</p>
+<p><b>División de R(x) por g(x)</b> (mayor potencia a la izquierda: se escribe invertido el flujo del enunciado):</p>
+<table class="div"><thead><tr><th>Paso</th><th>Resto parcial (mayor potencia a la izquierda)</th><th>Término del cociente</th><th>Divisor desplazado</th><th>Resto nuevo (suma mod 2)</th></tr></thead><tbody><tr><td>1</td><td><span class="bits">11100110011</span></td><td>x</td><td><span class="bits">11001100110</span></td><td><span class="bits">00101010101</span></td></tr></tbody></table>
+<p>El resto es <b>x<sup>8</sup> + x<sup>6</sup> + x<sup>4</sup> + x<sup>2</sup> + 1</b> (bits <span class="bits">101010101</span>) ≠ 0 → <b>la palabra no es válida</b>.</p>
+<p><b>Localizar el error:</b> se busca qué x<sup>i</sup> deja ese mismo resto. Para i &lt; 9 el resto sería x<sup>i</sup> (un solo 1); acá hay varios 1, así que el error está en la parte de información, y el resto coincide con la fila de P de x<sup>10</sup>: x<sup>10</sup> mod g = x<sup>8</sup> + x<sup>6</sup> + x<sup>4</sup> + x<sup>2</sup> + 1 ✓. (Equivalente por matriz: el síndrome S = R·H<sup>T</sup> es la columna 10 de H.)</p>
+<p><b>Corrección:</b> se invierte el bit 10: <span class="bits">110011001110</span> → <span class="bits">110011001100</span>. Comprobación: es la primera fila de G → válida; su información (posiciones 9–11) es <span class="bits">100</span>.</p>
+<div class="res">Error simple en x<sup>10</sup> → palabra válida 110011001100, información 1 0 0</div>
+<h4>Paso 6 · Errores dobles y triples (2020, inciso E)</h4>
+<p><b>Cómo se decodifica en general:</b> se divide R(x) por g(x); el resto es el <b>síndrome</b>. Se lo compara con las <b>filas de H<sup>T</sup></b> (= columnas de H = síndromes de errores simples): una coincidencia → error simple en esa posición; la suma (XOR) de dos filas → error doble en esas dos posiciones; etc.</p>
+<p><b>Error triple:</b> como t = 2, el decodificador solo busca patrones de peso ≤ 2. Con 3 errores el síndrome es el XOR de 3 filas de H<sup>T</sup> y <b>no coincide con ninguna fila ni con ningún XOR de dos filas</b>: el error se <b>detecta</b> (síndrome ≠ 0) pero <b>no se corrige</b> (hay que pedir retransmisión). Esto nunca se confunde con un error corregible: si un patrón de peso ≤ 2 diera el mismo síndrome, la diferencia entre ambos patrones sería una palabra válida de peso ≤ 5 &lt; 6 = d<sub>min</sub>, que no existe.</p>
+<p><i>Ejemplo:</i> palabra válida <span class='bits'>111111111111</span> con errores en las posiciones 0, 1 y 2 → resto <span class='bits'>111000000</span> (es el XOR de las filas de x⁰, x¹ y x²). Como no coincide con ninguna fila de H<sup>T</sup> ni con la suma de dos de ellas, se detecta sin corregir.</p>
+<p>Si en cambio hubiera <b>2 errores</b>, el síndrome es el XOR de dos filas de H<sup>T</sup> (y es único: lo verifiqué para todos los patrones de peso ≤ 2) → se corrigen.</p>
+<h4>Paso 7 · Circuito de h(x) (2010, inciso D)</h4>
+<p>Un código cíclico con polinomio de chequeo h(x) de grado k se implementa con un <b>registro de desplazamiento de k = 3 celdas</b> cuyas realimentaciones (compuertas XOR) corresponden a los coeficientes de h(x) que valen 1: acá h = 1 + x + x² + x³ → <b>las tres celdas</b> entran al XOR, y la suma se reinyecta a la entrada. En cada pulso el registro se corre un lugar y el bit que sale es el siguiente bit de la palabra.</p>
+<div class="svgwrap"><svg viewBox="0 0 560 150" width="500" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial" font-size="13">
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#10294a"/></marker></defs>
+<g stroke="#10294a" stroke-width="1.6" fill="none">
+<rect x="150" y="60" width="60" height="38" fill="#eef2f8"/><rect x="230" y="60" width="60" height="38" fill="#eef2f8"/><rect x="310" y="60" width="60" height="38" fill="#eef2f8"/>
+<line x1="210" y1="79" x2="230" y2="79" marker-end="url(#a)"/><line x1="290" y1="79" x2="310" y2="79" marker-end="url(#a)"/>
+<line x1="370" y1="79" x2="450" y2="79" marker-end="url(#a)"/>
+<line x1="60" y1="79" x2="150" y2="79" marker-end="url(#a)"/>
+<circle cx="60" cy="79" r="13" fill="#fff"/><line x1="52" y1="79" x2="68" y2="79"/><line x1="60" y1="71" x2="60" y2="87"/>
+<path d="M180 60 L180 22 L60 22 L60 66"/><path d="M260 60 L260 34 L60 34"/><path d="M340 60 L340 46 L60 46"/>
+</g>
+<text x="170" y="84">S0</text><text x="250" y="84">S1</text><text x="330" y="84">S2</text>
+<text x="388" y="72">salida</text><text x="6" y="83" font-size="12">⊕</text>
+<text x="96" y="16" font-size="12" fill="#35506f">las 3 celdas realimentan el XOR (h = 1 + x + x² + x³: los tres coeficientes son 1)</text>
+</svg></div>
+<p><b>Funcionamiento</b> (comprobado): cargando la «semilla» de información <span class="bits">1 1 0</span> (S<sub>0</sub>, S<sub>1</sub>, S<sub>2</sub> = c<sub>0</sub> c<sub>1</sub> c<sub>2</sub>), la secuencia de salida es c<sub>i+3</sub> = c<sub>i</sub> ⊕ c<sub>i+1</sub> ⊕ c<sub>i+2</sub> → <span class="bits">110011001100</span> = una palabra válida (la fila g del código). Cargar 1 0 0 da 100110011001, 1 0 1 da 101010101010, etc. Estas 8 secuencias son justamente las 8 palabras válidas del código (g(x)·m(x)).</p>
+<p class="small">Lo que se evalúa en el parcial es que las conexiones coincidan con los coeficientes de h(x). Hay dos arquitecturas (Fibonacci y Galois, esta última es la usada en control de error); como h(x) de este código es palíndromo, el dibujo no cambia entre ambas. Confirmá con la cátedra el estilo de dibujo que esperan.</p>
+<h4>Paso 8 · Entrelazado (2010 y 2013 T2)</h4>
+<p>Con t = 2, entrelazando <b>L</b> palabras se corrigen ráfagas de <b>t·L</b> bits: <b>L = 7 → 14 bits</b> (2010); <b>L = 20 → 40 bits</b> (2013 T2). Más detalle en la sección 5.</p>
+<h3 class="pb">4.3 Código (14, 4) con h(x) = x⁴ + x² + x + 1 &nbsp;<span class="exam">2012 T2</span><span class="exam">2013 T1</span><span class="exam">2025</span></h3>
+<p><b>Enunciado tipo (2012 T2 / 2013 T1):</b> «(14, K?, d<sub>min</sub>?) con h(X) = X⁴+X²+X+1. a) g(X). b) capacidades como corrector y/o detector, encontrando d<sub>min</sub>. c) cada chequeador como combinación lineal de qué dígitos de información. d) ¿R(x) = X⁸+X⁴ es válido? Si no, corregirlo. e) capacidad de corrección en ráfaga si se entrelazan 20 códigos.»<br>
+<b>2025:</b> dan directamente <b>G(x) = 11010001101</b> (mayores potencias a la derecha) y piden capacidad, matrices G y H, validar R(x) = 11110001101000, corregir, y entrelazar 25.</p>
+<h4>Paso 1 · k y g(x)</h4>
+<p>Si te dan h: deg h = 4 → <b>k = 4</b>, n−k = 10. Si te dan g (2025): deg g = 10 → k = 14 − 10 = 4 y h = (x¹⁴+1)/g = 1 + x + x² + x⁴ (bits <span class='bits'>11101</span>).</p>
+<table class="div"><thead><tr><th>Paso</th><th>Resto parcial (mayor potencia a la izquierda)</th><th>Término del cociente</th><th>Divisor desplazado</th><th>Resto nuevo (suma mod 2)</th></tr></thead><tbody><tr><td>1</td><td><span class="bits">100000000000001</span></td><td>x<sup>10</sup></td><td><span class="bits">101110000000000</span></td><td><span class="bits">001110000000001</span></td></tr><tr><td>2</td><td><span class="bits">001110000000001</span></td><td>x<sup>8</sup></td><td><span class="bits">001011100000000</span></td><td><span class="bits">000101100000001</span></td></tr><tr><td>3</td><td><span class="bits">000101100000001</span></td><td>x<sup>7</sup></td><td><span class="bits">000101110000000</span></td><td><span class="bits">000000010000001</span></td></tr><tr><td>4</td><td><span class="bits">000000010000001</span></td><td>x<sup>3</sup></td><td><span class="bits">000000010111000</span></td><td><span class="bits">000000000111001</span></td></tr><tr><td>5</td><td><span class="bits">000000000111001</span></td><td>x</td><td><span class="bits">000000000101110</span></td><td><span class="bits">000000000010111</span></td></tr><tr><td>6</td><td><span class="bits">000000000010111</span></td><td>1</td><td><span class="bits">000000000010111</span></td><td><span class="bits">000000000000000</span></td></tr></tbody></table>
+<div class="res">g(x) = x<sup>10</sup> + x<sup>8</sup> + x<sup>7</sup> + x<sup>3</sup> + x + 1 &nbsp;→ <span class="bits">11010001101</span> (6 términos; es exactamente el G(x) del enunciado 2025)</div>
+<h4>Paso 2 · d<sub>min</sub> enumerando las 15 palabras no nulas</h4>
+<div class="two"><div><table class="c"><thead><tr><th>m (bits)</th><th>V = m·g</th><th>Peso</th></tr></thead><tbody><tr><td>1000</td><td>1101000 1101000</td><td>6</td></tr><tr><td>0100</td><td>0110100 0110100</td><td>6</td></tr><tr><td>1100</td><td>1011100 1011100</td><td>8</td></tr><tr><td>0010</td><td>0011010 0011010</td><td>6</td></tr><tr><td>1010</td><td>1110010 1110010</td><td>8</td></tr><tr><td>0110</td><td>0101110 0101110</td><td>8</td></tr><tr><td>1110</td><td>1000110 1000110</td><td>6</td></tr><tr><td>0001</td><td>0001101 0001101</td><td>6</td></tr></tbody></table></div><div><table class="c"><thead><tr><th>m (bits)</th><th>V = m·g</th><th>Peso</th></tr></thead><tbody><tr><td>1001</td><td>1100101 1100101</td><td>8</td></tr><tr><td>0101</td><td>0111001 0111001</td><td>8</td></tr><tr><td>1101</td><td>1010001 1010001</td><td>6</td></tr><tr><td>0011</td><td>0010111 0010111</td><td>8</td></tr><tr><td>1011</td><td>1111111 1111111</td><td>14</td></tr><tr><td>0111</td><td>0100011 0100011</td><td>6</td></tr><tr><td>1111</td><td>1001011 1001011</td><td>8</td></tr></tbody></table></div></div>
+<div class="res">Pesos: 6 (×7), 8 (×7), 14 (×1) → <b>d<sub>min</sub> = 6</b>, t = 2, detecta 5 (corrige 2 y detecta 3 a la vez) · redundancia n/k = 14/4 = 3,5</div>
+<p class="small">⚠ La tabla de pesos de la resolución 2025 de alumna no coincide con la real (por ejemplo da 7 u 8 para palabras que son desplazamientos de g —m = 1, x, x²— y por lo tanto pesan 6, y da 9 para la 1011, que en realidad es todo unos, peso 14). La conclusión d<sub>min</sub> = 6 sí es correcta. Ver sección 8.</p>
+<h4>Paso 3 · G y H</h4>
+<p><b>Forma 1 – por desplazamientos de g</b> (la de la resolución 2025; es la más rápida):</p>
+<div class="matbox"><div class="matcap">G (4 × 14): filas g(x), x·g, x²·g, x³·g</div><pre class="mat">1 1 0 1 0 0 0 1 1 0 1 0 0 0
+0 1 1 0 1 0 0 0 1 1 0 1 0 0
+0 0 1 1 0 1 0 0 0 1 1 0 1 0
+0 0 0 1 1 0 1 0 0 0 1 1 0 1</pre></div>
+<p>Para H hay que usar el <b>recíproco</b> de h(x): h = <span class='bits'>11101</span> invertido es <span class='bits'>10111</span>; las filas de H son sus desplazamientos (10 filas = n−k):</p>
+<div class="matbox"><div class="matcap">H (10 × 14) con filas = desplazamientos de 10111</div><pre class="mat">1 0 1 1 1 0 0 0 0 0 0 0 0 0
+0 1 0 1 1 1 0 0 0 0 0 0 0 0
+0 0 1 0 1 1 1 0 0 0 0 0 0 0
+0 0 0 1 0 1 1 1 0 0 0 0 0 0
+0 0 0 0 1 0 1 1 1 0 0 0 0 0
+0 0 0 0 0 1 0 1 1 1 0 0 0 0
+0 0 0 0 0 0 1 0 1 1 1 0 0 0
+0 0 0 0 0 0 0 1 0 1 1 1 0 0
+0 0 0 0 0 0 0 0 1 0 1 1 1 0
+0 0 0 0 0 0 0 0 0 1 0 1 1 1</pre></div>
+<p>(Comprobado: G·H<sup>T</sup> = 0. Usar h sin invertir <b>no</b> da una H ortogonal a G: ver sección 8.)</p>
+<p><b>Forma 2 – sistemática</b> G = [P | I<sub>4</sub>], H = [I<sub>10</sub> | P<sup>T</sup>] (la que permite leer los chequeadores):</p>
+<div class="two"><div><div class="matbox"><div class="matcap"><b>G</b> (4 × 14)</div><pre class="mat">1 1 0 1 0 0 0 1 1 0 | 1 0 0 0
+0 1 1 0 1 0 0 0 1 1 | 0 1 0 0
+1 1 1 0 0 1 0 1 1 1 | 0 0 1 0
+1 0 1 0 0 0 1 1 0 1 | 0 0 0 1</pre></div></div><div><div class="matbox"><div class="matcap"><b>H</b> (10 × 14)</div><pre class="mat">1 0 0 0 0 0 0 0 0 0 | 1 0 1 1
+0 1 0 0 0 0 0 0 0 0 | 1 1 1 0
+0 0 1 0 0 0 0 0 0 0 | 0 1 1 1
+0 0 0 1 0 0 0 0 0 0 | 1 0 0 0
+0 0 0 0 1 0 0 0 0 0 | 0 1 0 0
+0 0 0 0 0 1 0 0 0 0 | 0 0 1 0
+0 0 0 0 0 0 1 0 0 0 | 0 0 0 1
+0 0 0 0 0 0 0 1 0 0 | 1 0 1 1
+0 0 0 0 0 0 0 0 1 0 | 1 1 1 0
+0 0 0 0 0 0 0 0 0 1 | 0 1 1 1</pre></div></div></div>
+<p><b>Chequeadores como combinación de bits de información</b> (i<sub>0..3</sub> = posiciones 10..13):</p>
+<table class="c"><thead><tr><th>c<sub>0</sub></th><th>c<sub>1</sub></th><th>c<sub>2</sub></th><th>c<sub>3</sub></th><th>c<sub>4</sub></th><th>c<sub>5</sub></th><th>c<sub>6</sub></th><th>c<sub>7</sub></th><th>c<sub>8</sub></th><th>c<sub>9</sub></th></tr></thead><tbody><tr><td>i<sub>0</sub> ⊕ i<sub>2</sub> ⊕ i<sub>3</sub></td><td>i<sub>0</sub> ⊕ i<sub>1</sub> ⊕ i<sub>2</sub></td><td>i<sub>1</sub> ⊕ i<sub>2</sub> ⊕ i<sub>3</sub></td><td>i<sub>0</sub></td><td>i<sub>1</sub></td><td>i<sub>2</sub></td><td>i<sub>3</sub></td><td>i<sub>0</sub> ⊕ i<sub>2</sub> ⊕ i<sub>3</sub></td><td>i<sub>0</sub> ⊕ i<sub>1</sub> ⊕ i<sub>2</sub></td><td>i<sub>1</sub> ⊕ i<sub>2</sub> ⊕ i<sub>3</sub></td></tr></tbody></table>
+<h4>Paso 4 · Decodificar (2025): R(x) = 11110001101000</h4>
+<p>R(x) = x<sup>10</sup> + x<sup>8</sup> + x<sup>7</sup> + x<sup>3</sup> + x<sup>2</sup> + x + 1. Se divide por g(x):</p>
+<table class="div"><thead><tr><th>Paso</th><th>Resto parcial (mayor potencia a la izquierda)</th><th>Término del cociente</th><th>Divisor desplazado</th><th>Resto nuevo (suma mod 2)</th></tr></thead><tbody><tr><td>1</td><td><span class="bits">10110001111</span></td><td>1</td><td><span class="bits">10110001011</span></td><td><span class="bits">00000000100</span></td></tr></tbody></table>
+<p>Resto = <b>x²</b> ≠ 0 → no es válida. Como x² tiene grado menor que n−k = 10, el síndrome de un error simple en la posición i &lt; 10 es x<sup>i</sup> mismo → <b>error en el bit 2</b>. Se invierte: <span class="bits">11110001101000</span> → <span class="bits">11010001101000</span> = g(x), múltiplo de g → válida (resto 0) ✓.</p>
+<div class="res">Corregida: 11010001101000 (información 0 0 0 1 → corresponde a m(x) = 1)</div>
+<h4>Paso 5 · R(x) = x⁸ + x⁴ (2012 T2 / 2013 T1)</h4>
+<p>R(x) = x⁸ + x⁴ es no nulo y de grado 8 &lt; 10 → <b>no es múltiplo de g</b> → no válida (atajo de 1.5). La división no hace falta: R ya es menor que g, así que el <b>resto es R(x) mismo</b> = x⁸ + x⁴.</p>
+<p>Como d<sub>min</sub> = 6 → t = 2, se busca un patrón de peso ≤ 2 con ese resto: para posiciones &lt; 10 el resto de x<sup>i</sup> es x<sup>i</sup>, de modo que e = x⁸ + x⁴ (errores en las posiciones 4 y 8). Corregida: R + e = <b>0</b> (la palabra nula, que es válida). Es la única corrección posible con t = 2.</p>
+<div class="res">R no válida → errores en x⁴ y x⁸ → palabra corregida = 00000000000000 (información 0000)</div>
+<h4>Paso 6 · Entrelazado</h4>
+<p>t = 2: con L = 20 → <b>40 bits</b> de ráfaga (2012 T2, 2013 T1); con L = 25 → <b>50 bits</b> (2025).</p>
+<h3>4.4 Código (15, 4) con h(x) = x⁴ + x + 1 &nbsp;<span class="exam">2012 T1</span></h3>
+<p><b>Enunciado:</b> (15, K?, d<sub>min</sub>?), h(X) = X⁴+X+1. a) g(X). b) capacidades. c) chequeadores. d) ¿R(x) = X⁸+X⁴+X² es válido? e) ráfaga con 20 códigos.</p>
+<p><b>k = 4</b>, n−k = 11. g(x) = (x¹⁵+1)/h(x):</p>
+<table class="div"><thead><tr><th>Paso</th><th>Resto parcial (mayor potencia a la izquierda)</th><th>Término del cociente</th><th>Divisor desplazado</th><th>Resto nuevo (suma mod 2)</th></tr></thead><tbody><tr><td>1</td><td><span class="bits">1000000000000001</span></td><td>x<sup>11</sup></td><td><span class="bits">1001100000000000</span></td><td><span class="bits">0001100000000001</span></td></tr><tr><td>2</td><td><span class="bits">0001100000000001</span></td><td>x<sup>8</sup></td><td><span class="bits">0001001100000000</span></td><td><span class="bits">0000101100000001</span></td></tr><tr><td>3</td><td><span class="bits">0000101100000001</span></td><td>x<sup>7</sup></td><td><span class="bits">0000100110000000</span></td><td><span class="bits">0000001010000001</span></td></tr><tr><td>4</td><td><span class="bits">0000001010000001</span></td><td>x<sup>5</sup></td><td><span class="bits">0000001001100000</span></td><td><span class="bits">0000000011100001</span></td></tr><tr><td>5</td><td><span class="bits">0000000011100001</span></td><td>x<sup>3</sup></td><td><span class="bits">0000000010011000</span></td><td><span class="bits">0000000001111001</span></td></tr><tr><td>6</td><td><span class="bits">0000000001111001</span></td><td>x<sup>2</sup></td><td><span class="bits">0000000001001100</span></td><td><span class="bits">0000000000110101</span></td></tr><tr><td>7</td><td><span class="bits">0000000000110101</span></td><td>x</td><td><span class="bits">0000000000100110</span></td><td><span class="bits">0000000000010011</span></td></tr><tr><td>8</td><td><span class="bits">0000000000010011</span></td><td>1</td><td><span class="bits">0000000000010011</span></td><td><span class="bits">0000000000000000</span></td></tr></tbody></table>
+<div class="res">g(x) = x<sup>11</sup> + x<sup>8</sup> + x<sup>7</sup> + x<sup>5</sup> + x<sup>3</sup> + x<sup>2</sup> + x + 1 &nbsp;→ <span class="bits">111101011001</span> (8 términos)</div>
+<p><b>d<sub>min</sub></b>: las 15 palabras no nulas pesan <b>todas 8</b> (es el código «símplex»): <b>d<sub>min</sub> = 8</b> → <b>t = 3</b>, detecta 7 (corrige 3 y detecta 4 a la vez), redundancia 15/4 = 3,75.</p>
+<p><b>Chequeadores</b> (P = x<sup>11+i</sup> mod g; información i<sub>0..3</sub> en las posiciones 11..14):</p>
+<table class="c"><thead><tr><th>c<sub>0</sub></th><th>c<sub>1</sub></th><th>c<sub>2</sub></th><th>c<sub>3</sub></th><th>c<sub>4</sub></th><th>c<sub>5</sub></th></tr></thead><tbody><tr><td>i<sub>0</sub> ⊕ i<sub>3</sub></td><td>i<sub>0</sub> ⊕ i<sub>1</sub> ⊕ i<sub>3</sub></td><td>i<sub>0</sub> ⊕ i<sub>1</sub> ⊕ i<sub>2</sub> ⊕ i<sub>3</sub></td><td>i<sub>0</sub> ⊕ i<sub>1</sub> ⊕ i<sub>2</sub></td><td>i<sub>1</sub> ⊕ i<sub>2</sub> ⊕ i<sub>3</sub></td><td>i<sub>0</sub> ⊕ i<sub>2</sub></td></tr></tbody></table>
+<table class="c"><thead><tr><th>c<sub>6</sub></th><th>c<sub>7</sub></th><th>c<sub>8</sub></th><th>c<sub>9</sub></th><th>c<sub>10</sub></th></tr></thead><tbody><tr><td>i<sub>1</sub> ⊕ i<sub>3</sub></td><td>i<sub>0</sub> ⊕ i<sub>2</sub> ⊕ i<sub>3</sub></td><td>i<sub>0</sub> ⊕ i<sub>1</sub></td><td>i<sub>1</sub> ⊕ i<sub>2</sub></td><td>i<sub>2</sub> ⊕ i<sub>3</sub></td></tr></tbody></table>
+<p>G = [P | I<sub>4</sub>] y H = [I<sub>11</sub> | P<sup>T</sup>] con P cuyas filas son x<sup>11</sup>, x<sup>12</sup>, x<sup>13</sup>, x<sup>14</sup> mod g:</p>
+<div class="matbox"><div class="matcap"><b>G</b> (4 × 15)</div><pre class="mat">1 1 1 1 0 1 0 1 1 0 0 | 1 0 0 0
+0 1 1 1 1 0 1 0 1 1 0 | 0 1 0 0
+0 0 1 1 1 1 0 1 0 1 1 | 0 0 1 0
+1 1 1 0 1 0 1 1 0 0 1 | 0 0 0 1</pre></div>
+<p><b>¿Es válido R(x) = x⁸ + x⁴ + x²?</b> Es no nulo y de grado 8 &lt; 11 → <b>no es múltiplo de g</b> → no válido; el resto es R mismo. Se busca un patrón de peso ≤ t = 3 con ese síndrome: e = x² + x⁴ + x⁸ (posiciones 2, 4, 8; peso 3 ≤ 3). Corregida: R + e = <b>0</b>. Es única, porque con d<sub>min</sub> = 8 dos patrones de peso ≤ 3 distintos no pueden dar el mismo síndrome (su diferencia sería una palabra de peso ≤ 6 &lt; 8).</p>
+<div class="res">Corregida = palabra nula (3 errores corregidos) · Ráfaga con L = 20: 3·20 = <b>60 bits</b></div>
+<h2 class="pb">5. Entrelazado y ráfagas (Etapa 7)</h2>
+<p>Los códigos de bloque están pensados para errores <b>aleatorios</b> (independientes). Una <b>ráfaga</b> (errores en bits consecutivos por una causa común: un rayón en un CD, un desvanecimiento) puede superar la capacidad t de una sola palabra.</p>
+<p><b>Entrelazar L palabras:</b> se escriben las L palabras como filas de una matriz y se transmite <b>por columnas</b> (primer bit de la palabra 1, primer bit de la palabra 2, …, primer bit de la palabra L; después los segundos bits…). Si el canal daña una ráfaga de B bits consecutivos, cada palabra recibe como máximo ⌈B/L⌉ errores. Se puede corregir si ⌈B/L⌉ ≤ t, es decir:</p>
+<div class="res">Ráfaga corregible = t · L bits &nbsp;(y detectable: (d<sub>min</sub>−1)·L)</div>
+<div class="box ex"><div class="bt">Ejemplo con L = 3, t = 1 (se transmiten las columnas)</div>
+<pre class="mat">palabra A:  a1 a2 a3 a4 a5 a6 a7
+palabra B:  b1 b2 b3 b4 b5 b6 b7
+palabra C:  c1 c2 c3 c4 c5 c6 c7
+
+se envía :  a1 b1 c1 | a2 b2 c2 | a3 b3 c3 | …
+ráfaga de 3 bits seguidos (a2 b2 c2) → 1 error por palabra → t = 1 los corrige</pre></div>
+<table class="c"><thead><tr><th>Código</th><th>Palabras entrelazadas L</th><th>Ráfaga corregible t·L (bits)</th><th>Parcial</th></tr></thead><tbody><tr><td>(12, 3), t = 2</td><td>7</td><td>14</td><td>2010 (teórica)</td></tr><tr><td>(12, 3), t = 2</td><td>20</td><td>40</td><td>2013 T2</td></tr><tr><td>(14, 4), t = 2</td><td>20</td><td>40</td><td>2012 T2, 2013 T1</td></tr><tr><td>(14, 4), t = 2</td><td>25</td><td>50</td><td>2025</td></tr><tr><td>(15, 4), t = 3</td><td>20</td><td>60</td><td>2012 T1</td></tr></tbody></table>
+<div class="box "><div class="bt">«¿Qué nuevas capacidades adquiere el código?»</div><p>Sigue corrigiendo t errores aleatorios por palabra, pero <b>adquiere capacidad de corrección de ráfagas de hasta t·L bits</b>. La tasa k/n no cambia (no se agregan chequeadores); el costo es <b>latencia y memoria</b> (hay que juntar las L palabras antes de transmitir/decodificar) y que una ráfaga mayor a t·L ya no se corrige garantizadamente.</p></div>
+<h2>6. Reed–Solomon: la tabla (Etapa 8)</h2>
+<p>Reed–Solomon trabaja con <b>símbolos (bytes)</b> de m bits sobre un campo de Galois GF(2<sup>m</sup>). Por eso es muy potente contra ráfagas: da lo mismo que un byte tenga 1 o m bits dañados, cuenta como <b>un</b> error de símbolo.</p>
+<div class="box ok"><div class="bt">Reglas para completar la tabla</div><ul>
+<li><b>Tamaño del campo</b> q = 2<sup>m</sup>; <b>bits por byte</b> = m; <b>grado del polinomio que genera el campo</b> = m.</li>
+<li><b>Longitud de palabra</b> n = q − 1 (bytes).</li>
+<li><b>Bytes chequeadores</b> n − k = 2t; <b>bytes de información</b> k = n − 2t; <b>t</b> = capacidad de corrección en bytes.</li>
+<li><b>Ráfaga con L códigos entrelazados</b> = t·L bytes.</li></ul></div>
+<h4><span class="exam">2012 T2</span> Tabla</h4>
+<table class="c"><thead><tr><th>Tamaño del campo GF(q)</th><th>Grado del pol. del campo</th><th>n (bytes)</th><th>bits / byte</th><th>bytes chequeadores</th><th>bytes información</th><th>t</th><th>7 códigos entrelazados</th></tr></thead><tbody><tr><td>2048</td><td>11</td><td>2047</td><td>11</td><td>200</td><td>1847</td><td>100 bytes</td><td>700 bytes</td></tr><tr><td>512</td><td>9</td><td>511</td><td>9</td><td>50</td><td>461</td><td>25 bytes</td><td>175 bytes</td></tr><tr><td>128</td><td>7</td><td>127</td><td>7</td><td>10</td><td>117</td><td>5 bytes</td><td>35 bytes</td></tr></tbody></table>
+<p><b>Fila 1</b> (dato: q = 2048, t = 100): 2048 = 2¹¹ → m = 11, n = 2047, 2t = 200, k = 2047 − 200 = 1847, ráfaga 7·100 = 700 bytes.<br>
+<b>Fila 2</b> (dato: grado 9, k = 461): q = 2⁹ = 512, n = 511, 2t = 511 − 461 = 50 → t = 25, ráfaga 7·25 = 175 bytes.<br>
+<b>Fila 3</b> (dato: n = 127, 10 chequeadores): q = 128 = 2⁷, m = 7, 2t = 10 → t = 5, k = 117, ráfaga 7·5 = 35 bytes.</p>
+<p class="small">Datos del enunciado: fila 1 = tamaño del campo 2048 y capacidad 100 bytes; fila 2 = grado del polinomio del campo 9 y 461 bytes de información; fila 3 = longitud de palabra 127 y 10 bytes chequeadores. Cada fila queda determinada por esos dos datos.</p>
+<h4>Tabla de «Preguntas teóricas» (verificada)</h4>
+<table class="c"><thead><tr><th>Capacidad</th><th>Grado g(x) = 2t</th><th>Grado campo</th><th>Tamaño</th><th>Longitud V(x)</th><th>Bits/byte</th><th>Bytes de check</th><th>Bytes de info</th></tr></thead><tbody><tr><td>Corrector doble</td><td>4</td><td>5</td><td>32</td><td>31</td><td>5</td><td>4</td><td>27</td></tr><tr><td>Corrector triple</td><td>6</td><td>5</td><td>32</td><td>31</td><td>5</td><td>6</td><td>25</td></tr><tr><td>Corrector triple</td><td>6</td><td>4</td><td>16</td><td>15</td><td>4</td><td>6</td><td>9</td></tr><tr><td>Corrector de 7 bytes</td><td>14</td><td>8</td><td>256</td><td>255</td><td>8</td><td>14</td><td>241</td></tr></tbody></table>
+<p>Regla: g(x) tiene grado 2t (= bytes de chequeo). Ej.: corrector de 7 bytes → 2t = 14; GF(256) → n = 255 → k = 241 ✓.</p>
+<h2 class="pb">7. Teóricas de control de error con respuesta</h2>
+<p><b>1. Si se entrelazan n códigos, ¿qué nuevas capacidades adquiere el código?</b><br>Corrige ráfagas de longitud t·L (t = capacidad de corrección por palabra, L = cantidad de palabras entrelazadas); también multiplica por L la longitud de ráfaga detectable. No cambia t ni la tasa k/n. Ver sección 5.</p>
+<p><b>2. Propiedades del polinomio generador de un código cíclico.</b><br>(1) es de grado n−k; (2) es factor de xⁿ+1; (3) coeficiente 1 en el término independiente y en el de mayor grado; (4) es el de menor grado y primo; (5) toda palabra válida es múltiplo de g(x) y todo múltiplo de g(x) (grado menor que n) es palabra válida; (6) toda rotación de una palabra válida es otra palabra válida.</p>
+<p><b>3. ¿Qué relación tienen G y H? ¿Qué significa?</b><br>Son <b>ortogonales</b>: G·H<sup>T</sup> = 0. Si G = [I | P] entonces H = [P<sup>T</sup> | I]; si G = [P | I] entonces H = [I | P<sup>T</sup>]. Toda palabra válida pertenece al subespacio generado por las filas de G, y H genera el subespacio perpendicular: el producto escalar de una palabra válida por cada fila de H da 0; si hubo error, el síndrome S = R·H<sup>T</sup> es ≠ 0 y coincide con la suma de las columnas de H en las posiciones erróneas.</p>
+<p><b>4. ¿Un código cíclico de capacidad 10 (d<sub>min</sub> = 10), qué puede hacer?</b><br>Como corrector: d<sub>min</sub> ≥ 2t+1 → t = 4, corrige hasta 4 (y detecta 5 a la vez). Como detector: detecta d<sub>min</sub>−1 = 9.</p>
+<p><b>5. Capacidad de un código ISBN.</b><br>d<sub>min</sub> = 2: detecta un error en una sola posición (y el intercambio de dos dígitos adyacentes en ISBN-10); no corrige. Dos errores que se compensan producen otro ISBN válido: error indetectable.</p>
+<p><b>6. ¿Cómo se calcula el dígito faltante de un ISBN?</b><br>Pesos 10…1, suma de dígito × peso ≡ 0 (mod 11); resolver w·x ≡ −S (mod 11). Ver sección 2.</p>
+<p><b>7. Necesidad de la base prima.</b><br>Con base prima todo peso no nulo tiene inverso, así que la ecuación de decodificación w·x ≡ c tiene <b>solución única</b>: no hay ambigüedad al decodificar.</p>
+<p><b>8. ¿Por qué d<sub>min</sub> ≥ 2t+1?</b><br>Para corregir t errores, las «esferas» de radio t alrededor de cada palabra válida no deben superponerse: dos palabras a distancia ≥ 2t+1 dejan cada palabra recibida a lo sumo a distancia t de una sola. Como detector basta d<sub>min</sub>−1 porque ninguna combinación de ≤ d<sub>min</sub>−1 errores convierte una palabra válida en otra.</p>
+<p><b>9. ¿Qué sucede en la decodificación con más errores de los que corrige el código?</b><br>Si el patrón tiene peso ≤ d<sub>min</sub>−1 el síndrome es ≠ 0 y se detecta (no se corrige); con peso mayor el patrón puede coincidir con otra palabra válida y no detectarse, o ser «corregido» al lado equivocado.</p>
+<p><b>10. ¿Qué distancia mínima tiene un arreglo rectangular?</b><br>d<sub>min</sub> = d<sub>1</sub>·d<sub>2</sub> (producto de las distancias del código por filas y del código por columnas). Ver 3.2.</p>
+<h2>8. ⚠ Errores encontrados en resoluciones de alumnos (y cómo evitarlos)</h2>
+<p>Estas resoluciones son útiles de referencia, pero al recalcular todo aparecieron los siguientes puntos. Conviene no copiarlos.</p>
+<table class=""><thead><tr><th>Dónde</th><th>Qué dice la resolución</th><th>Qué da el cálculo</th></tr></thead><tbody><tr><td>2025 – 1a (B. Melani)</td><td>Tabla de pesos con valores 6, 7, 8 y 9 para las 15 palabras.</td><td>Los desplazamientos de g (x·g, x²·g, …) pesan siempre 6. Los pesos reales son 6 (×7), 8 (×7) y 14 (×1). La conclusión d<sub>min</sub> = 6 es correcta.</td></tr><tr><td>2025 – 1b (B. Melani)</td><td>H con filas = desplazamientos de h = <span class='bits'>11101</span>.</td><td><b>No es ortogonal a G</b>: 23 de los 40 productos fila de G × fila de H dan 1 (p. ej. G fila 1 · H fila 3 = 1). Hay que usar el <b>recíproco</b> <span class='bits'>10111</span> (o la forma sistemática [I | P<sup>T</sup>]); con eso G·H<sup>T</sup> = 0.</td></tr><tr><td>2025 – 1c, 1d, 1e</td><td>Resto x² → error en el bit 2; corregida = g(x); 25 códigos → 50 bits.</td><td>✔ Correcto (verificado).</td></tr><tr><td>2025 – 2 (ISBN-13)</td><td>Suma 103 → inválido; con verificador = 0 queda válido.</td><td>✔ Correcto. Agregar que solo se corrige bajo la hipótesis de que el erróneo es el verificador (13 posibles correcciones si no).</td></tr><tr><td>2025 – 3 (arreglo)</td><td>d<sub>min</sub> = d<sub>1</sub>·d<sub>2</sub> = 3·2 = 6, t = 2. Palabra inválida por fila 2 y columna 2.</td><td>La fórmula es correcta; con BP de fila y d<sub>1</sub> = 4 se obtiene 8 (7 sin esquina), t = 3. Además falla también la columna 3. Confirmar con la cátedra qué esperan.</td></tr><tr><td>2020 – 2A (J. Arce)</td><td>ISBN 3-540-?3218-9 → ? = 6.</td><td>Error de suma: S = 158 (no 113); 6x ≡ 7 (mod 11) → <b>? = 3</b>. Con 3 el total es 176 = 16·11 (el mismo que muestra la diapositiva 9).</td></tr><tr><td>2020 – 1 (J. Arce)</td><td>g(x) = x⁹+x⁸+x⁵+x⁴+x+1, G de 3×12, d<sub>min</sub> = 6, corrige 2 y detecta 5, H = [P<sup>T</sup> | I].</td><td>✔ g(x), G y capacidad correctos. Su H, tal como se lee en la foto, también resulta ortogonal a su G en este código en particular; la pareja general es G = [P | I] ↔ H = [I | P<sup>T</sup>] (o G = [I | P] ↔ H = [P<sup>T</sup> | I]), así que conviene no mezclar los órdenes.</td></tr></tbody></table>
+<div class="box warn"><div class="bt">Errores típicos a evitar</div><ul>
+<li>Dividir con el string en el orden del enunciado (mayor potencia a la derecha) y alinear mal. Invertí antes de dividir.</li>
+<li>Usar h(x) sin invertir para armar H cuando G viene de desplazar g(x). El recíproco de h es el que sirve.</li>
+<li>Calcular d<sub>min</sub> con una tabla a medias. Si enumerás, hacelo con todas las palabras y chequeá que los desplazamientos de g pesan lo mismo que g.</li>
+<li>Decir que «se corrige» un ISBN sin aclarar la hipótesis. Un ISBN se detecta; se corrige solo si se sabe qué dígito es el erróneo.</li>
+<li>Olvidar que un polinomio no nulo de grado menor que n−k jamás es palabra válida.</li></ul></div>
+<h2 class="pb">9. Ejercicios propuestos (con soluciones al final)</h2>
+<p>Resolvelos sin mirar la sección 9.2. Están pensados como variantes de lo que ya viste.</p>
+<h3>9.1 Enunciados</h3>
+<ol start="0">
+<li><b>P0 – capacidad.</b> Un código cíclico tiene d<sub>min</sub> = 9. ¿Qué corrige, qué detecta y qué ráfaga corrige si se entrelazan 30 palabras? Repetí para d<sub>min</sub> = 7 y 12.</li>
+<li><b>P1 – ISBN-10.</b> Hallá el dígito faltante: (a) 0-306-4?615-2 &nbsp; (b) 0-13-11?362-8 &nbsp; (c) 0-262-0?384-4.</li>
+<li><b>P2 – ISBN-13.</b> Indicá si 978-0-13-110363-7 es válido. Si no, corregilo suponiendo que el erróneo es el verificador. (El libro real es 978-0-13-110362-7: ¿qué observás?)</li>
+<li><b>P3 – Hamming (7,4).</b> Recibido <span class="bits">0 1 1 1 0 0 0</span> (C<sub>1</sub> C<sub>2</sub> I<sub>1</sub> C<sub>3</sub> I<sub>2</sub> I<sub>3</sub> I<sub>4</sub>). Calculá el síndrome, corregí y dá la información.</li>
+<li><b>P4 – cíclico (7,4), g = x³+x+1.</b> (a) Codificá sistemáticamente la información <span class="bits">1011</span>. (b) Decodificá <span class="bits">0001111</span> y <span class="bits">0110101</span> (mayores potencias a la derecha), corrigiendo.</li>
+<li><b>P5 – variante de 2012 T1.</b> n = 15, h(x) = x⁴ + x³ + 1. Hallá k, g(x), d<sub>min</sub>, capacidad y la ráfaga con 10 códigos entrelazados.</li>
+<li><b>P6 – Reed–Solomon.</b> Completá: (a) t = 20 bytes, 10 bits por byte, 75 códigos entrelazados; (b) t = 40 bytes, n = 255, 75 códigos; (c) n = 63, 24 bytes chequeadores.</li>
+<li><b>P7 – teóricas.</b> Escribí de memoria: propiedades de g(x), relación G–H, y por qué la base prima.</li>
+<li><b>P8 – simulacro.</b> Resolvé en 60 minutos y sin apuntes: control de error de 2020 (sección 4.2 con todo el inciso E) + ISBN-13 y arreglo de 2025.</li></ol>
+<h3>9.2 Soluciones</h3>
+<div class="ans"><b>P0.</b> d<sub>min</sub> = 9 → corrige t = 4; como detector puro detecta 8; ráfaga 4·30 = <b>120 bits</b>. d<sub>min</sub> = 7 → corrige 3, detector puro 6, ráfaga 3·30 = 90. d<sub>min</sub> = 12 → corrige 5, detector puro 11 (o corrige 5 y detecta 6 a la vez), ráfaga 5·30 = 150.</div>
+<div class="ans"><b>P1.</b> (a) S = 132, peso 5 → <b>0</b> &nbsp; (b) S = 88, peso 5 → <b>0</b> &nbsp; (c) S = 128, peso 5 → <b>3</b>. (Son tres ISBN reales.)</div>
+<div class="ans"><b>P2.</b> Suma total = 83 → 83 mod 10 = 3 ≠ 0 → <b>no válido</b>. Suma de los 12 primeros = 76 → verificador = 4 → «corrige» a 978-0-13-110363-4. Pero el libro real es …362-7: el error estaba en el dígito 12 (3 en vez de 2), no en el verificador. <b>La corrección bajo hipótesis puede ser incorrecta</b>: un ISBN se detecta, no se corrige a ciegas.</div>
+<div class="ans"><b>P3.</b> S<sub>1</sub> = 1, S<sub>2</sub> = 0, S<sub>3</sub> = 1 → (S<sub>3</sub>S<sub>2</sub>S<sub>1</sub>) = 101 = posición <b>5</b> → corregida <span class='bits'>0111100</span>; información I<sub>1</sub>I<sub>2</sub>I<sub>3</sub>I<sub>4</sub> = <span class='bits'>1100</span>.</div>
+<div class="ans"><b>P4.</b> (a) i(x) = 1 + x<sup>2</sup> + x<sup>3</sup>; x³·i(x) = x<sup>6</sup> + x<sup>5</sup> + x<sup>3</sup>; resto (÷g) = 1 → V = <span class='bits'>1001011</span> (chequeadores <span class='bits'>100</span>, información <span class='bits'>1011</span>). (b) <span class='bits'>0001111</span>: resto x<sup>2</sup> + x + 1 = x<sup>5</sup> mod g → error en el bit 5 → <span class='bits'>0001101</span>, información <span class='bits'>1101</span>. <span class='bits'>0110101</span>: resto x<sup>2</sup> + 1 = x<sup>6</sup> mod g → error en el bit 6 → <span class='bits'>0110100</span>, información <span class='bits'>0100</span>.</div>
+<div class="ans"><b>P5.</b> k = 4, n−k = 11. g(x) = x<sup>11</sup> + x<sup>10</sup> + x<sup>9</sup> + x<sup>8</sup> + x<sup>6</sup> + x<sup>4</sup> + x<sup>3</sup> + 1 (bits <span class='bits'>100110101111</span>, 8 términos). Las 15 palabras no nulas pesan 8 → <b>d<sub>min</sub> = 8, t = 3</b>, detecta 7. Ráfaga con 10 códigos: 3·10 = <b>30 bits</b>.</div>
+<div class="ans"><b>P6.</b> (a) m = 10 → q = 1024, n = 1023, 2t = 40, k = 983, ráfaga 20·75 = <b>1500 bytes</b>. (b) n = 255 → q = 256, m = 8, 2t = 80, k = 175, ráfaga 40·75 = <b>3000 bytes</b>. (c) n = 63 → q = 64, m = 6, 2t = 24 → t = 12, k = 39.</div>
+<div class="ans"><b>P7.</b> Ver secciones 1.5, 7 (preguntas 2, 3 y 7) y 2.3. Autoevaluate: ¿nombraste las 6 propiedades? ¿mencionaste G·H<sup>T</sup> = 0 y las dos parejas [I | P] / [P<sup>T</sup> | I]? ¿pusiste el contraejemplo base 10?</div>
+<div class="ans"><b>P8.</b> Criterios: (1) k = 3 y g(x) por división; (2) d<sub>min</sub> = 6 por enumeración, t = 2, detecta 5; (3) G, H verificando G·H<sup>T</sup> = 0; (4) decodificar 110011001110 con corrección; (5) error triple se detecta y no se corrige; (6) ISBN-13: suma 103, no válido, verificador 0; (7) arreglo: d<sub>min</sub> = d<sub>1</sub>·d<sub>2</sub> y localización fila–columna.</div>
+<h2 class="pb">10. Chuleta de una página</h2>
+<div class="two"><div>
+<h4>Capacidad</h4>
+<p>t = ⌊(d<sub>min</sub>−1)/2⌋ · detecta d<sub>min</sub>−1 · mixto: d<sub>min</sub> ≥ t+s+1<br>
+Lineal: d<sub>min</sub> = peso mínimo de palabra no nula.<br>
+Cíclico: d<sub>min</sub> ≤ #términos de g.</p>
+<h4>Cíclicos</h4>
+<p>k = grado h · n−k = grado g · g = (xⁿ+1)/h<br>
+V = i·g (no sist.) · V = xⁿ⁻ᵏ·i + r (sist.), r = xⁿ⁻ᵏ·i mod g<br>
+Decodificar: r = R mod g; r = 0 válida; si no, e (peso ≤ t) con e mod g = r; V = R+e.<br>
+Grado(R) &lt; n−k y R ≠ 0 ⇒ no válida (resto = R).</p>
+<h4>Matrices</h4>
+<p>G = [P | I] con fila i de P = x<sup>n−k+i</sup> mod g<br>
+H = [I | P<sup>T</sup>] · G·H<sup>T</sup> = 0<br>
+Si G = filas g, xg, x²g…, H = desplazamientos del <b>recíproco</b> de h.<br>
+Chequeador j = suma de los i<sub>m</sub> con P[m][j] = 1.<br>
+Síndrome = suma de columnas de H en las posiciones erróneas.</p>
+<h4>Entrelazado</h4>
+<p>Ráfaga corregible = t·L · detectable = (d<sub>min</sub>−1)·L</p>
+</div><div>
+<h4>Hamming (7,4)</h4>
+<p>C<sub>1</sub> C<sub>2</sub> I<sub>1</sub> C<sub>3</sub> I<sub>2</sub> I<sub>3</sub> I<sub>4</sub> · S<sub>1</sub>: pos 1,3,5,7 · S<sub>2</sub>: 2,3,6,7 · S<sub>3</sub>: 4,5,6,7<br>
+(S<sub>3</sub>S<sub>2</sub>S<sub>1</sub>)<sub>2</sub> = posición del error · d<sub>min</sub> = 3<br>
++ BP: d<sub>min</sub> = 4 · S≠0 y BP falla → corrige · S≠0 y BP ok → doble.</p>
+<h4>Arreglos</h4>
+<p>d<sub>min</sub> = d<sub>1</sub>·d<sub>2</sub> · falla fila + falla columna → error en la intersección.</p>
+<h4>ISBN</h4>
+<p>ISBN-10: pesos 10…1, Σ ≡ 0 (mod 11); w·x ≡ −S. Inversos mod 11: 1→1, 2→6, 3→4, 4→3, 5→9, 6→2, 7→8, 8→7, 9→5, 10→10.<br>
+ISBN-13: pesos 1,3,1,3…, Σ ≡ 0 (mod 10); verificador = (10 − S<sub>12</sub> mod 10) mod 10.<br>
+d<sub>min</sub> = 2: detecta 1 error, no corrige. Base prima ⇒ solución única.<br>
+Base 37 (alfanumérico): suma de valores mod 37, sin pesos.</p>
+<h4>Reed–Solomon</h4>
+<p>q = 2<sup>m</sup>; n = q−1; bits/byte = m; grado del campo = m; n−k = 2t; ráfaga = t·L bytes.</p>
+<h4>Los tres códigos de siempre</h4>
+<table class="c"><tr><th>(n,k)</th><th>h(x)</th><th>g(x) (bits)</th><th>d<sub>min</sub></th><th>t</th><th>L = 20</th></tr>
+<tr><td>(12,3)</td><td>x³+x²+x+1</td><td><span class="bits">1100110011</span></td><td>6</td><td>2</td><td>40</td></tr>
+<tr><td>(14,4)</td><td>x⁴+x²+x+1</td><td><span class="bits">11010001101</span></td><td>6</td><td>2</td><td>40</td></tr>
+<tr><td>(15,4)</td><td>x⁴+x+1</td><td><span class="bits">111101011001</span></td><td>8</td><td>3</td><td>60</td></tr></table>
+</div></div>
+</body></html>
