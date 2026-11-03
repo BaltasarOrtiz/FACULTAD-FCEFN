@@ -308,15 +308,48 @@ H  A  Y  G  E  N   T   E  Q   U  E  D  E  S   U  C  E  N   C  I  A  T   I  E  N 
 
 Despejamos: `c = a·m + b ⇒ m = a⁻¹(c − b) = a⁻¹·c − a⁻¹·b`, o sea `d = −a⁻¹·b mod N`.
 
-**Inverso de `a = 3` mod 131** (Euclides extendido):
+**Inverso de `a = 3` mod 131** (Euclides extendido).
+
+Buscamos `x` tal que `3·x ≡ 1 (mod 131)`. Eso equivale a encontrar enteros `x, y` con `3·x + 131·y = 1` (identidad de Bézout); entonces `x` es el inverso. Existe porque `gcd(3, 131) = 1` (131 es primo).
+
+**Paso 1 — Euclides hacia adelante** (divisiones sucesivas hasta llegar a resto 0):
 
 ```
-131 = 43·3 + 2
-  3 =  1·2 + 1
-  1 = 3 − 1·2 = 3 − (131 − 43·3) = 44·3 − 1·131
+131 = 43·3 + 2      (43·3 = 129; 131 − 129 = 2)
+  3 =  1·2 + 1      (1·2 = 2;      3 −   2 = 1)
+  2 =  2·1 + 0      (resto 0 → terminamos)
 ```
 
-⇒ `3⁻¹ ≡ 44 (mod 131)` (comprobación: `3·44 = 132 = 131 + 1` ✔).
+El último resto distinto de cero es `1` ⇒ `gcd(3, 131) = 1` ✔ (condición para que exista el inverso).
+
+**Paso 2 — Despejar cada resto** (de las líneas con resto ≠ 0):
+
+```
+2 = 131 − 43·3      (de la 1.ª línea)
+1 =   3 −  1·2      (de la 2.ª línea)
+```
+
+**Paso 3 — Sustitución hacia atrás**: partimos del `1` y reemplazamos el `2` por su expresión en términos de `131` y `3`:
+
+```
+1 = 3 − 1·2
+  = 3 − 1·(131 − 43·3)        ← se reemplaza 2 = 131 − 43·3
+  = 3 − 131 + 43·3            ← se distribuye el −1
+  = (1 + 43)·3 − 1·131        ← se agrupan los términos en 3
+  = 44·3 − 1·131
+```
+
+Quedó la identidad de Bézout: **`44·3 + (−1)·131 = 1`**.
+
+**Paso 4 — Leer el inverso**: reducimos la identidad módulo 131. El término `−1·131` es múltiplo de 131, así que desaparece:
+
+```
+44·3 ≡ 1 (mod 131)
+```
+
+⇒ **`3⁻¹ ≡ 44 (mod 131)`** (comprobación: `3·44 = 132 = 131 + 1` ✔).
+
+> Regla práctica: el coeficiente que acompaña al `a` (acá el `44`) es el inverso. Si diera negativo, se le suma `N` hasta que quede en `[0, N−1]`. El coeficiente de `131` (acá `−1`) no importa para el inverso.
 
 `d = −44·7 mod 131 = −308 mod 131`; `308 = 2·131 + 46` ⇒ `−308 ≡ −46 ≡ 85`.
 
