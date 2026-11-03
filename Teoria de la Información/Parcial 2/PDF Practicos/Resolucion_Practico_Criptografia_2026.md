@@ -308,54 +308,114 @@ H  A  Y  G  E  N   T   E  Q   U  E  D  E  S   U  C  E  N   C  I  A  T   I  E  N 
 
 Despejamos: `c = a·m + b ⇒ m = a⁻¹(c − b) = a⁻¹·c − a⁻¹·b`, o sea `d = −a⁻¹·b mod N`.
 
-**Inverso de `a = 3` mod 131** (Euclides extendido).
+Todo el ejercicio se reduce a **hallar `a⁻¹ mod 131` con `a = 3`**. Se resuelve de dos maneras: el método que usa el profesor en el pizarrón (Euler + cuadrados sucesivos) y Euclides extendido con tabla. Dan el mismo resultado; lo ideal es resolver con uno y **comprobar con el otro**.
 
-Buscamos `x` tal que `3·x ≡ 1 (mod 131)`. Eso equivale a encontrar enteros `x, y` con `3·x + 131·y = 1` (identidad de Bézout); entonces `x` es el inverso. Existe porque `gcd(3, 131) = 1` (131 es primo).
+**Paso 0 — ¿Existe el inverso?** Existe si y solo si `gcd(a, N) = 1`. Si no se cumple, **no existe `a⁻¹` y no hay que perder tiempo buscándolo** (la función `E` ni siquiera sería inyectiva: dos letras distintas darían el mismo número). Acá `gcd(3, 131) = 1`, porque 131 es primo y 3 < 131.
 
-**Paso 1 — Euclides hacia adelante** (divisiones sucesivas hasta llegar a resto 0):
+#### Método 1 — Euler y cuadrados sucesivos (el del profesor)
 
-```
-131 = 43·3 + 2      (43·3 = 129; 131 − 129 = 2)
-  3 =  1·2 + 1      (1·2 = 2;      3 −   2 = 1)
-  2 =  2·1 + 0      (resto 0 → terminamos)
-```
+**1.1 ¿Qué son el CRR y φ(N)?**
 
-El último resto distinto de cero es `1` ⇒ `gcd(3, 131) = 1` ✔ (condición para que exista el inverso).
+- `CRR(N)` es el *Conjunto Reducido de Residuos* de `N`: los restos módulo `N` que son **coprimos con `N`**, es decir `CRR(N) = { rᵢ / gcd(rᵢ, N) = 1 }`.
+- `φ(N) = #CRR(N)` (función de Euler): la cantidad de elementos de ese conjunto.
+- Ejemplo del pizarrón, `N = 14 = 2·7`: de los restos `1…13` se descartan los pares (comparten el factor 2) y el `7` (comparte el factor 7). Queda **`CRR(14) = {1, 3, 5, 9, 11, 13}`** y por lo tanto **`φ(14) = 6`**.
+- **Si `N` es primo**, ningún resto comparte factor con `N`: `CRR(N) = {1, …, N−1}` y **`φ(N) = N − 1`** (último renglón del pizarrón).
+- Si `N` es compuesto, `φ(N) ≠ N − 1`: se cuenta el CRR o se factoriza (`φ(p·q) = (p−1)(q−1)`, `φ(pᵏ) = pᵏ − pᵏ⁻¹`).
 
-**Paso 2 — Despejar cada resto** (de las líneas con resto ≠ 0):
+**1.2 Teorema de Euler.** Si `gcd(a, N) = 1`, entonces `a^φ(N) mod N = 1`. (Idea: multiplicar todo el CRR por `a` solo lo reordena. Con `N = 14` y `a = 3`: `3·{1,3,5,9,11,13} mod 14 = {3,9,1,13,5,11}`, el mismo conjunto; y se verifica `3⁶ = 729 = 52·14 + 1`.)
 
-```
-2 = 131 − 43·3      (de la 1.ª línea)
-1 =   3 −  1·2      (de la 2.ª línea)
-```
-
-**Paso 3 — Sustitución hacia atrás**: partimos del `1` y reemplazamos el `2` por su expresión en términos de `131` y `3`:
+Como buscamos `a·a⁻¹ ≡ 1 (mod N)`, y `a · a^(φ(N)−1) = a^φ(N) ≡ 1`:
 
 ```
+a⁻¹ = a^(φ(N) − 1) mod N        (el recuadro "a⁻¹" con el arco hacia φ(N) del pizarrón)
+```
+
+**1.3 Datos del ejercicio.** `N = 131` es primo ⇒ `φ(131) = 131 − 1 = 130`. Con `a = 3`:
+
+```
+3⁻¹ = 3^(130 − 1) = 3¹²⁹ mod 131
+```
+
+**1.4 Partir el exponente.** `3¹²⁹` es un número enorme, no se calcula entero. Se descompone el exponente en potencias de 2: `129 = 128 + 1 = 2⁷ + 1`, entonces
+
+```
+3¹²⁹ = 3¹²⁸ · 3     ( = (3¹²⁸ · 3) mod 131, como lo escribe el profe )
+```
+
+y `3¹²⁸` se obtiene elevando 7 veces al cuadrado, **reduciendo mod 131 en cada paso** (así los números nunca pasan de `130² = 16 900`). Es la cadena `((3²)² mod 131)² mod 131)² …` del pizarrón.
+
+**1.5 Cuadrados sucesivos.** Cada fila es el cuadrado de la anterior, reducido mod 131:
+
+| Potencia | Cálculo | Resultado mod 131 |
+|---|---|---|
+| `3¹` | — | 3 |
+| `3²` | `3² = 9` | **9** |
+| `3⁴` | `9² = 81` | **81** |
+| `3⁸` | `81² = 6561 = 50·131 + 11` | **11** |
+| `3¹⁶` | `11² = 121` | **121** |
+| `3³²` | `121² = 14641 = 111·131 + 100` | **100** |
+| `3⁶⁴` | `100² = 10000 = 76·131 + 44` | **44** |
+| `3¹²⁸` | `44² = 1936 = 14·131 + 102` | **102** |
+
+(Los `9, 81, 11, 12(1)…` que se ven en el borde derecho del pizarrón son exactamente esta columna.)
+
+**1.6 Cerrar.**
+
+```
+3¹²⁹ = 3¹²⁸ · 3 ≡ 102 · 3 = 306 = 2·131 + 44   ⇒   3⁻¹ ≡ 44 (mod 131)
+```
+
+**Si el exponente no fuera `2ᵏ + 1`** (*square-and-multiply*): se pasa a binario y se multiplican **solo las potencias de la tabla cuyo bit es 1**, reduciendo mod `N` en cada producto. Ej.: `13 = 8 + 4 + 1` ⇒ `3¹³ = 3⁸ · 3⁴ · 3¹`.
+
+#### Método 2 — Euclides extendido con tabla
+
+**Idea.** Cada resto que aparece al hacer Euclides entre `N` y `a` se puede escribir como combinación de ambos: **`r = s·N + t·a`**. En vez de despejar hacia atrás al final, se llevan los coeficientes `s` y `t` en una tabla junto con las divisiones. Cuando el resto llega a `1`, vale `1 = s·N + t·a`; como `s·N` desaparece módulo `N`, **la `t` de esa fila es `a⁻¹`**.
+
+**Cómo se arma la tabla:**
+
+1. Dos filas fijas de arranque: `(r, s, t) = (N, 1, 0)` y `(a, 0, 1)`.
+2. Para cada fila nueva: `q = ` cociente entero de (`r` de dos filas atrás) ÷ (`r` de la fila anterior).
+3. **La misma regla para las tres columnas:** `nuevo = (de dos filas atrás) − q · (de la fila anterior)`.
+4. Se para cuando `r = 1` (hay inverso: `t` es `a⁻¹`) o cuando `r = 0` sin haber pasado por 1 (el último `r ≠ 0` es el `gcd`; si es `> 1`, **no hay inverso**).
+5. Si `t` da negativo, se le suma `N`.
+
+**Tabla para `N = 131`, `a = 3`:**
+
+| `q` | `r` | `s` | `t` | Control: `r = s·131 + t·3` |
+|---|---|---|---|---|
+| — | 131 | 1 | 0 | `131 = 1·131 + 0·3` ✔ |
+| — | 3 | 0 | 1 | `3 = 0·131 + 1·3` ✔ |
+| 43 | `131 − 43·3 = 2` | `1 − 43·0 = 1` | `0 − 43·1 = −43` | `131 − 129 = 2` ✔ |
+| 1 | `3 − 1·2 = 1` | `0 − 1·1 = −1` | `1 − 1·(−43) = 44` | `−131 + 132 = 1` ✔ |
+
+El resto llegó a `1` ⇒ `gcd(3, 131) = 1` (hay inverso) y **`1 = (−1)·131 + 44·3`** (identidad de Bézout). Reduciendo mod 131 desaparece el término de 131: `44·3 ≡ 1`, o sea **`3⁻¹ ≡ 44 (mod 131)`**.
+
+La columna "Control" es la forma de no equivocarse: **en cada fila** tiene que cumplirse `r = s·N + t·a`. Si una fila no cierra, el error está en esa fila.
+
+**Variante equivalente — sustitución hacia atrás** (es la misma cuenta, despejando al final):
+
+```
+131 = 43·3 + 2        ⇒   2 = 131 − 43·3
+  3 =  1·2 + 1        ⇒   1 =   3 −  1·2
+  2 =  2·1 + 0        (resto 0: terminamos; el último resto ≠ 0 es 1 ⇒ gcd = 1 ✔)
+
 1 = 3 − 1·2
   = 3 − 1·(131 − 43·3)        ← se reemplaza 2 = 131 − 43·3
-  = 3 − 131 + 43·3            ← se distribuye el −1
   = (1 + 43)·3 − 1·131        ← se agrupan los términos en 3
   = 44·3 − 1·131
 ```
 
-Quedó la identidad de Bézout: **`44·3 + (−1)·131 = 1`**.
+#### Resultado (los dos métodos coinciden)
 
-**Paso 4 — Leer el inverso**: reducimos la identidad módulo 131. El término `−1·131` es múltiplo de 131, así que desaparece:
+**`3⁻¹ ≡ 44 (mod 131)`**. Comprobación: `3·44 = 132 = 131 + 1` ✔.
 
-```
-44·3 ≡ 1 (mod 131)
-```
-
-⇒ **`3⁻¹ ≡ 44 (mod 131)`** (comprobación: `3·44 = 132 = 131 + 1` ✔).
-
-> Regla práctica: el coeficiente que acompaña al `a` (acá el `44`) es el inverso. Si diera negativo, se le suma `N` hasta que quede en `[0, N−1]`. El coeficiente de `131` (acá `−1`) no importa para el inverso.
-
-`d = −44·7 mod 131 = −308 mod 131`; `308 = 2·131 + 46` ⇒ `−308 ≡ −46 ≡ 85`.
+`d = −a⁻¹·b mod N = −44·7 mod 131 = −308 mod 131`; `308 = 2·131 + 46` ⇒ `−308 ≡ −46 ≡ 85`.
 
 **`D_K(c) = 44·c + 85 mod 131`**
 
 Comprobación: `D(92) = 44·92 + 85 = 4133 = 31·131 + 72 → 72 = H` ✔; `D(0) = 85 = U` ✔.
+
+> **Nota de notación.** En el pizarrón el profesor escribe `mᵢ = a⁻¹·cᵢ + b⁻¹ mod 131`. Ese `b⁻¹` es la **constante `d = −a⁻¹·b = 85`**, no el inverso multiplicativo de `b`. Es lo mismo que `mᵢ = 44·(cᵢ − 7)`.
 
 ### Inciso 8.d)
 
@@ -366,29 +426,78 @@ Comprobación: `D(92) = 44·92 + 85 = 4133 = 31·131 + 72 → 72 = H` ✔; `D(0)
 
 Criptograma (45 números): `42, 109, 49, 100, 19, 69, 99, 89, 129, 100, 60, 79, 99, 100, 59, 90, 100, 99, 49, 129, 80, 130, 69, 100, 39, 60, 79, 99, 100, 59, 90, 100, 99, 80, 69, 109, 60, 109, 70, 129, 100, 59, 60, 109, 74`
 
+**Idea general.** Esta vez **no se conoce la clave `(a, b)`**: hay que encontrarla. Es un ataque por frecuencias a un cifrado afín `c = a·m + b mod 131`. Hay dos incógnitas, así que hacen falta **dos pares (letra → número) supuestos**; cada par da una ecuación y queda un **sistema de 2 ecuaciones con 2 incógnitas módulo 131**, que se resuelve con **Euclides extendido con tabla** (hay que invertir un coeficiente).
+
 **Paso 1 — Frecuencias del criptograma** (45 símbolos):
 
 | Número | 100 | 99 | 109 | 60 | 69 | 129 | 59 | 49 | 79 | 90 | 80 | resto (1 c/u) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Veces | **8** | 5 | 4 | 4 | 3 | 3 | 3 | 2 | 2 | 2 | 2 | 42,19,89,130,39,70,74 |
 
-**Paso 2 — Hipótesis.** El más frecuente (`100`) es la `e` (ASCII 101). Además, el último número `74` es un signo de puntuación; el más probable al final de una frase es el punto (ASCII 46). Dos pares claro → cifrado dan dos ecuaciones para `(a, b)`:
+**Paso 2 — Suposiciones** (dos pares letra → número):
+
+- La letra más frecuente del castellano es la `e` (ASCII **101**), y el número más frecuente es el **100** (8 veces) ⇒ **`e → 100`**.
+- El enunciado dice que el último número es un signo de puntuación; el más probable al final de una frase es el punto (ASCII **46**), y el último número es **74** ⇒ **`. → 74`**.
+
+**Paso 3 — Sistema de ecuaciones.** Cada par cumple `c = a·m + b mod 131`:
 
 ```
-a·101 + b ≡ 100  (mod 131)      (e → 100)
-a· 46 + b ≡  74  (mod 131)      (. → 74)
+(1)  101·a + b ≡ 100   (mod 131)      (e → 100)
+(2)   46·a + b ≡  74   (mod 131)      (. → 74)
 ```
 
-Restando: `55·a ≡ 26 (mod 131)`. Se despeja con el inverso de 55 o, a mano, probando múltiplos: `55·10 = 550 = 4·131 + 26 ≡ 26` ✔ ⇒ **`a = 10`** (es única, porque 131 es primo).
-Luego `b = 100 − 101·10 = −910 ≡ −910 + 7·131 = 7` ⇒ **`b = 7`**.
+Se restan (1) − (2) para **eliminar `b`**: `(101 − 46)·a ≡ 100 − 74`, o sea
 
-*(Alternativa del apunte: fijar `e → 100` y probar la segunda letra de la lista `a, o, l, s` contra el siguiente número más frecuente. Con `a → 99` y `a → 109` el desencriptado da basura no imprimible; con `a → 60` sale `a = 10, b = 7` y texto con sentido, que es la validación.)*
+```
+55·a ≡ 26   (mod 131)
+```
 
-**Paso 3 — Clave de cifrado `E(m) = 10·m + 7 mod 131`.** Su inversa: `10⁻¹ mod 131 = 118` (`10·118 = 1180 = 9·131 + 1` ✔):
+**Paso 4 — Despejar `a`: hace falta `55⁻¹ mod 131`** (Euclides extendido con tabla, `N = 131`, `a = 55`):
 
-**`D(c) = 118·(c − 7) mod 131`**
+| `q` | `r` | `s` | `t` | Control: `r = s·131 + t·55` |
+|---|---|---|---|---|
+| — | 131 | 1 | 0 | ✔ |
+| — | 55 | 0 | 1 | ✔ |
+| 2 | `131 − 2·55 = 21` | `1 − 2·0 = 1` | `0 − 2·1 = −2` | `131 − 110 = 21` ✔ |
+| 2 | `55 − 2·21 = 13` | `0 − 2·1 = −2` | `1 − 2·(−2) = 5` | `−262 + 275 = 13` ✔ |
+| 1 | `21 − 1·13 = 8` | `1 − 1·(−2) = 3` | `−2 − 1·5 = −7` | `393 − 385 = 8` ✔ |
+| 1 | `13 − 1·8 = 5` | `−2 − 1·3 = −5` | `5 − 1·(−7) = 12` | `−655 + 660 = 5` ✔ |
+| 1 | `8 − 1·5 = 3` | `3 − 1·(−5) = 8` | `−7 − 1·12 = −19` | `1048 − 1045 = 3` ✔ |
+| 1 | `5 − 1·3 = 2` | `−5 − 1·8 = −13` | `12 − 1·(−19) = 31` | `−1703 + 1705 = 2` ✔ |
+| 1 | `3 − 1·2 = 1` | `8 − 1·(−13) = 21` | `−19 − 1·31 = −50` | `2751 − 2750 = 1` ✔ |
 
-**Paso 4 — Desencriptar** (`m = 118·(c − 7) mod 131`):
+El resto llegó a `1` ⇒ `gcd(55, 131) = 1` (el coeficiente **sí** es invertible; este chequeo es obligatorio antes de dividir) y `1 = 21·131 + (−50)·55`. Entonces `55⁻¹ ≡ −50 ≡ −50 + 131 = 81`. Comprobación: `55·81 = 4455 = 34·131 + 1` ✔.
+
+Se multiplica la ecuación `55·a ≡ 26` por `55⁻¹ = 81`:
+
+```
+a ≡ 26 · 81 = 2106 = 16·131 + 10   ⇒   a = 10
+```
+
+(Atajo equivalente: usar `t = −50` directamente, `a ≡ 26·(−50) = −1300 ≡ −1300 + 10·131 = 10`.)
+
+**Paso 5 — Despejar `b`.** Se reemplaza `a = 10` en (1): `b ≡ 100 − 101·10 = −910`; como `7·131 = 917`, `b ≡ −910 + 917 = 7`.
+
+**`b = 7`**. Comprobación con (2): `46·10 + 7 = 467 = 3·131 + 74 → 74` ✔.
+
+Clave de cifrado: **`E(m) = 10·m + 7 mod 131`**. (Es una clave válida: `gcd(10, 131) = 1`.)
+
+**Paso 6 — Función de descifrado: inverso de `a = 10`** (Euclides extendido con tabla):
+
+| `q` | `r` | `s` | `t` | Control: `r = s·131 + t·10` |
+|---|---|---|---|---|
+| — | 131 | 1 | 0 | ✔ |
+| — | 10 | 0 | 1 | ✔ |
+| 13 | `131 − 13·10 = 1` | `1 − 13·0 = 1` | `0 − 13·1 = −13` | `131 − 130 = 1` ✔ |
+
+`10⁻¹ ≡ −13 ≡ −13 + 131 = 118` (comprobación: `10·118 = 1180 = 9·131 + 1` ✔). Por el método del profesor daría lo mismo: `10¹²⁹ mod 131 = 118` (ver 8.c).
+
+```
+D(c) = 118·(c − 7) mod 131  =  118·c + d,   d = −118·7 = −826 ≡ −826 + 7·131 = 91
+D(c) = 118·c + 91 mod 131
+```
+
+**Paso 7 — Desencriptar** (`m = 118·(c − 7) mod 131`; ej.: `c = 42 ⇒ 118·35 = 4130 = 31·131 + 69 → 69 = E`):
 
 | `c` | 42 | 109 | 49 | 100 | 19 | 69 | 99 | 89 | 129 | 100 | 60 | 79 | 99 | 100 | 59 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -409,6 +518,18 @@ Luego `b = 100 − 101·10 = −910 ≡ −910 + 7·131 = 7` ⇒ **`b = 7`**.
 → «**Es mejor que aprender mucho el aprender cosas buenas.**»
 
 Comprobación: `E(101) = 1017 = 7·131 + 100 → 100` ✔ y `E(46) = 467 = 3·131 + 74 → 74` ✔.
+
+**Cómo se valida la hipótesis (y qué hacer si el texto sale basura).** Si el descifrado no tiene sentido, se prueba otro par. Usando la lista `e, a, o, l, s` del enunciado: se fija `e → 100` y se prueba la `a` contra los siguientes números más frecuentes. Para `e → 100` y `a (97) → x`, la diferencia de letras es `101 − 97 = 4`, que es invertible mod 131 (`4⁻¹ = 33`), y `a = (100 − x)·33 mod 131`:
+
+| `a → x` | `a` | `b` | Texto |
+|---|---|---|---|
+| `a → 99` (el 2.º más frecuente) | 33 | 42 | `???e'la9VeH?aeD=ea…` (basura) |
+| `a → 109` | 96 | 98 | `6aPe?*t?;e.?te=xet…` (basura) |
+| `a → 60` | **10** | **7** | `Esmejorqueaprender…` ✔ |
+
+Con `a → 60` sale la misma clave `(10, 7)` que con el punto: dos hipótesis independientes que coinciden es la mejor validación.
+
+> **Si `N` fuera compuesto:** antes de dividir hay que chequear `g = gcd(coeficiente, N)`. Si `g = 1`, se invierte como arriba. Si `g > 1`, la ecuación `c·a ≡ r` tiene solución **solo si `g` divide a `r`**, y entonces hay `g` soluciones módulo `N` (se dividen ambos lados y el módulo por `g`); de esas hay que descartar las que no sean coprimas con `N`. Ej.: `6·a ≡ 4 (mod 14)`: `g = 2` divide a 4 ⇒ `3·a ≡ 2 (mod 7)` ⇒ `a ≡ 3` ⇒ `a ∈ {3, 10} mod 14`; como `gcd(10, 14) = 2`, **solo `a = 3` es clave válida**.
 
 ---
 
