@@ -12,6 +12,30 @@
 | 15/12/2020, Ej. 4 | Vectorial vs. bitmap, y RLE de PCX de `129,129,129,129,129,194` | 1.1 y 1.6 |
 | 21/11/2012 (Tema 1) | Con máscaras, ¿a qué recta pertenece el punto central? | 1.5 Máscaras de rectas |
 | 21/11/2012 (Tema 2) | Suavizar el punto central de dos ventanas con media aritmética | 1.3 y 1.4 |
+| *(variante teórica probable)* | «¿Por qué en PCX el contador se reconoce por los dos primeros bits en 1 y qué pasa con los colores ≥ 192?» | 1.6 (bits del byte) |
+
+> **Revisión de parciales viejos (2012, 2013, 2020, 2025).** Las únicas preguntas de imágenes que aparecen son las de la tabla: **paso bajo** (2025), **RLE de PCX + vectorial/bitmap** (2020), **máscaras de rectas** y **media aritmética** (2012). En 2013 y en los otros archivos de la carpeta no hay preguntas de imágenes. Los dos temas que más conviene dominar son **RLE de PCX (bits y límite 192)** y **filtros paso bajo/paso alto**; tienen respuesta modelo en la sección 0.1.
+
+## 0.1 Las dos preguntas más probables, con respuesta modelo
+
+**A) RLE de PCX: ¿qué son los dos primeros bits y qué pasa hasta el 192?**
+
+- PCX guarda cada color en **1 byte** (8 bits, valores 0 a 255). Si un color se repite, se guardan **2 bytes**: un byte de **cantidad** y un byte de **color**.
+- El byte de cantidad se reconoce porque tiene **encendidos (en 1) los dos primeros bits**: `11xxxxxx`. La cantidad va en los **6 bits restantes** (`xxxxxx`), por eso la racha máxima es $2^6-1=63$.
+- Los dos primeros bits en 1 valen $128+64=192$ (`11000000` = `0xC0`). Entonces todo byte **$\ge192$** empieza con `11` y se interpreta como contador. Todo byte **$<192$** (0 a 191, empieza con `00`, `01` o `10`) es un **color**.
+- **El problema** (la diapositiva lo marca como «PROBLEMAS…»): un color suelto $\ge192$ se confundiría con un contador. Solución: se lo escribe siempre precedido del contador `193` (`11000001` = racha de 1), aunque aparezca una sola vez. Los colores $<192$ sueltos se escriben tal cual.
+- Costo: un color suelto $\ge192$ ocupa 2 bytes en vez de 1, así que en imágenes con pocas rachas el RLE puede **agrandar** el archivo.
+- Ejemplo con bits: `129,129,129,129,129,194`. $129=10000001$ (empieza con `10`: es color). $194=11000010$ (empieza con `11`: parecería un contador de 2, por eso necesita escape). Resultado: `197,129,193,194` ($197=11000101$, cantidad $5$).
+
+**B) Filtros paso bajo y paso alto: ejemplo y efectos**
+
+| | Paso bajo | Paso alto |
+|---|---|---|
+| Ejemplo | Media 3×3: $\frac19\begin{pmatrix}1&1&1\\1&1&1\\1&1&1\end{pmatrix}$ (también gaussiano, mediana) | $\begin{pmatrix}-1&-1&-1\\-1&8&-1\\-1&-1&-1\end{pmatrix}$ (también high-boost, centro 9) |
+| Coeficientes | **Todos positivos**; se divide por la suma | **Centro positivo, periferia negativa**; suma 0 (no se divide) |
+| Qué deja pasar | Bajas frecuencias (zonas lisas) | Altas frecuencias (bordes, detalles) |
+| Efecto | **Suaviza y reduce ruido**, pero **emborrona** bordes y detalles. Ventana mayor: más ruido eliminado, más desenfoque | **Realza bordes y detalles** (afila); en zona constante da 0; también **realza el ruido** |
+| Ejemplo numérico | $\begin{pmatrix}10&10&10\\10&82&10\\10&10&10\end{pmatrix}\to162/9=18$ | misma ventana $\to 8\cdot82-80=576$ |
 
 ---
 
@@ -43,6 +67,31 @@ Una imagen digital en gris es entonces una **matriz de números**. Todo el proce
 | Al ampliar | No pierde calidad | Se **pixela** |
 | Tamaño | Chico (depende de la cantidad de figuras) | Más grande (depende de la resolución) |
 | Sirve para | Logos, planos, tipografías | Fotos |
+| Formatos (presentación) | CDR (CorelDraw), WMF (metaarchivo de Windows), DXF (AutoCad). Se usan en CAD, arquitectura e ingeniería | BMP, PCX, GIF, TIF, JPG |
+
+**La luz y el ojo (presentación PDI 2026).** La luz visible es una porción del espectro electromagnético, aprox. entre **0,4 y 0,7 micrones**. La imagen se forma en la **retina** por dos tipos de receptores:
+
+| | Conos | Bastones |
+|---|---|---|
+| Cantidad | 6 a 7 millones | 75 a 150 millones |
+| Dónde | Concentrados en la **fóvea** | Repartidos por toda la retina |
+| Función | **Color** y detalles finos | Impresión general del campo visual y **baja iluminación**; no ven color |
+| Visión | **Fotópica** (luz brillante) | **Escotópica** (luz tenue) |
+
+Esto justifica el submuestreo de la crominancia en JPEG (1.10): el ojo es más sensible al brillo (bastones) que al color (conos).
+
+**PDI y ADI.** **PDI** (procesamiento digital de imágenes): pasar la imagen a formato digital y procesarla en computadora; la salida es otra imagen. **ADI** (análisis de imágenes): descripción y reconocimiento del contenido; la salida es una **descripción simbólica**. Tópicos: formación de la imagen (sistema óptico, sensor, digitalizador, con degradaciones), **restauración** (reduce deformaciones y degradaciones), **realce** (reducción de ruido, afilado, contraste), **compresión** (aprovecha la redundancia; **sin pérdida**: GIF, BMP, PCX; **con pérdida**: JPG, fractal; a mayor compresión, mayor degradación), **detección de bordes** (ayuda a segmentar regiones).
+
+**Modelo de imagen simple (valores típicos).** $i(x,y)$: Sol en día soleado 9000 cd/pie², nublado 1000, Luna llena 0,01. $r(x,y)$: terciopelo negro 0,01; acero inoxidable 0,65; pared blanca 0,80; lámina plateada 0,90; nieve 0,93.
+
+**Formatos BMP y PCX (estructura).** Ambos tienen: identificación del archivo, descripción del gráfico, tabla de colores, datos y final.
+
+| | BMP | PCX |
+|---|---|---|
+| Identificación | Los dos primeros caracteres son `BM` | Primer byte `10`; segundo byte = versión (0 a 5) |
+| Compresión | Normalmente sin comprimir (`bicompresion` = 0) | **RLE** |
+| Cabecera | tamaño, desplazamiento a los datos, ancho, alto, planos (=1), bits por píxel, resolución, colores usados | rle (modo de codificación), bits por píxel, coordenadas de inicio y fin, resolución (normalmente 100), `byteslinea` |
+| Paleta | Tabla de colores (para 256 colores, 768 bytes: R, G, B por cada índice) | Hasta 16 colores en la cabecera; si hay más (p. ej. 256) se usa una tabla de **768 bytes al final del archivo** |
 
 ### 1.2 Color (para completar la teoría)
 
@@ -92,6 +141,12 @@ Atenúa las altas frecuencias, así que **suaviza y emborrona**: reduce el ruido
 | **Gaussiano** | Promedio con pesos que decrecen con la distancia al centro | Máscara $\frac1{16}\begin{pmatrix}1&2&1\\2&4&2\\1&2&1\end{pmatrix}$. Emborrona menos que la media |
 | **Mediana** | Se **ordenan** los 9 valores y el centro pasa a ser el 5.º | **No lineal**. El más eficaz contra ruido «sal y pimienta»; conserva mejor los bordes |
 
+**Detalles de la presentación sobre paso bajo:**
+
+- **Media:** hace la imagen algo borrosa y reduce ruido; todos los coeficientes son **positivos**. Al pasar de 3×3 a 5×5 se mitiga más el ruido gaussiano, a costa de más desenfoque.
+- **Gaussiano:** con 3×3 casi no se nota diferencia contra la media, pero se dice que emborrona un poco menos y por eso suaviza «mejor».
+- **Mediana:** se usa cuando se busca **reducir ruido más que difuminar**, porque media y gaussiano difuminan bordes. Ejemplo de la presentación: valores ordenados $3,3,4,4,5,5,5,6,7$ → mediana **5**. Con ruido «sal y pimienta», la ventana 3×3 no elimina todo el ruido; la 5×5 sí lo elimina, pero deja la imagen borrosa.
+
 **Ejemplo con la mediana.** Ventana $\begin{pmatrix}3&18&73\\1&7&20\\9&25&14\end{pmatrix}$. Ordenados: $1,3,7,9,14,18,20,25,73$. El quinto es **14**, así que el centro 7 pasa a 14. El 73 (pico de ruido) no influye.
 
 #### Paso alto (realce de bordes)
@@ -109,8 +164,8 @@ $$\begin{pmatrix}-1&-1&-1\\-1&8&-1\\-1&-1&-1\end{pmatrix}$$
 #### Otros
 
 - **Laplaciano:** detección de bordes, p. ej. $\begin{pmatrix}0&1&0\\1&-4&1\\0&1&0\end{pmatrix}$ (suma 0).
-- **Paso banda:** deja pasar solo un rango de frecuencias (sirve para restaurar imágenes: se elimina la banda del ruido).
-- **Homomórfico:** para ruido **multiplicativo** o iluminación desigual. Se pasa a **logaritmos**, porque el producto se vuelve suma y ahí sí se puede filtrar.
+- **Paso banda:** deja pasar solo un rango de frecuencias (sirve para restaurar imágenes: se elimina la banda del ruido). En la presentación se muestra con distintas **frecuencias de corte** (64, 32, 16, 8) y para restaurar una imagen dañada con **ruido sinusoidal**, que luego se mejora con técnicas de histograma.
+- **Homomórfico:** para ruido **multiplicativo** o iluminación desigual. Se pasa a **logaritmos**, porque el producto se vuelve suma y ahí sí se puede filtrar: $\ln f=\ln i+\ln r$ → se filtra → se vuelve con la exponencial. *(Complemento: la iluminación es de baja frecuencia y la reflectancia de alta, por eso se atenúa la primera y se realza la segunda.)* Resultado visto: bordes mejorados y más detalle en zonas oscuras.
 
 ### 1.5 Detectar rectas con máscaras direccionales
 
@@ -147,9 +202,23 @@ Ejemplo: `aaabccdddd` → `3abcc4d`.
 | Valor suelto $\ge192$ | byte de escape `193` (= racha de 1) y luego el valor |
 | Racha de más de 63 | se parte en bloques de 63 como máximo |
 
+**Por qué 192 y por qué «los dos primeros bits»** (presentación, formato PCX 3): cuando se repite un color se guardan 2 bytes, un byte de **cantidad** (identificado porque tiene **encendidos los dos primeros bits**, con la cantidad en los **6 bits restantes**) y un byte de **color**.
+
+| Byte | Binario | Interpretación |
+|---|---|---|
+| 0 a 63 | `00xxxxxx` | color |
+| 64 a 127 | `01xxxxxx` | color |
+| 128 a 191 | `10xxxxxx` | color |
+| **192 a 255** | **`11xxxxxx`** | **contador** (cantidad = los 6 bits `xxxxxx`, de 0 a 63) |
+
+- $192=128+64=$ `11000000` (`0xC0`): el menor byte con los dos primeros bits en 1.
+- Con 6 bits la cantidad máxima es $2^6-1=63$; el byte de cuenta más alto es $192+63=255$ (`11111111`).
+- **El problema:** los colores 192 a 255 también empiezan con `11`, y al leer el archivo se confundirían con un contador. Por eso un color $\ge192$ va **siempre** precedido de un contador (`193` = `11000001`, cantidad 1), aunque no se repita. Los colores $<192$ no tienen este problema.
+- Consecuencia: la compresión puede **empeorar** si hay muchos colores altos sin repetirse.
+
 **Descodificar:** si un byte es $\ge192$, el contador es $\text{byte}-192$ y el siguiente byte es el valor. Si no, es un valor suelto.
 
-> **Sobre la fuente.** Los apuntes de la cátedra (Rubio) dan solo la idea general de RLE. El esquema de arriba es el del formato PCX estándar. En el parcial 2020 esta pregunta quedó sin responder, así que no hay corrección del docente. Si en clase vieron otra notación, el criterio de racha y valor es el mismo.
+> **Sobre la fuente.** La presentación PDI 2026 confirma el esquema de contador (dos primeros bits en 1, cantidad en 6 bits) y señala el problema de los colores altos; el escape `193` es el del formato PCX estándar. Los apuntes de Rubio dan solo la idea general de RLE. En el parcial 2020 esta pregunta quedó sin responder, así que no hay corrección del docente. Si en clase vieron otra notación, el criterio de racha y valor es el mismo.
 
 ### 1.7 Histograma (teoría de la unidad; no salió en estos parciales)
 
@@ -168,6 +237,23 @@ El **histograma** cuenta cuántos píxeles hay en cada nivel de gris.
 | Acumulada | 2 | 5 | 10 | 13 | 14 | 15 | 16 | 16 |
 | Acum./16 | 0,125 | 0,3125 | 0,625 | 0,8125 | 0,875 | 0,9375 | 1 | 1 |
 | ×7 y redondeo | **1** | **2** | **4** | **6** | **6** | **7** | **7** | **7** |
+
+**Fórmulas de la presentación** (sea $I$ el nivel de gris de un píxel; $I_{MAX}$ e $I_{MIN}$ el mayor y menor nivel presentes en la imagen; $MAX$ y $MIN$ los posibles, p. ej. 255 y 0):
+
+- **Stretching:** $\;I'=\dfrac{I-I_{MIN}}{I_{MAX}-I_{MIN}}\,(MAX-MIN)+MIN$ (estira al rango completo; sube el contraste).
+- **Shrinking:** $\;I'=\dfrac{Shrink_{MAX}-Shrink_{MIN}}{I_{MAX}-I_{MIN}}\,(I-I_{MIN})+Shrink_{MIN}$ (comprime al rango deseado; baja el contraste; la presentación lo muestra con rango $[75,175]$).
+- **Slide (desplazamiento):** $\;I'=I+OFFSET$ (OFFSET positivo aclara, negativo oscurece; conserva la relación entre niveles).
+
+*(Complemento: las ecuaciones de la presentación están como imagen; estas son las expresiones estándar que coinciden con sus definiciones.)*
+
+**Segundo ejemplo de ecualización (el de la presentación).** Histograma de 8 niveles con 10, 8, 9, 2, 14, 1, 5, 2 píxeles (total 51):
+
+| Nivel | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|---|---|---|---|---|---|---|---|---|
+| Acumulada | 10 | 18 | 27 | 29 | 43 | 44 | 49 | 51 |
+| ÷ 51 × 7, redondeo | **1** | **2** | **4** | **4** | **6** | **6** | **7** | **7** |
+
+Los niveles 0, 1, 2, 3... pasan a 1, 2, 4, 4... La ecualización da resultados parecidos aunque la imagen de entrada sea clara, oscura o de poco contraste.
 
 ### 1.8 Cómo armar tu propia ventana de ejemplo
 
@@ -219,6 +305,36 @@ Dos columnas de fondo (10) y una columna de otro nivel (80). El centro queda jus
 > **En el paso alto, el signo importa poco.** El negativo indica de qué lado del borde está el píxel. En la práctica se suele tomar el valor absoluto o recortar a 0.
 
 **RLE:** ahí no hay ventana, el dato es una secuencia. Para inventar un ejemplo, armá una secuencia con **una racha** (varios valores iguales), **un valor suelto menor a 192** y **un valor suelto mayor o igual a 192**, para que aparezcan los tres casos de la tabla de 1.6. Ej.: `10,10,10,200,7`.
+
+### 1.9 Detección de discontinuidades: puntos, rectas y bordes (presentación)
+
+La presentación agrupa tres detecciones, todas con máscaras:
+
+- **Puntos:** una máscara con centro positivo y periferia negativa (la del paso alto, $8$ en el centro y $-1$ alrededor); un punto aislado da respuesta grande.
+- **Rectas:** las cuatro máscaras de 1.5 (horizontal, 45°, vertical, 135°).
+- **Bordes con operadores de gradiente:** se calculan dos derivadas ($G_x$ y $G_y$) y se combina $|G|\approx|G_x|+|G_y|$. Los operadores que aparecen son **Roberts**, **Sobel**, **Prewitt** y **Laplaciano**.
+
+| Operador | $G_x$ | $G_y$ |
+|---|---|---|
+| **Roberts** (2×2) | $\begin{pmatrix}-1&0\\0&1\end{pmatrix}$ | $\begin{pmatrix}0&-1\\1&0\end{pmatrix}$ |
+| **Prewitt** | $\begin{pmatrix}-1&0&1\\-1&0&1\\-1&0&1\end{pmatrix}$ | $\begin{pmatrix}-1&-1&-1\\0&0&0\\1&1&1\end{pmatrix}$ |
+| **Sobel** | $\begin{pmatrix}-1&0&1\\-2&0&2\\-1&0&1\end{pmatrix}$ | $\begin{pmatrix}-1&-2&-1\\0&0&0\\1&2&1\end{pmatrix}$ |
+| **Laplaciano** | $\begin{pmatrix}0&1&0\\1&-4&1\\0&1&0\end{pmatrix}$ (una sola máscara, segunda derivada) | |
+
+*(Complemento: en la presentación las máscaras están como imagen; estas son las estándar. Sobel pesa más la fila/columna central, así que suaviza un poco el ruido. Es teoría de la unidad que no salió en parciales.)*
+
+### 1.10 Compresión JPEG (presentación)
+
+JPEG es una compresión **con pérdida** que reduce la **redundancia espacial** (píxeles vecinos parecidos, como el cielo). Es un codificador por **transformación** (transform coding): usa la **DCT** para pasar al dominio de frecuencias. Pasos:
+
+1. **Conversión RGB → $YC_bC_r$:** separa la luminancia $Y$ de las dos crominancias ($C_b$ = diferencia del azul, $C_r$ = diferencia del rojo).
+2. **Submuestreo:** se reduce la resolución de la crominancia, porque el ojo es más sensible al brillo (bastones, 75 a 150 millones) que al color (conos, 6 a 7 millones). Lo que sigue se aplica por **bloques de 8×8**, a luminancia y a crominancias.
+3. **DCT:** concentra la mayor parte de la información en pocos coeficientes. *(Aclaración: la esquina superior izquierda es el coeficiente continuo DC, de frecuencia cero y mayor valor; hacia la derecha y abajo suben las frecuencias, con valores decrecientes y muchos ceros.)*
+4. **Cuantización:** cada coeficiente se **divide** por un entero (tabla de cuantización, una para luminancia y otra para crominancia) y se **trunca**. **Es el paso donde se pierde información**; deja más ceros.
+5. **Recorrido en zig-zag** hasta el último elemento no nulo, y **RLE de las corridas de ceros** entre coeficientes no nulos (termina con `EOB`).
+6. **Huffman** sobre los símbolos del RLE, con tablas fijas según la probabilidad de cada corrida.
+
+Ejemplo de la presentación (bloque ya recorrido en zig-zag): `150,7,8,1,5,2,2,4,2,1,0,1,2,2,0,0,0,1,0,0,0,0,0,0,1,EOB`.
 
 ---
 
@@ -402,6 +518,18 @@ $$161+163+180+11+21+190+161+165+191=1243\;\rightarrow\;\frac{1243}{9}=138{,}1\ap
 **3.7 Setenta ceros.**
 *Resolución:* el máximo por bloque es 63 → $192+63=255$, luego el valor `0`, y quedan 7 → `199,0`. **`255,0,199,0`**.
 
+**3.8 Bits del contador.** El byte `11001010`, ¿qué es y qué dice?
+*Resolución:* empieza con `11`, es un contador. Cantidad = `001010` = 10 (o $202-192=10$). El byte siguiente es el color que se repite 10 veces.
+
+**3.9 ¿Es contador o color?** Clasificá `100`, `191`, `192`, `255`.
+*Resolución:* `100` ($01100100$) color; `191` ($10111111$) color; `192` ($11000000$) contador de 0 (no se usa); `255` ($11111111$) contador de 63.
+
+**3.10 Codificar con binario.** `64,64,64` y luego `250`.
+*Resolución:* tres 64 → $192+3=195$ (`11000011`), `64`; el 250 es $\ge192$ → `193,250`. Resultado: `195,64,193,250`.
+
+**3.11 Paso bajo vs. paso alto.** Una imagen con mucho ruido granulado, ¿qué filtro aplicás y qué esperás? ¿Y si querés marcar contornos?
+*Resolución:* ruido → paso bajo (media, gaussiano o, mejor para «sal y pimienta», mediana): baja el ruido pero emborrona bordes. Contornos → paso alto (suma de pesos 0): realza bordes, pero también el ruido.
+
 ---
 
 ## 4. Resumen de último momento
@@ -415,6 +543,11 @@ $$161+163+180+11+21+190+161+165+191=1243\;\rightarrow\;\frac{1243}{9}=138{,}1\ap
 | Mediana | Ordenar los 9 y tomar el 5.º |
 | Vectorial vs. bitmap | Figuras matemáticas (escala sin pérdida) vs. matriz de píxeles (se pixela) |
 | RLE de PCX | Racha: $192+r$ y valor. Suelto $<192$: tal cual. Suelto $\ge192$: `193` y valor. Máximo 63 por bloque |
+| «¿Por qué 192 / los dos primeros bits?» | Contador = `11xxxxxx` ($128+64=192$), cantidad en 6 bits (máx. 63). Colores $\ge192$ también empiezan con `11` → ambigüedad → escape `193` |
+| Paso alto vs. paso bajo | Bajo: coef. positivos, suaviza/emborrona. Alto: centro $+$, periferia $-$, suma 0, realza bordes (y ruido) |
+| Histograma | Stretching/shrinking/slide; ecualización en 4 pasos (ejemplos en 1.7) |
+| JPEG | $YC_bC_r$ → submuestreo → bloques 8×8 → DCT → cuantización (pérdida) → zig-zag → RLE + Huffman |
+| Bordes (Roberts, Sobel, Prewitt, Laplaciano) | Gradiente $G_x$, $G_y$; Laplaciano una máscara (1.9) |
 | Paso alto / high-boost | Centro positivo, periferia negativa, suma 0 (high-boost: suma 1) |
 
 **Antes de entregar:** revisá los signos de las máscaras, las divisiones por 9 y que hayas probado **todas** las máscaras o ventanas que pide el enunciado.
