@@ -1,0 +1,2290 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legislación Profesional · Simulador del integrador final</title>
+<style>
+:root{
+  --bg:#0e1420; --panel:#151e30; --panel2:#1b2540; --bd:#27334d;
+  --tx:#e7ecf6; --mut:#96a5c4; --acc:#4d8dff; --acc2:#2f6fe0;
+  --ok:#2fbf71; --okbg:#12351f; --bad:#ff5f6b; --badbg:#3a1620;
+  --warn:#f0b429; --warnbg:#3a2e10;
+  --rd:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(1100px 560px at 82% -12%, #1b2c50 0%, transparent 62%), var(--bg);
+  color:var(--tx);
+  font:15.5px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+.wrap{max-width:920px;margin:0 auto;padding:26px 18px 90px}
+h1{font-size:22px;line-height:1.25;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:17px;margin:26px 0 10px;letter-spacing:-.01em}
+h3{font-size:14.5px;margin:20px 0 8px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+p{margin:0 0 12px}
+a{color:var(--acc)}
+.sub{color:var(--mut);font-size:13.5px;margin:0}
+code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:.92em}
+
+/* tabs */
+.tabs{display:flex;gap:6px;margin:20px 0 18px;flex-wrap:wrap;border-bottom:1px solid var(--bd);padding-bottom:12px}
+.tabs button{
+  background:transparent;border:1px solid transparent;color:var(--mut);
+  padding:8px 13px;border-radius:10px;font:inherit;font-size:14px;cursor:pointer;
+}
+.tabs button:hover{color:var(--tx);background:var(--panel)}
+.tabs button.on{background:var(--panel2);color:var(--tx);border-color:var(--bd)}
+
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:var(--rd);padding:20px}
+.card + .card{margin-top:14px}
+
+/* chips */
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 16px}
+.chip{
+  background:var(--panel);border:1px solid var(--bd);color:var(--mut);
+  padding:6px 12px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer;
+}
+.chip:hover{color:var(--tx)}
+.chip.on{background:var(--acc2);border-color:var(--acc);color:#fff}
+
+/* buttons */
+.btn{
+  background:var(--acc2);border:1px solid var(--acc);color:#fff;
+  padding:11px 20px;border-radius:11px;font:inherit;font-weight:600;cursor:pointer;
+  transition:filter .12s;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;border-color:var(--bd);color:var(--tx);font-weight:500}
+.btn.ghost:hover{background:var(--panel2)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* progress */
+.meta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;font-size:13px;color:var(--mut)}
+.bar{height:5px;background:#0b1220;border:1px solid #1d2942;border-radius:99px;overflow:hidden;margin-bottom:20px}
+.bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc));width:0;transition:width .25s}
+.clock{font-variant-numeric:tabular-nums;font-weight:600}
+.clock.low{color:var(--bad)}
+
+/* question */
+.q{font-size:17.5px;line-height:1.5;margin:0 0 18px;font-weight:500}
+.tag{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--mut);border:1px solid var(--bd);
+  border-radius:6px;padding:2px 7px;margin-bottom:11px;background:var(--panel2);
+}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{
+  display:flex;gap:11px;align-items:flex-start;text-align:left;
+  background:var(--panel2);border:1px solid var(--bd);color:var(--tx);
+  padding:13px 15px;border-radius:11px;font:inherit;font-size:15px;cursor:pointer;
+  transition:border-color .12s,background .12s;
+}
+.opt:hover:not(:disabled){border-color:var(--acc)}
+.opt:disabled{cursor:default}
+.opt .k{
+  flex:0 0 auto;width:22px;height:22px;border-radius:6px;background:#0e1626;
+  border:1px solid var(--bd);display:grid;place-items:center;font-size:12px;
+  font-weight:700;color:var(--mut);margin-top:1px;
+}
+.opt.vf{justify-content:center;font-size:16px;font-weight:600;padding:16px}
+.opt.vf .k{display:none}
+.opt.sel{border-color:var(--acc);background:#1d2f52}
+.opt.good{border-color:var(--ok);background:var(--okbg)}
+.opt.good .k{background:var(--ok);color:#04150b;border-color:var(--ok)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt.wrong .k{background:var(--bad);color:#200408;border-color:var(--bad)}
+
+/* feedback */
+.fb{margin-top:16px;border-radius:11px;padding:14px 16px;font-size:14.5px;border:1px solid}
+.fb.ok{background:var(--okbg);border-color:#1f6b40}
+.fb.no{background:var(--badbg);border-color:#7a2a35}
+.fb > b{display:block;margin-bottom:5px;font-size:15px}
+.fb .ref{display:block;margin-top:9px;color:var(--mut);font-size:13px}
+
+/* results */
+.score{font-size:46px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.score small{font-size:17px;color:var(--mut);font-weight:500}
+.rev{border-top:1px solid var(--bd);padding:14px 0}
+.rev:first-of-type{border-top:0}
+.rev .qq{font-weight:500;margin-bottom:6px}
+.rev .aa{font-size:13.5px;color:var(--mut)}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:99px;margin-right:7px}
+.pill.ok{background:var(--okbg);color:var(--ok);border:1px solid #1f6b40}
+.pill.no{background:var(--badbg);color:var(--bad);border:1px solid #7a2a35}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--bd);vertical-align:top}
+th{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.tbl-wrap{overflow-x:auto;margin:0 -4px}
+
+/* trampas */
+.pair{background:var(--panel);border:1px solid var(--bd);border-radius:var(--rd);padding:0;margin-bottom:10px;overflow:hidden}
+.pair > button{
+  all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;
+  padding:15px 18px;font-size:15px;
+}
+.pair > button:hover{background:var(--panel2)}
+.pair .quote{color:var(--bad)}
+.pair .quote::before{content:"“"}
+.pair .quote::after{content:"”"}
+.pair .fix{
+  display:none;padding:0 18px 16px;border-top:1px solid var(--bd);
+  background:#0f1728;
+}
+.pair.open .fix{display:block}
+.pair .fix p{margin:13px 0 0;font-size:14.5px}
+.pair .fix .why{color:var(--tx)}
+.pair .lbl{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);font-weight:700;margin-top:12px;display:block}
+.pair .lbl.no{color:var(--bad)}
+.pair .lbl.yes{color:var(--ok)}
+
+.note{font-size:13px;color:var(--mut);background:var(--panel2);border:1px solid var(--bd);border-left:3px solid var(--warn);border-radius:9px;padding:12px 14px;margin:0 0 16px}
+.hidden{display:none}
+.center{text-align:center}
+.mt{margin-top:16px}
+kbd{background:#0c1322;border:1px solid var(--bd);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:12px;font-family:inherit}
+.stat{display:flex;gap:22px;flex-wrap:wrap;margin:14px 0 0}
+.stat div{font-size:13px;color:var(--mut)}
+.stat b{display:block;font-size:21px;color:var(--tx);font-weight:700;letter-spacing:-.01em}
+
+/* examen: navegador y formatos nuevos */
+.navgrid{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.navgrid button{
+  position:relative;width:34px;height:34px;border-radius:8px;border:1px solid var(--bd);
+  background:var(--panel);color:var(--mut);font:inherit;font-size:13px;cursor:pointer;
+}
+.navgrid button:hover{border-color:var(--acc);color:var(--tx)}
+.navgrid button.done{background:#1d2f52;border-color:var(--acc);color:var(--tx)}
+.navgrid button.cur{outline:2px solid var(--tx);outline-offset:1px}
+.navgrid button.flag::after{content:"";position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--warn)}
+.opt.chk .k{border-radius:5px}
+.opt.sel .k{background:var(--acc);color:#fff;border-color:var(--acc)}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--bd)}
+.mrow:first-child{border-top:0}
+.msel{width:100%;background:var(--panel2);color:var(--tx);border:1px solid var(--bd);border-radius:9px;padding:10px 11px;font:inherit;font-size:14px}
+.msel.good{border-color:var(--ok);background:var(--okbg)}
+.msel.wrong{border-color:var(--bad);background:var(--badbg)}
+/* cazador */
+.hunt{font-size:18px;line-height:2.15}
+.tok{display:inline-block;padding:0 2px;border-radius:6px;border:1px solid transparent;cursor:pointer}
+.tok:hover{background:var(--panel2)}
+.tok.sel{background:#1d2f52;border-color:var(--acc)}
+.tok.hit{background:var(--okbg);border-color:var(--ok)}
+.tok.bad{background:var(--badbg);border-color:var(--bad)}
+.tok.miss{text-decoration:line-through;border-color:var(--bad);color:var(--mut)}
+/* tarjetas */
+.flash{min-height:150px;padding:16px 4px 4px;text-align:center}
+.flash-q{font-size:20px;font-weight:600;line-height:1.4}
+.flash-a{margin-top:18px;padding-top:16px;border-top:1px solid var(--bd);font-size:17px;line-height:1.5}
+.center{text-align:center}
+
+@media (max-width:560px){
+  .mrow{grid-template-columns:1fr;gap:6px}
+  .wrap{padding:20px 14px 70px}
+  h1{font-size:19px}
+  .q{font-size:16px}
+  .score{font-size:38px}
+}
+@media print{
+  body{background:#fff;color:#000}
+  .tabs,.btn,.chips,.sub,.note{display:none !important}
+  .wrap{max-width:none;padding:0}
+  .card{border-color:#bbb;background:#fff;break-inside:avoid}
+  th,td{border-color:#ccc}
+  th{color:#444}
+  .screen-only{display:none !important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Legislación Profesional · Simulador del integrador final</h1>
+    <p class="sub">10 preguntas · V/F, opción múltiple, varias correctas y relacionar · Unidades 1 a 5 — FCEFN</p>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button data-view="sim" class="on">Integrador</button>
+    <button data-view="casos">Casos</button>
+    <button data-view="cazador">Cazador</button>
+    <button data-view="tarjetas">Tarjetas</button>
+    <button data-view="trampas">Banco de trampas</button>
+    <button data-view="cifras">Datos duros</button>
+    <button data-view="cob">Cobertura</button>
+  </nav>
+
+  <main>
+
+    <!-- ================= SIMULADOR ================= -->
+    <section id="view-sim">
+
+      <div id="sim-setup">
+        <div class="card">
+          <h3 style="margin-top:0">Armá tu intento</h3>
+          <div class="chips" id="unitChips">
+            <button class="chip on" data-u="all">Todas las unidades</button>
+            <button class="chip" data-u="1">U1 · Autor y software</button>
+            <button class="chip" data-u="2">U2 · Contratos y firma</button>
+            <button class="chip" data-u="3">U3 · Datos personales</button>
+            <button class="chip" data-u="4">U4 · Delitos</button>
+            <button class="chip" data-u="5">U5 · Responsabilidad</button>
+          </div>
+
+          <h3>Modalidad</h3>
+          <div class="chips" id="modeChips">
+            <button class="chip on" data-mode="estudio">Estudio · corrige al instante</button>
+            <button class="chip" data-mode="examen">Examen · como Moodle: navegás, marcás y corregís al final</button>
+          </div>
+
+          <h3>Preguntas</h3>
+          <div class="chips" id="lenChips">
+            <button class="chip on" data-len="10">10 (como el final)</button>
+            <button class="chip" data-len="20">20</button>
+            <button class="chip" data-len="30">30</button>
+          </div>
+
+          <h3>Fuente</h3>
+          <div class="chips" id="srcChips">
+            <button class="chip on" data-src="all">Todo el banco</button>
+            <button class="chip" data-src="failed">Solo las que fallé</button>
+            <button class="chip" data-src="trap">Solo las marcadas ⚠️ trampa</button>
+          </div>
+
+          <div class="row mt">
+            <button class="btn" id="startBtn">Empezar</button>
+            <span class="sub" id="poolInfo"></span>
+          </div>
+        </div>
+
+        <div class="card" id="histCard">
+          <h3 style="margin-top:0">Tus intentos</h3>
+          <div id="histBody" class="sub">Todavía no hiciste ningún intento.</div>
+        </div>
+      </div>
+
+      <div id="sim-run" class="hidden">
+        <div class="meta">
+          <span id="qCounter">Pregunta 1 de 10</span>
+          <span class="clock" id="clock">0:00</span>
+        </div>
+        <div class="bar"><i id="progBar"></i></div>
+        <div id="navGrid" class="navgrid hidden"></div>
+        <div class="card">
+          <div class="q" id="qText"></div>
+          <div class="opts" id="qOpts"></div>
+          <div id="qFb"></div>
+        </div>
+        <div class="row mt">
+          <button class="btn ghost hidden" id="prevBtn">← Anterior</button>
+          <button class="btn hidden" id="confirmBtn">Confirmar</button>
+          <button class="btn hidden" id="nextBtn">Siguiente</button>
+          <button class="btn ghost hidden" id="flagBtn">⚑ Marcar para revisar</button>
+          <button class="btn hidden" id="finishBtn">Finalizar intento</button>
+          <button class="btn ghost" id="abortBtn">Abandonar</button>
+          <span class="sub" id="keysHint"></span>
+        </div>
+      </div>
+
+      <div id="sim-done" class="hidden">
+        <div class="card">
+          <h3 style="margin-top:0">Resultado</h3>
+          <div class="score" id="finalScore">0<small> / 10</small></div>
+          <p class="sub" id="finalVerdict" style="margin-top:8px"></p>
+          <div class="stat" id="finalStats"></div>
+          <div id="repasar"></div>
+          <div class="row mt">
+            <button class="btn" id="againBtn">Otro intento</button>
+            <button class="btn ghost" id="reviewFailBtn">Repetir solo las falladas</button>
+          </div>
+        </div>
+        <div class="card" id="reviewCard">
+          <h3 style="margin-top:0">Corrección</h3>
+          <div id="reviewBody"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= CASOS ================= -->
+    <section id="view-casos" class="hidden">
+      <div class="note">
+        Casos al estilo de los Prácticos 3 y 4: primero identificás la <b>figura</b> y después los
+        <b>planos de responsabilidad</b> que se activan. Respondé solo con lo que dice el enunciado.
+      </div>
+      <div class="chips" id="caseFilters">
+        <button class="chip on" data-cu="all">Todos</button>
+        <button class="chip" data-cu="3">U3</button>
+        <button class="chip" data-cu="4">U4</button>
+        <button class="chip" data-cu="5">U5</button>
+      </div>
+      <div class="card" id="caseCard"></div>
+      <p class="sub" id="caseScore" style="margin-top:12px"></p>
+    </section>
+
+    <!-- ================= CAZADOR ================= -->
+    <section id="view-cazador" class="hidden">
+      <div class="note">
+        En el parcial las trampas son <b>una palabra cambiada</b>. Acá practicás encontrarla: tocá la parte
+        incorrecta de la frase y comprobá. Lo que fallás vuelve más seguido.
+      </div>
+      <div class="chips" id="huntFilters">
+        <button class="chip on" data-hu="all">Todas</button>
+        <button class="chip" data-hu="1">U1</button>
+        <button class="chip" data-hu="2">U2</button>
+        <button class="chip" data-hu="3">U3</button>
+        <button class="chip" data-hu="4">U4</button>
+        <button class="chip" data-hu="5">U5</button>
+      </div>
+      <div class="card" id="huntCard"></div>
+      <p class="sub" id="huntScore" style="margin-top:12px"></p>
+    </section>
+
+    <!-- ================= TARJETAS ================= -->
+    <section id="view-tarjetas" class="hidden">
+      <div class="note">
+        Los números son la mitad del V/F. Repaso espaciado: lo que no sabés vuelve en un minuto; lo que sabés,
+        cada vez más tarde. Atajos: <kbd>Espacio</kbd> mostrar · <kbd>1</kbd> no la sabía · <kbd>2</kbd> la sabía.
+      </div>
+      <div class="chips" id="cardFilters"></div>
+      <div class="card">
+        <div class="stat" id="cardStats" style="margin-top:0;margin-bottom:14px"></div>
+        <div id="cardBox"></div>
+      </div>
+    </section>
+
+    <!-- ================= TRAMPAS ================= -->
+    <section id="view-trampas" class="hidden">
+      <div class="note">
+        Cada tarjeta es una frase que <b>parece correcta y no lo es</b>. Elegí mentalmente qué responderías en un V/F,
+        después tocá para ver la corrección. Estas son las que más se repiten en los parciales.
+      </div>
+      <div class="chips" id="trapFilters">
+        <button class="chip on" data-tu="all">Todas</button>
+        <button class="chip" data-tu="1">U1</button>
+        <button class="chip" data-tu="2">U2</button>
+        <button class="chip" data-tu="3">U3</button>
+        <button class="chip" data-tu="4">U4</button>
+        <button class="chip" data-tu="5">U5</button>
+      </div>
+      <div id="pairsBody"></div>
+    </section>
+
+    <!-- ================= DATOS DUROS ================= -->
+    <section id="view-cifras" class="hidden">
+      <div class="note screen-only">
+        Para V/F los números son la mitad del examen. Esto entra en una carilla: imprimila y leela el día antes.
+      </div>
+      <div class="row screen-only" style="margin-bottom:16px">
+        <button class="btn ghost" onclick="window.print()">Imprimir / guardar PDF</button>
+      </div>
+      <div id="cifrasBody"></div>
+    </section>
+
+    <!-- ================= COBERTURA ================= -->
+    <section id="view-cob" class="hidden">
+      <div class="note">
+        Cuántos ítems hay por tema y cómo te está yendo en cada uno. Un tema con acierto bajo y muchas preguntas
+        es donde se juega el final.
+      </div>
+      <div id="cobBody"></div>
+      <div class="row mt">
+        <button class="btn ghost" id="resetBtn">Borrar progreso guardado</button>
+      </div>
+    </section>
+
+  </main>
+
+  <p class="sub" style="margin-top:34px;text-align:center">
+    Contenido derivado de <em>Resumen Integrador Final</em> y <em>Guía de Estudio</em> de la carpeta.
+    Progreso guardado en este navegador.
+  </p>
+</div>
+
+<script>
+/* =========================================================
+   1. BANCO DE PREGUNTAS
+   u = unidad · top = tema · t = 'vf' | 'mc'
+   a = respuesta (true/false, o índice en opts)
+   why = por qué · ref = norma · trap = ⚠️ · hist = años en que cayó
+   ========================================================= */
+const BANK = [
+
+/* ---------- UNIDAD 1 · Propiedad intelectual y derecho de autor ---------- */
+{id:'u1-01',u:1,top:'Marco y tratados',t:'vf',hist:'2022 · 2026',trap:true,
+ q:'La obra goza de la misma protección en todos los países, cualquiera sea el lugar de su creación.',
+ a:true,why:'Es la internacionalidad del Convenio de Berna (1886): trato nacional. Lo que sí es territorial son las patentes y las marcas.',
+ ref:'Convenio de Berna'},
+
+{id:'u1-02',u:1,top:'Marco y tratados',t:'vf',
+ q:'Las patentes de invención y las marcas son territoriales: solo protegen en el país donde se registraron.',
+ a:true,why:'A diferencia del derecho de autor, la propiedad industrial exige registro país por país.',
+ ref:'Propiedad industrial'},
+
+{id:'u1-03',u:1,top:'Qué se protege',t:'vf',trap:true,
+ q:'El derecho de autor protege las ideas, los procedimientos y los métodos de operación en sí mismos.',
+ a:false,why:'Se protege la EXPRESIÓN, no la idea. El art. 1 in fine deja expresamente fuera las ideas, los procedimientos, los métodos de operación y los conceptos matemáticos.',
+ ref:'Ley 11.723, art. 1 in fine'},
+
+{id:'u1-04',u:1,top:'Qué se protege',t:'vf',
+ q:'Los programas de computación, tanto en código fuente como en código objeto, están incluidos expresamente entre las obras protegidas por la Ley 11.723.',
+ a:true,why:'Por eso el software es una obra literaria y se protege por derecho de autor.',
+ ref:'Ley 11.723, art. 1 (Ley 25.036)'},
+
+{id:'u1-05',u:1,top:'Qué se protege',t:'vf',trap:true,
+ q:'El software puede patentarse en la Argentina sin ninguna condición.',
+ a:false,why:'El art. 6 de la Ley 24.481 excluye el software, salvo que esté embebido en un hardware y sea imprescindible para su funcionamiento.',
+ ref:'Ley 24.481, art. 6'},
+
+{id:'u1-06',u:1,top:'Morales y patrimoniales',t:'vf',
+ q:'Los derechos morales del autor son perpetuos, inalienables, irrenunciables e inembargables.',
+ a:true,why:'Son los que protegen la personalidad del autor respecto de la obra; no se pierden ni se ceden.',
+ ref:'Ley 11.723'},
+
+{id:'u1-07',u:1,top:'Morales y patrimoniales',t:'vf',hist:'2024',
+ q:'Los derechos morales del autor pueden cederse por contrato.',
+ a:false,why:'Son intransmisibles. Lo que se cede es lo patrimonial (transmisible, renunciable, embargable).',
+ ref:'Ley 11.723'},
+
+{id:'u1-08',u:1,top:'Morales y patrimoniales',t:'vf',hist:'2024',
+ q:'Los derechos patrimoniales son transmisibles, renunciables y embargables.',
+ a:true,why:'Son temporales (vida + 70 años) y protegen la explotación económica de la obra.',
+ ref:'Ley 11.723'},
+
+{id:'u1-09',u:1,top:'Morales y patrimoniales',t:'mc',hist:'2024',
+ q:'¿Cuál de estas facultades NO es un derecho moral del autor?',
+ opts:['Divulgación (publicar o mantener inédita)','Paternidad (ser reconocido como autor)','Distribución','Integridad (oponerse a deformaciones)'],
+ a:2,why:'La distribución es patrimonial, junto con reproducción, comunicación pública y transformación. Las morales son divulgación, paternidad, integridad y retracto.',
+ ref:'Ley 11.723, art. 2'},
+
+{id:'u1-10',u:1,top:'Morales y patrimoniales',t:'vf',
+ q:'Vender el soporte físico de una obra cede automáticamente los derechos de reproducción sobre ella.',
+ a:false,why:'Los derechos son independientes del soporte material: comprar el cuadro no habilita a reproducirlo.',
+ ref:'Ley 11.723, arts. 51-52'},
+
+{id:'u1-11',u:1,top:'Plazos',t:'vf',hist:'2024',
+ q:'Los derechos de autor de una persona humana duran toda su vida más 70 años, contados desde el 1 de enero del año siguiente a su muerte.',
+ a:true,why:'Vida + 70 años, art. 5.',
+ ref:'Ley 11.723, art. 5'},
+
+{id:'u1-12',u:1,top:'Plazos',t:'mc',hist:'2024',
+ q:'Las obras anónimas de personas jurídicas, instituciones o corporaciones duran…',
+ opts:['20 años desde la publicación','50 años desde la publicación','70 años desde la publicación','Vida del autor más 70 años'],
+ a:1,why:'50 años desde la publicación (art. 8). Los 70 años son para persona humana (art. 5).',
+ ref:'Ley 11.723, art. 8'},
+
+{id:'u1-13',u:1,top:'Plazos',t:'vf',hist:'2026',trap:true,
+ q:'Las obras fotográficas están protegidas durante 25 años según la Ley 11.723.',
+ a:false,why:'Son 20 años desde la primera publicación (art. 34). Los 25 años son los de Berna, no los de la ley argentina.',
+ ref:'Ley 11.723, art. 34'},
+
+{id:'u1-14',u:1,top:'Plazos',t:'vf',
+ q:'Las obras cinematográficas duran 50 años desde la muerte del último colaborador.',
+ a:true,why:'Se cuenta desde la muerte del último de los colaboradores: autor del argumento, productor y director.',
+ ref:'Ley 11.723, arts. 20 y 34'},
+
+{id:'u1-15',u:1,top:'Registro y sanciones',t:'vf',hist:'2024',
+ q:'Para registrar una obra se exige que sea inédita y original; no importan su valor, mérito ni importancia.',
+ a:true,why:'Es el requisito de la Ley 11.723: originalidad e ineditismo, sin juicio de valor.',
+ ref:'Ley 11.723'},
+
+{id:'u1-16',u:1,top:'Registro y sanciones',t:'vf',
+ q:'La falta de inscripción de la obra en el registro extingue definitivamente los derechos del autor.',
+ a:false,why:'No los extingue: los SUSPENDE hasta que se inscriba (art. 63). El depósito garantiza los derechos (art. 62).',
+ ref:'Ley 11.723, arts. 62-63'},
+
+{id:'u1-17',u:1,top:'Registro y sanciones',t:'vf',hist:'2022 · 2024 · 2026',trap:true,
+ q:'La copia ilegal de software está reprimida con la pena del art. 172 del Código Penal, es decir, estafa.',
+ a:true,why:'El art. 71 de la Ley 11.723 remite a la estafa. Es la pregunta más repetida de la materia: NO es hurto, robo ni homicidio.',
+ ref:'Ley 11.723, art. 71 → CP art. 172'},
+
+{id:'u1-18',u:1,top:'Registro y sanciones',t:'vf',hist:'2026',
+ q:'La cesión de derechos patrimoniales sobre una obra presupone que la obra esté registrada.',
+ a:true,why:'Es el criterio que tomó la cátedra en el parcial 2026: sin registro no hay cesión válida según ese criterio.',
+ ref:'Criterio de cátedra · arts. 62-63'},
+
+{id:'u1-19',u:1,top:'Registro y sanciones',t:'mc',
+ q:'¿Ante qué organismo se registra una obra de software?',
+ opts:['INPI','Dirección Nacional del Derecho de Autor (DNDA)','AAIP','Ministerio de Trabajo'],
+ a:1,why:'La DNDA. El trámite es Inscripción de obra publicada de Software: datos, comprobante de pago del trámite y de la tasa, y depósito de la obra.',
+ ref:'Ley 11.723, art. 57'},
+
+{id:'u1-20',u:1,top:'Titulares',t:'mc',hist:'2025',
+ q:'¿Quién es titular del software creado por un dependiente en el desempeño de sus funciones laborales?',
+ opts:['Siempre el programador que lo escribió','El empleador, salvo estipulación en contrario','El Estado','El editor que lo distribuye'],
+ a:1,why:'Art. 4 inc. d, incorporado por la Ley 25.036: las personas físicas o jurídicas cuyos dependientes crearon el programa en el marco de su relación laboral, salvo pacto en contrario.',
+ ref:'Ley 11.723, art. 4 inc. d'},
+
+{id:'u1-21',u:1,top:'Excepciones',t:'vf',
+ q:'Quien recibe una licencia de uso de un programa puede realizar todas las copias de salvaguardia que necesite.',
+ a:false,why:'Puede hacer UNA única copia, y solo reemplaza al original si este se pierde o se inutiliza.',
+ ref:'Ley 11.723, art. 9 (Ley 25.036)'},
+
+{id:'u1-22',u:1,top:'Excepciones',t:'vf',trap:true,
+ q:'En Argentina existe una copia privada general: se puede digitalizar un libro entero para uso personal sin autorización.',
+ a:false,why:'No existe. Solo el derecho de cita y la copia de salvaguardia del software. La regla general es autorización expresa u onerosa del autor.',
+ ref:'Ley 11.723, arts. 9 y 10'},
+
+{id:'u1-23',u:1,top:'Excepciones',t:'vf',
+ q:'El derecho de cita con fines didácticos o científicos admite hasta 1.000 palabras u 8 compases en música.',
+ a:true,why:'Es el límite del art. 10.',
+ ref:'Ley 11.723, art. 10'},
+
+{id:'u1-24',u:1,top:'Excepciones',t:'vf',
+ q:'Vencidos los plazos de protección la obra cae en dominio público y su uso comercial ya no paga nada en Argentina.',
+ a:false,why:'El dominio público argentino es PAGANTE: el uso comercial paga un gravamen al Fondo Nacional de las Artes, con exención para usos culturales o didácticos gratuitos.',
+ ref:'Fondo Nacional de las Artes'},
+
+{id:'u1-25',u:1,top:'Licencias y software',t:'vf',trap:true,
+ q:'Que un programa sea software libre significa necesariamente que es gratuito.',
+ a:false,why:'Libre se refiere a libertades (usar, estudiar y modificar, distribuir, mejorar y publicar mejoras), no a precio. Puede venderse. Gratuito es freeware.',
+ ref:'FSF · GNU (1985)'},
+
+{id:'u1-26',u:1,top:'Licencias y software',t:'vf',hist:'2022',
+ q:'Con una licencia copyleft como la GPL se puede tomar el código y redistribuirlo como software propietario cerrado.',
+ a:false,why:'El copyleft obliga a que las obras derivadas conserven la misma licencia. Cerrar el código solo se puede con licencia permisiva.',
+ ref:'GPL v3'},
+
+{id:'u1-27',u:1,top:'Licencias y software',t:'vf',hist:'2022',
+ q:'Con una licencia permisiva se puede hacer un fork y redistribuir el código incluso cerrado.',
+ a:true,why:'Esa es la diferencia clave con el copyleft.',
+ ref:'Licencias permisivas'},
+
+{id:'u1-28',u:1,top:'Licencias y software',t:'vf',hist:'2022',
+ q:'Una licencia es libre si permite cualquier uso, modificar el código, redistribuir y redistribuir también las modificaciones.',
+ a:true,why:'Las cuatro libertades. En la permisiva, redistribuir las modificaciones incluso cerrándolas.',
+ ref:'FSF'},
+
+{id:'u1-29',u:1,top:'Licencias y software',t:'mc',hist:'2022',
+ q:'¿Cuál es el modelo de protección del software que la cátedra considera adecuado en Argentina?',
+ opts:['Patentes de invención','Secreto comercial exclusivamente','Derecho de autor, complementado con medidas contractuales y técnicas','Registro de marca'],
+ a:2,why:'Las patentes lo excluyen (Ley 24.481 art. 6) y el secreto comercial se pierde al publicarse. La conclusión es derecho de autor + licencias + medidas técnicas.',
+ ref:'Conclusión de cátedra'},
+
+{id:'u1-30',u:1,top:'Licencias y software',t:'vf',
+ q:'El secreto comercial protege el software mientras sea secreto, tenga valor comercial por serlo y se hayan tomado medidas razonables de resguardo.',
+ a:true,why:'Son los tres requisitos de la Ley 24.766. Se pierde cuando el conocimiento se hace público.',
+ ref:'Ley 24.766'},
+
+{id:'u1-31',u:1,top:'Marco y tratados',t:'mc',
+ q:'¿Cuál tratado protegió los programas de computación y las compilaciones de datos en el entorno digital?',
+ opts:['Convenio de Berna (1886)','Convención Universal de Ginebra (1952)','Convención de Roma (1961)','Tratado OMPI WCT'],
+ a:3,why:'El WCT de la OMPI extendió el derecho de autor al entorno digital y protege programas de ordenador y compilaciones de datos.',
+ ref:'Tratado OMPI WCT'},
+
+{id:'u1-32',u:1,top:'Marco y tratados',t:'vf',
+ q:'Los derechos conexos protegen a intérpretes, productores de fonogramas y organismos de radiodifusión.',
+ a:true,why:'Protección más limitada, regulada por la Convención de Roma de 1961.',
+ ref:'Convención de Roma, 1961'},
+
+/* ---------- UNIDAD 2 · Contratos, firma digital y teletrabajo ---------- */
+{id:'u2-01',u:2,top:'Contrato y capacidad',t:'vf',hist:'2026',
+ q:'Solo las personas humanas tienen capacidad de derecho.',
+ a:false,why:'Las personas jurídicas también tienen capacidad de hecho y de derecho (arts. 22-23 CCCN). Fue pregunta del parcial 2026.',
+ ref:'CCCN, arts. 22-23'},
+
+{id:'u2-02',u:2,top:'Contrato y capacidad',t:'vf',
+ q:'El objeto del contrato no necesariamente debe ser lícito.',
+ a:false,why:'Consentimiento, objeto y causa deben ser todos lícitos. El objeto ilícito invalida el contrato.',
+ ref:'CCCN'},
+
+{id:'u2-03',u:2,top:'Contrato y capacidad',t:'vf',
+ q:'Rige la libertad de formas: un contrato no necesita estar escrito ni firmado en forma ológrafa para ser válido.',
+ a:true,why:'Salvo excepciones legales, la forma es libre; por eso son válidos los contratos electrónicos.',
+ ref:'CCCN'},
+
+{id:'u2-04',u:2,top:'Obra vs servicios',t:'mc',hist:'2026',
+ q:'¿Qué artículos del CCCN regulan la locación de obra?',
+ opts:['Art. 1251 y 1262 al 1279','Art. 1251 y 1278 al 1290','Art. 1092 al 1095','Art. 1708 al 1730'],
+ a:0,why:'Locación de obra: arts. 1251 y 1262 ss. Los 1278 ss. son locación de servicios; 1092-1095 es consumo; 1708 ss. es responsabilidad.',
+ ref:'CCCN, arts. 1251 y 1262 ss.'},
+
+{id:'u2-05',u:2,top:'Obra vs servicios',t:'vf',trap:true,
+ q:'En la locación de servicios se debe un resultado, mientras que en la locación de obra se debe una actividad diligente.',
+ a:false,why:'Es al revés: obra = resultado; servicios = actividad diligente (obligación de medios).',
+ ref:'CCCN, arts. 1251 y ss.'},
+
+{id:'u2-06',u:2,top:'Obra vs servicios',t:'mc',hist:'2025',
+ q:'Un contrato de desarrollo de software a medida se califica como…',
+ opts:['Locación de servicios, obligación de medios','Locación de obra, obligación de resultado, con objeto complejo','Compraventa simple','Contrato de trabajo'],
+ a:1,why:'Es obra (se promete un resultado) pero con objeto complejo: combina obligaciones de dar y de hacer, incluye un bien intelectual protegido y la calificación medios/resultado es discutible.',
+ ref:'CCCN, art. 1252'},
+
+{id:'u2-07',u:2,top:'Obra vs servicios',t:'vf',
+ q:'En las obligaciones de resultado el deudor se presume responsable y solo se libera probando causa ajena.',
+ a:true,why:'Art. 1723: la responsabilidad es objetiva en las obligaciones de resultado. En las de medios, el acreedor debe probar dolo o culpa.',
+ ref:'CCCN, art. 1723'},
+
+{id:'u2-08',u:2,top:'Obra vs servicios',t:'mc',
+ q:'El mantenimiento que adapta el software a nuevas necesidades o a cambios legales se llama…',
+ opts:['Preventivo','Correctivo','Evolutivo','Predictivo'],
+ a:2,why:'Preventivo evita fallas; correctivo repara fallas ya manifestadas; evolutivo adapta a nuevas necesidades o normas.',
+ ref:'Contrato de mantenimiento'},
+
+{id:'u2-09',u:2,top:'Adhesión y consumo',t:'vf',
+ q:'Las cláusulas abusivas son válidas si fueron negociadas o aprobadas expresamente por el consumidor.',
+ a:false,why:'Se tienen por abusivas aunque hayan sido negociadas: lo que las define es el desequilibrio significativo en perjuicio del consumidor, no la falta de negociación.',
+ ref:'CCCN, arts. 984-989 y 1092-1095'},
+
+{id:'u2-10',u:2,top:'Adhesión y consumo',t:'vf',
+ q:'La aceptación con un clic de una licencia EULA de software enlatado es típicamente un contrato de adhesión.',
+ a:true,why:'Cláusulas predispuestas por una parte: el adherente solo acepta o rechaza.',
+ ref:'CCCN, arts. 984-989'},
+
+{id:'u2-11',u:2,top:'Adhesión y consumo',t:'mc',
+ q:'En los contratos celebrados a distancia, ¿dónde se considera cumplida la obligación a los efectos de la jurisdicción?',
+ opts:['En el domicilio del proveedor','Donde el consumidor recibió la prestación','En el lugar de celebración del contrato','Donde tenga su sede el servidor'],
+ a:1,why:'Art. 1109: lugar donde el consumidor recibió la prestación; la prórroga de jurisdicción se tiene por no escrita.',
+ ref:'CCCN, art. 1109'},
+
+{id:'u2-12',u:2,top:'Firma digital',t:'vf',hist:'2024',trap:true,
+ q:'La firma electrónica goza de presunción de autoría e integridad.',
+ a:false,why:'No tiene ninguna presunción. La que presume autoría (art. 7) e integridad (art. 8) es la firma DIGITAL.',
+ ref:'Ley 25.506, arts. 7-8'},
+
+{id:'u2-13',u:2,top:'Firma digital',t:'vf',hist:'2024',
+ q:'La firma digital cumple el requisito de firma manuscrita y produce un documento original.',
+ a:true,why:'Art. 3 (equivale a firma manuscrita) y art. 11 (documento original). Equivale a instrumento privado firmado.',
+ ref:'Ley 25.506, arts. 3 y 11'},
+
+{id:'u2-14',u:2,top:'Firma digital',t:'vf',trap:true,
+ q:'La firma digital cifra el contenido del mensaje, por lo que garantiza confidencialidad.',
+ a:false,why:'Garantiza autoría, integridad y no repudio, y verificabilidad por terceros. NO cifra el contenido: la confidencialidad exige cifrado aparte.',
+ ref:'Ley 25.506'},
+
+{id:'u2-15',u:2,top:'Firma digital',t:'mc',hist:'2024',
+ q:'¿Qué garantiza el par de claves privada y pública?',
+ opts:['Confidencialidad y anonimato','Autoría, integridad y no repudio','Disponibilidad y respaldo','Solo la confidencialidad del canal'],
+ a:1,why:'La clave privada firma (solo la conoce el firmante) y la pública, que va en el certificado, verifica. No cifra el contenido.',
+ ref:'Ley 25.506 · criptografía asimétrica'},
+
+{id:'u2-16',u:2,top:'Firma digital',t:'vf',
+ q:'La firma digital requiere el certificado de un certificador licenciado.',
+ a:true,why:'Art. 2: procedimiento criptográfico con información de exclusivo conocimiento del firmante y certificado emitido por un certificador licenciado. La validez (art. 9) exige que se haya creado durante la vigencia del certificado.',
+ ref:'Ley 25.506, arts. 2 y 9'},
+
+{id:'u2-17',u:2,top:'Firma digital',t:'mc',hist:'2024',
+ q:'En la infraestructura de firma digital, ¿quién valida la identidad del titular?',
+ opts:['El certificador licenciado','La Autoridad de Registro','El ente licenciante','El usuario que recibe el documento'],
+ a:1,why:'El certificador emite, revoca y publica certificados; la Autoridad de Registro valida la identidad del titular.',
+ ref:'Ley 25.506 · PKI'},
+
+{id:'u2-18',u:2,top:'Firma digital',t:'mc',
+ q:'¿Cuál de estos actos queda EXCLUIDO de la firma digital (art. 4)?',
+ opts:['Un contrato de locación de obra de software','Una compraventa entre empresas','Las disposiciones por causa de muerte','Un contrato de adhesión'],
+ a:2,why:'Exclusiones del art. 4: disposiciones por causa de muerte, derecho de familia, actos personalísimos y los que deben ser ológrafos.',
+ ref:'Ley 25.506, art. 4'},
+
+{id:'u2-19',u:2,top:'Teletrabajo',t:'vf',
+ q:'En el teletrabajo la reversibilidad, es decir el regreso a la presencialidad, existe siempre a pedido del trabajador.',
+ a:false,why:'Solo si se pactó en el convenio colectivo o en el contrato, y en los contratos que nacieron como teletrabajo.',
+ ref:'Ley 27.555'},
+
+{id:'u2-20',u:2,top:'Teletrabajo',t:'vf',
+ q:'El empleador debe proveer el equipamiento y hacerse cargo de los gastos de mantenimiento, energía y conectividad del teletrabajador.',
+ a:true,why:'Es la compensación de gastos de la Ley 27.555: el trabajador no puede absorber el costo de trabajar.',
+ ref:'Ley 27.555'},
+
+{id:'u2-21',u:2,top:'Teletrabajo',t:'vf',
+ q:'La ley de teletrabajo establece cuidados especiales para trabajadores con menores de 13 años, personas con discapacidad o adultos mayores convivientes.',
+ a:true,why:'Deben pactarse horarios compatibles con las tareas de cuidado.',
+ ref:'Ley 27.555'},
+
+{id:'u2-22',u:2,top:'Teletrabajo',t:'vf',
+ q:'Los controles sobre la actividad del teletrabajador requieren participación sindical y no pueden afectar su intimidad.',
+ a:true,why:'La ley prohíbe el software de vigilancia que viole la intimidad y exige participación sindical en los controles.',
+ ref:'Ley 27.555'},
+
+{id:'u2-23',u:2,top:'Teletrabajo',t:'mc',
+ q:'¿Cuál es la autoridad de aplicación de la Ley 27.555?',
+ opts:['La AAIP','El Ministerio de Trabajo, Empleo y Seguridad Social','La DNDA','El INPI'],
+ a:1,why:'El Ministerio de Trabajo registra las empresas que aplican teletrabajo y las plataformas.',
+ ref:'Ley 27.555 · Decreto 27/2021'},
+
+/* ---------- UNIDAD 3 · Intimidad, privacidad y datos personales ---------- */
+{id:'u3-01',u:3,top:'Conceptos',t:'vf',hist:'2024',
+ q:'La intimidad y la privacidad son derechos personalísimos.',
+ a:true,why:'Están en la CN (arts. 18 y 19) y en el CCCN (arts. 52 y 1770). Pregunta del parcial 2024.',
+ ref:'CN 18-19 · CCCN 52 y 1770'},
+
+{id:'u3-02',u:3,top:'Conceptos',t:'mc',
+ q:'¿Qué concepto designa el autogobierno del titular sobre sus propios datos y supera a la intimidad y la privacidad?',
+ opts:['Derecho al olvido','Autodeterminación informativa','Derecho al anonimato','Habeas corpus'],
+ a:1,why:'La autodeterminación informativa es el poder de decidir sobre el tratamiento de los datos propios.',
+ ref:'Doctrina'},
+
+{id:'u3-03',u:3,top:'Ley 25.326',t:'vf',
+ q:'La Ley 25.326 protege los datos de archivos públicos y también de archivos privados destinados a dar informes.',
+ a:true,why:'Es el objeto del art. 1: datos asentados en archivos, registros o bancos de datos públicos o privados destinados a dar informes.',
+ ref:'Ley 25.326, art. 1'},
+
+{id:'u3-04',u:3,top:'Ley 25.326',t:'vf',
+ q:'Los datos personales son información de cualquier tipo referida a personas físicas o de existencia ideal determinadas o determinables.',
+ a:true,why:'Incluye tanto personas humanas como personas jurídicas.',
+ ref:'Ley 25.326, art. 2'},
+
+{id:'u3-05',u:3,top:'Ley 25.326',t:'mc',hist:'2022 · 2024',trap:true,
+ q:'¿Cuál de estos datos NO es un dato sensible?',
+ opts:['El origen racial o étnico','La afiliación sindical','El perfil en redes sociales','El estado de salud'],
+ a:2,why:'El perfil en redes sociales no está en la enumeración del art. 2. Sensibles: origen racial y étnico, opiniones políticas, convicciones religiosas, filosóficas o morales, afiliación sindical, salud y vida sexual.',
+ ref:'Ley 25.326, art. 2'},
+
+{id:'u3-06',u:3,top:'Ley 25.326',t:'mc',
+ q:'Los datos sensibles pueden tratarse…',
+ opts:['Con consentimiento verbal del titular','Solo por interés general legal o con fines estadísticos o científicos sin identificar al titular','Siempre que el archivo esté inscripto','Cuando el titular tenga más de 18 años'],
+ a:1,why:'Art. 7: nadie está obligado a darlos y solo se autoriza por interés general legal o con fines estadísticos/científicos que no permitan identificar al titular.',
+ ref:'Ley 25.326, art. 7'},
+
+{id:'u3-07',u:3,top:'Principios',t:'vf',hist:'2026',trap:true,
+ q:'Para que un archivo de datos personales sea ilícito debe estar inscripto en el Registro Nacional de Bases de Datos.',
+ a:false,why:'Al revés: es ilícito el archivo que NO está inscripto. La inscripción es la que lo hace lícito (art. 3). Es la trampa que fallaste en el parcial 2026.',
+ ref:'Ley 25.326, art. 3'},
+
+{id:'u3-08',u:3,top:'Principios',t:'vf',hist:'2022',
+ q:'El consentimiento del titular debe ser libre, expreso e informado, dado por escrito o por un medio equivalente.',
+ a:true,why:'Art. 5. Sin esos tres caracteres el tratamiento es ilegítimo, salvo las excepciones legales.',
+ ref:'Ley 25.326, art. 5'},
+
+{id:'u3-09',u:3,top:'Principios',t:'mc',hist:'2025',trap:true,
+ q:'¿Cuál NO es una excepción al deber de consentimiento del art. 5?',
+ opts:['Datos obtenidos de fuentes de acceso público irrestricto','Listados de nombre, DNI, ocupación y domicilio','Datos sensibles tratados con fines estadísticos sin identificar al titular','Datos necesarios para una relación contractual o profesional'],
+ a:2,why:'Los datos sensibles se rigen por el art. 7 y no son una excepción del art. 5. Las otras tres son excepciones legales del art. 5.',
+ ref:'Ley 25.326, arts. 5 y 7'},
+
+{id:'u3-10',u:3,top:'Principios',t:'vf',
+ q:'Obtener datos de fuentes de acceso público irrestricto no requiere consentimiento del titular.',
+ a:true,why:'Excepción del art. 5. Fue pregunta del parcial 2025.',
+ ref:'Ley 25.326, art. 5'},
+
+{id:'u3-11',u:3,top:'Principios',t:'vf',hist:'2025',
+ q:'La obligación de secreto profesional del art. 10 solo se releva por resolución judicial o por razones fundadas de seguridad pública, defensa nacional o salud pública.',
+ a:true,why:'No alcanza con la decisión del responsable del archivo. Respuesta del parcial 2025.',
+ ref:'Ley 25.326, art. 10'},
+
+{id:'u3-12',u:3,top:'Principios',t:'vf',
+ q:'El principio de calidad exige que los datos sean ciertos, adecuados, pertinentes y no excesivos, y que se destruyan cuando dejen de ser necesarios.',
+ a:true,why:'Art. 4: además exactos y actualizados, con medios leales y sin uso para fines incompatibles.',
+ ref:'Ley 25.326, art. 4'},
+
+{id:'u3-13',u:3,top:'Principios',t:'vf',
+ q:'La transferencia internacional de datos está permitida libremente hacia cualquier país, esté o no protegido.',
+ a:false,why:'Art. 12: está prohibida la transferencia a países que no tengan un nivel de protección adecuado, salvo excepciones.',
+ ref:'Ley 25.326, art. 11-12'},
+
+{id:'u3-14',u:3,top:'Derechos y plazos',t:'vf',
+ q:'El pedido de acceso a los datos personales debe responderse dentro de 10 días hábiles.',
+ a:false,why:'10 días CORRIDOS (art. 14). Los 5 días hábiles son para la rectificación o supresión (art. 16).',
+ ref:'Ley 25.326, art. 14'},
+
+{id:'u3-15',u:3,top:'Derechos y plazos',t:'vf',
+ q:'El derecho de acceso es gratuito, pero solo a intervalos no inferiores a 6 meses.',
+ a:true,why:'Art. 14: gratuito a intervalos no inferiores a 6 meses; antes, si se pide, puede cobrarse el costo.',
+ ref:'Ley 25.326, art. 14'},
+
+{id:'u3-16',u:3,top:'Derechos y plazos',t:'mc',
+ q:'¿En qué plazo debe darse respuesta a un pedido de rectificación, actualización o supresión de datos?',
+ opts:['10 días corridos','5 días hábiles','30 días corridos','15 días hábiles'],
+ a:1,why:'Art. 16: 5 días hábiles desde el reclamo, y la rectificación es gratuita (art. 19).',
+ ref:'Ley 25.326, arts. 16 y 19'},
+
+{id:'u3-17',u:3,top:'Derechos y plazos',t:'mc',
+ q:'Las multas de la Ley 25.326 (art. 31) van de…',
+ opts:['$100 a $10.000','$1.000 a $100.000','$10.000 a $1.000.000','$500 a $50.000'],
+ a:1,why:'Apercibimiento, suspensión, multa de $1.000 a $100.000, clausura o cancelación del archivo.',
+ ref:'Ley 25.326, art. 31'},
+
+{id:'u3-18',u:3,top:'Habeas Data',t:'vf',hist:'2026',
+ q:'La acción de Habeas Data permite suprimir un dato erróneo incluso de una base privada destinada a dar informes.',
+ a:true,why:'Art. 43 CN y arts. 33 ss. de la Ley 25.326: sirve para acceder, rectificar, suprimir, actualizar o pedir confidencialidad, en bases públicas y privadas.',
+ ref:'CN art. 43 · Ley 25.326, arts. 33 ss.'},
+
+{id:'u3-19',u:3,top:'Habeas Data',t:'vf',
+ q:'El Habeas Data es una acción meramente legal, sin jerarquía constitucional.',
+ a:false,why:'El art. 43 de la Constitución Nacional lo incorpora expresamente como acción constitucional.',
+ ref:'CN, art. 43'},
+
+{id:'u3-20',u:3,top:'Habeas Data',t:'mc',
+ q:'¿Qué organismo controla el cumplimiento de la Ley 25.326?',
+ opts:['La AAIP (Agencia de Acceso a la Información Pública)','La DNDA','La CNV','El Banco Central'],
+ a:0,why:'El trámite de registro se hace online por TAD con clave fiscal ante la AAIP.',
+ ref:'Ley 25.326 · AAIP'},
+
+{id:'u3-21',u:3,top:'Rodríguez c/ Google',t:'vf',trap:true,
+ q:'Los buscadores responden objetivamente por los contenidos de terceros que indexan.',
+ a:false,why:'El fallo Rodríguez c/ Google (CSJN, 2014) estableció responsabilidad SUBJETIVA, desde que el buscador tomaron conocimiento efectivo del contenido ilícito y no actuó.',
+ ref:'Fallo Rodríguez, CSJN 2014'},
+
+{id:'u3-22',u:3,top:'Rodríguez c/ Google',t:'vf',
+ q:'En la doctrina del fallo Rodríguez, si la ilicitud del contenido es manifiesta basta la comunicación privada del damnificado para que el buscador responda.',
+ a:true,why:'Ilicitud manifiesta (pornografía infantil, apología del genocidio): basta la comunicación privada. En los demás casos se exige notificación judicial o administrativa.',
+ ref:'Fallo Rodríguez, CSJN 2014'},
+
+{id:'u3-23',u:3,top:'Rodríguez c/ Google',t:'vf',
+ q:'Los buscadores tienen el deber de monitorear previamente todos los contenidos que indexan.',
+ a:false,why:'No hay deber de monitoreo previo: indexar es ejercicio de la libertad de expresión y los thumbnails son un mero enlace.',
+ ref:'Fallo Rodríguez, CSJN 2014'},
+
+{id:'u3-24',u:3,top:'Rodríguez c/ Google',t:'mc',
+ q:'¿Cómo resolvió la CSJN en Rodríguez c/ Google?',
+ opts:['Condenó a Google a indemnizar por daño moral','Rechazó la condena porque Google bloqueó al ser notificado','Declaró inconstitucional la Ley 25.326','Obligó a Google a implementar filtros previos'],
+ a:1,why:'El buscador no es responsable objetivo; Google bloqueó los contenidos cuando fue notificado, así que no hubo responsabilidad.',
+ ref:'Fallo Rodríguez, CSJN 2014'},
+
+{id:'u3-25',u:3,top:'Conceptos',t:'mc',
+ q:'El derecho que permite pedir la supresión o el bloqueo de información obsoleta, irrelevante o excesiva, sobre todo en buscadores, es el derecho…',
+ opts:['De acceso','Al anonimato','Al olvido','De rectificación'],
+ a:2,why:'Derecho al olvido. El contenido original puede permanecer en el sitio que lo publicó; lo que se pide es desvincularlo de la búsqueda.',
+ ref:'Doctrina'},
+
+/* ---------- UNIDAD 4 · Delitos informáticos y forensia ---------- */
+{id:'u4-01',u:4,top:'Conceptos',t:'vf',
+ q:'Delito es toda conducta típica, antijurídica, culpable y punible.',
+ a:true,why:'Son los cuatro caracteres que deben darse simultáneamente.',
+ ref:'Teoría del delito'},
+
+{id:'u4-02',u:4,top:'Conceptos',t:'vf',
+ q:'En el delito informático el dispositivo puede ser medio para cometer el delito o fin y objeto del delito.',
+ a:true,why:'Estafa online: el sistema es medio. Virus: el sistema es el objeto dañado.',
+ ref:'Delito informático'},
+
+{id:'u4-03',u:4,top:'Conceptos',t:'vf',
+ q:'La Ley 26.388 (2008) modificó el Código Penal incorporando los delitos informáticos, y la Argentina adhirió al Convenio de Budapest por Ley 27.411.',
+ a:true,why:'Budapest (2001) es el antecedente internacional. Ley 26.904 incorporó el grooming y Ley 27.436 la tenencia de pornografía infantil.',
+ ref:'Ley 26.388 · Ley 27.411'},
+
+{id:'u4-04',u:4,top:'Artículos',t:'mc',
+ q:'Ingresar sin permiso a la cuenta de redes sociales de otra persona y leer sus mensajes configura…',
+ opts:['Art. 153 bis (acceso ilegítimo a sistema o dato informático de acceso restringido)','Art. 172 (estafa)','Art. 183 (daño informático)','Art. 197 (interrupción de comunicaciones)'],
+ a:0,why:'El 153 bis castiga acceder sin autorización o excediendo la que se tiene. Si además se apodera de las comunicaciones, se suman 153 y 155.',
+ ref:'CP, art. 153 bis'},
+
+{id:'u4-05',u:4,top:'Artículos',t:'mc',
+ q:'Introducir un virus o ransomware en un sistema configura…',
+ opts:['Art. 153','Art. 183, segundo párrafo (daño informático)','Art. 128','Art. 117 bis'],
+ a:1,why:'Alterar, destruir o inutilizar datos, programas o sistemas, o distribuir e introducir programas dañinos: 183 segundo párrafo (15 días a 1 año). Se agrava por el art. 184 si es sistema público, de salud, comunicaciones, energía o transporte.',
+ ref:'CP, arts. 183 y 184'},
+
+{id:'u4-06',u:4,top:'Estafa vs 173.16',t:'mc',hist:'2026',trap:true,
+ q:'Una víctima, engañada por un falso funcionario, autoriza ella misma una transferencia de dinero. Configura…',
+ opts:['Art. 173 inc. 16 (defraudación por manipulación informática)','Art. 172 (estafa)','Art. 153 bis','Art. 255'],
+ a:1,why:'La víctima fue engañada y se perjudicó con su propia disposición: estafa. El sistema funcionó normalmente, no hubo manipulación informática.',
+ ref:'CP, art. 172'},
+
+{id:'u4-07',u:4,top:'Estafa vs 173.16',t:'mc',
+ q:'Alguien usa la clave semilla del cliente y se hace pasar por el titular ante el sistema para transferir sus bitcoins (caso Lazarte Di Lieto). Configura…',
+ opts:['Art. 172 (estafa)','Art. 173 inc. 16 (defraudación por manipulación informática)','Art. 153 bis','Art. 157 bis'],
+ a:1,why:'El engaño no fue a una persona: fue al SISTEMA. Por eso va el inc. 16 y no la estafa.',
+ ref:'CP, art. 173 inc. 16'},
+
+{id:'u4-08',u:4,top:'Estafa vs 173.16',t:'vf',
+ q:'En la estafa del art. 172 el engaño recae sobre una persona, que se perjudica con su propia disposición patrimonial.',
+ a:true,why:'Es la diferencia central con el 173 inc. 16, donde la maniobra recae sobre el sistema o la transmisión de datos.',
+ ref:'CP, arts. 172 y 173 inc. 16'},
+
+{id:'u4-09',u:4,top:'Artículos',t:'vf',
+ q:'El grooming fue incorporado por la Ley 26.904 en el art. 131 del Código Penal, con pena de 6 meses a 4 años.',
+ a:true,why:'Contactar a un menor por medios electrónicos con el fin de cometer un delito contra su integridad sexual.',
+ ref:'CP, art. 131 · Ley 26.904'},
+
+{id:'u4-10',u:4,top:'Artículos',t:'mc',
+ q:'Publicar una comunicación electrónica ajena que no estaba destinada a publicidad, causando perjuicio, configura…',
+ opts:['Art. 153','Art. 155','Art. 157','Art. 197'],
+ a:1,why:'Art. 155: publicación indebida de una comunicación electrónica. Hay exención si se hace para proteger un interés público.',
+ ref:'CP, art. 155'},
+
+{id:'u4-11',u:4,top:'Artículos',t:'vf',
+ q:'Quien publica una comunicación electrónica ajena para proteger un interés público está exento de pena (art. 155).',
+ a:true,why:'La propia figura prevé esa exención por interés público.',
+ ref:'CP, art. 155'},
+
+{id:'u4-12',u:4,top:'Artículos',t:'vf',
+ q:'Acceder ilegítimamente a un banco de datos personales o revelar su información está previsto en el art. 157 bis.',
+ a:true,why:'Si el autor es funcionario público se suma la inhabilitación especial; el art. 157 es para el funcionario que revela datos secretos.',
+ ref:'CP, arts. 157 y 157 bis'},
+
+{id:'u4-13',u:4,top:'Prueba digital',t:'vf',
+ q:'La prueba digital es intangible, replicable, volátil, deleble y parcial.',
+ a:true,why:'Replicable: la copia bit a bit tiene la misma fuerza que el original. Parcial: puede estar repartida en varios soportes o en la nube.',
+ ref:'Forensia informática'},
+
+{id:'u4-14',u:4,top:'Prueba digital',t:'mc',trap:true,
+ q:'¿Cuál de estas características NO corresponde a la prueba digital?',
+ opts:['Intangible','Replicable','Volátil','Inalterable por naturaleza'],
+ a:3,why:'Justamente lo contrario: es volátil y deleble, y puede alterarse si no se preserva con cadena de custodia.',
+ ref:'Forensia informática'},
+
+{id:'u4-15',u:4,top:'Prueba digital',t:'vf',
+ q:'Una copia bit a bit de la evidencia digital tiene la misma fuerza probatoria que el original.',
+ a:true,why:'Es la característica de replicabilidad, y la razón por la que la copia forense es válida.',
+ ref:'Forensia informática'},
+
+{id:'u4-16',u:4,top:'Cadena de custodia',t:'vf',
+ q:'Si se rompe la cadena de custodia, la prueba digital necesariamente es nula de pleno derecho.',
+ a:false,why:'Puede perder validez y quedar cuestionada, y eso puede dejar el delito impune. No hay una nulidad automática, pero el riesgo es justamente ese.',
+ ref:'Cadena de custodia'},
+
+{id:'u4-17',u:4,top:'Cadena de custodia',t:'vf',
+ q:'El escribano que interviene en el secuestro de evidencia digital da fe de la integridad técnica del dato.',
+ a:false,why:'Da fe de lo que ve y del procedimiento que presencia, pero no certifica la integridad técnica del dato: eso es materia pericial.',
+ ref:'Cadena de custodia'},
+
+{id:'u4-18',u:4,top:'Cadena de custodia',t:'vf',
+ q:'Aislar el dispositivo de ingresos externos, rotularlo con precisión y labrar un acta firmada en el momento son prácticas correctas de cadena de custodia.',
+ a:true,why:'Garantizan autenticidad e integridad de la evidencia.',
+ ref:'Cadena de custodia'},
+
+{id:'u4-19',u:4,top:'Cadena de custodia',t:'mc',
+ q:'En el CPC de San Juan, si no se fija plazo para la pericia, ¿de cuánto es?',
+ opts:['5 días','10 días','15 días','30 días'],
+ a:2,why:'Art. 423: 15 días si no se fijó plazo. La pericia procede cuando se requieren conocimientos especiales (art. 420).',
+ ref:'CPC San Juan, arts. 420-423'},
+
+{id:'u4-20',u:4,top:'Artículos',t:'vf',
+ q:'Si un empleado solo opera su propia computadora asignada y copia archivos a un disco externo, en principio no hay delito informático.',
+ a:true,why:'No hay acceso indebido (153 bis), ni interceptación (153), ni daño (183), ni datos personales (157 bis). Es el caso 1 del Práctico 3.',
+ ref:'Práctico 3'},
+
+{id:'u4-21',u:4,top:'Artículos',t:'mc',
+ q:'Un empleado público entra sin autorización a la base del padrón de un organismo y filtra datos que un tercero usa para estafar. Respecto del empleado, corresponde…',
+ opts:['Solo art. 172','Art. 153 bis segundo párrafo y art. 157 bis, con inhabilitación','Solo art. 183','Ninguna figura penal'],
+ a:1,why:'Acceso ilegítimo agravado por tratarse de organismo público y violación de banco de datos personales, más inhabilitación por ser funcionario. El tercero responde por estafa (172).',
+ ref:'CP, arts. 153 bis, 157 bis y 172'},
+
+{id:'u4-22',u:4,top:'Artículos',t:'mc',
+ q:'Destruir u ocultar pruebas o registros bajo custodia configura…',
+ opts:['Art. 197','Art. 255','Art. 183','Art. 149 bis'],
+ a:1,why:'Art. 255: sustraer, alterar u ocultar pruebas o registros, de 1 mes a 4 años.',
+ ref:'CP, art. 255'},
+
+/* ---------- UNIDAD 5 · Responsabilidad ---------- */
+{id:'u5-01',u:5,top:'Civil',t:'vf',
+ q:'La responsabilidad contractual nace del incumplimiento de un contrato y la extracontractual, de la violación del deber general de no dañar.',
+ a:true,why:'Contractual en arts. 1708 ss.; extracontractual en art. 1717, con sus elementos: daño e imputación.',
+ ref:'CCCN, arts. 1708 y 1717'},
+
+{id:'u5-02',u:5,top:'Civil',t:'vf',trap:true,
+ q:'Los profesionales liberales responden objetivamente por actividad riesgosa (art. 1757).',
+ a:false,why:'El art. 1768 establece que asumen obligaciones de hacer con responsabilidad SUBJETIVA (hay que probar la culpa), salvo que prometan un resultado. No les aplica el régimen de actividades riesgosas.',
+ ref:'CCCN, art. 1768'},
+
+{id:'u5-03',u:5,top:'Civil',t:'vf',
+ q:'En las obligaciones de resultado el deudor solo se libera probando causa ajena.',
+ a:true,why:'Art. 1723: responsabilidad objetiva en obligaciones de resultado.',
+ ref:'CCCN, art. 1723'},
+
+{id:'u5-04',u:5,top:'Civil',t:'mc',
+ q:'¿Qué comprende la reparación del daño?',
+ opts:['Solo el daño emergente','Daño emergente, lucro cesante y pérdida de chance, más intereses','Solo el lucro cesante','Únicamente el daño moral'],
+ a:1,why:'Arts. 1738-1739: daño emergente, lucro cesante y pérdida de chance, con intereses.',
+ ref:'CCCN, arts. 1738-1739'},
+
+{id:'u5-05',u:5,top:'Civil',t:'vf',
+ q:'La acción civil y la acción penal son independientes entre sí.',
+ a:true,why:'Art. 1774. Pero la condena penal hace cosa juzgada en lo civil sobre el hecho y la culpa (art. 1776).',
+ ref:'CCCN, arts. 1774 y 1776'},
+
+{id:'u5-06',u:5,top:'Penal',t:'vf',
+ q:'En la Argentina las personas jurídicas no pueden ser penalmente responsables.',
+ a:false,why:'La Ley 27.401 de responsabilidad penal empresaria permite penarlas por delitos cometidos en su beneficio, incluidos fraude informático, difusión de malware y violación de propiedad intelectual.',
+ ref:'Ley 27.401'},
+
+{id:'u5-07',u:5,top:'Ley 1236-A',t:'vf',
+ q:'El poder disciplinario del Colegio excluye la responsabilidad civil y penal del profesional.',
+ a:false,why:'Se ejerce SIN PERJUICIO de la responsabilidad civil, penal o administrativa (art. 48). Son planos independientes.',
+ ref:'Ley 1236-A, art. 48'},
+
+{id:'u5-08',u:5,top:'Ley 1236-A',t:'mc',
+ q:'¿Qué exige el art. 11 de la Ley 1236-A para la documentación del ejercicio profesional?',
+ opts:['Nada, basta la firma del cliente','Firma y número de matrícula del profesional, que se hace responsable de su labor','Solo el sello del Colegio','Firma legalizada por escribano'],
+ a:1,why:'La documentación debe llevar firma y número de matrícula, y el profesional asume la responsabilidad por su trabajo.',
+ ref:'Ley 1236-A, art. 11'},
+
+{id:'u5-09',u:5,top:'Ley 1236-A',t:'vf',
+ q:'Ejercer la profesión sin matrícula o arrogarse el título constituye ejercicio ilegítimo de la profesión.',
+ a:true,why:'Arts. 13-14. El título habilitante exige grado de 4 años o más, terciario de 3 años con acreditación, o idóneo autorizado.',
+ ref:'Ley 1236-A, arts. 2, 3, 9, 13-14'},
+
+{id:'u5-10',u:5,top:'Ley 1236-A',t:'vf',trap:true,
+ q:'La cancelación de la matrícula inhabilita al profesional de forma definitiva.',
+ a:false,why:'Inhabilita hasta 5 años. La suspensión, en cambio, es de hasta 1 año.',
+ ref:'Ley 1236-A, arts. 56-57'},
+
+{id:'u5-11',u:5,top:'Ley 1236-A',t:'vf',
+ q:'La acción disciplinaria del Colegio prescribe a los 3 años.',
+ a:true,why:'Prescripción de 3 años (art. 55).',
+ ref:'Ley 1236-A, art. 55'},
+
+{id:'u5-12',u:5,top:'Ley 1236-A',t:'vf',
+ q:'La suspensión mayor a 6 meses y la cancelación de la matrícula requieren unanimidad del Tribunal.',
+ a:true,why:'Son las dos sanciones más gravosas y exigen decisión unánime.',
+ ref:'Ley 1236-A, arts. 56-57'},
+
+{id:'u5-13',u:5,top:'Ley 1236-A',t:'mc',
+ q:'¿Cuál de estas NO es causal de sanción disciplinaria del art. 55?',
+ opts:['Facilitar el título a otro','Negligencias reiteradas y frecuentes','Condena criminal por delito doloso de acción pública','Trabajar para más de un empleador a la vez'],
+ a:3,why:'Las causales son facilitar el título, violar incompatibilidades, incumplir la ley y normas del ejercicio, negligencias reiteradas y condena criminal por delito doloso de acción pública.',
+ ref:'Ley 1236-A, art. 55'},
+
+{id:'u5-14',u:5,top:'Casos',t:'mc',
+ q:'En el caso Portal de Mendoza c/ Soler (sitio web a medida nunca entregado), la responsabilidad fue…',
+ opts:['Penal por estafa','Civil contractual, por incumplimiento de una obligación de resultado','Profesional disciplinaria','No hubo responsabilidad'],
+ a:1,why:'Se condenó a pagar $62.225,25 más intereses y costas, con cláusula penal reducida por excesiva (1 % diario).',
+ ref:'Práctico 4'},
+
+{id:'u5-15',u:5,top:'Casos',t:'vf',trap:true,
+ q:'Retrasar la entrega de un software es, por sí solo, un delito.',
+ a:false,why:'Es incumplimiento contractual: responsabilidad civil. Solo sería delito si hay una conducta típica, por ejemplo un engaño inicial.',
+ ref:'Práctico 4'},
+
+{id:'u5-16',u:5,top:'Casos',t:'mc',
+ q:'En el caso Lazarte Di Lieto, ¿cuál fue la condena?',
+ opts:['Absolución por falta de prueba','3 años de prisión en suspenso con reglas de conducta','Multa de $1.000','Inhabilitación de 5 años'],
+ a:1,why:'3 años de prisión en suspenso, reglas de conducta, prohibición de contacto y costas, por art. 173 inc. 16 más responsabilidad civil concurrente.',
+ ref:'Práctico 4'},
+
+{id:'u5-17',u:5,top:'Tendencias',t:'vf',
+ q:'El Reglamento (UE) 2024/1689 de inteligencia artificial prohíbe la manipulación cognitivo-conductual, la actuación policial predictiva y el reconocimiento de emociones en el trabajo y la educación.',
+ a:true,why:'Prohíbe sistemas que amenacen la seguridad, los derechos o los medios de vida.',
+ ref:'Reglamento (UE) 2024/1689'},
+
+{id:'u5-18',u:5,top:'Tendencias',t:'vf',
+ q:'Los neuroderechos incluyen la privacidad mental, la identidad personal, el libre albedrío y la protección contra sesgos algorítmicos.',
+ a:true,why:'Es la lectura de tendencias de la unidad 5.',
+ ref:'Neuroderechos'},
+
+/* ---------- NUEVOS FORMATOS · varias correctas (ms) y relacionar (match) ---------- */
+{id:'x-ms01',u:1,top:'Plazos',t:'ms',
+ q:'¿Cuáles de estos plazos de protección de la Ley 11.723 son correctos? (Hay dos)',
+ opts:['Autor persona humana: vida + 70 años','Obras fotográficas: 25 años','Obras anónimas de personas jurídicas: 50 años desde la publicación','Obras cinematográficas: 20 años'],
+ a:[0,2],why:'Persona humana: vida + 70 (art. 5). Personas jurídicas: 50 desde la publicación (art. 8). Las fotográficas son 20 años (los 25 son de Berna) y las cinematográficas 50 desde la muerte del último colaborador.',
+ ref:'Ley 11.723, arts. 5, 8, 20 y 34'},
+
+{id:'x-ms02',u:1,top:'Morales y patrimoniales',t:'ms',
+ q:'¿Cuáles de estas facultades son derechos MORALES del autor? (Hay dos)',
+ opts:['Paternidad','Reproducción','Integridad','Distribución'],
+ a:[0,2],why:'Los morales son divulgación, paternidad, integridad y retracto. Reproducción, comunicación pública, transformación y distribución son patrimoniales.',
+ ref:'Ley 11.723'},
+
+{id:'x-ms03',u:1,top:'Licencias y software',t:'ms',
+ q:'¿Cuáles son dos de las cuatro libertades del software libre?',
+ opts:['Estudiar y modificar el programa','Obtenerlo sin pagar nada','Distribuir copias','Cerrar el código de las obras derivadas'],
+ a:[0,2],why:'Las cuatro libertades son usar, estudiar y modificar, distribuir copias, y mejorar y publicar las mejoras. Libre no es gratuito, y cerrar el código es lo que impide el copyleft.',
+ ref:'FSF / GNU'},
+
+{id:'x-ms04',u:2,top:'Firma digital',t:'ms',
+ q:'¿Qué presunciones genera la firma digital? (Hay dos)',
+ opts:['Autoría','Confidencialidad del contenido','Integridad','Capacidad del firmante'],
+ a:[0,2],why:'La firma digital presume autoría (art. 7) e integridad (art. 8). No cifra el contenido, y la capacidad no es una presunción de la ley.',
+ ref:'Ley 25.506, arts. 7 y 8'},
+
+{id:'x-ms05',u:3,top:'Conceptos',t:'ms',hist:'2022 · 2024',
+ q:'¿Cuáles de estos datos SÍ son sensibles según el art. 2 de la Ley 25.326? (Hay dos)',
+ opts:['Afiliación sindical','Perfil en redes sociales','Datos de salud','Nombre, DNI y domicilio'],
+ a:[0,2],why:'Sensibles: origen racial y étnico, opiniones políticas, convicciones religiosas, filosóficas o morales, afiliación sindical, salud y vida sexual. El perfil en redes no figura, y nombre, DNI y domicilio son listados básicos.',
+ ref:'Ley 25.326, art. 2'},
+
+{id:'x-ms06',u:3,top:'Principios',t:'ms',trap:true,
+ q:'¿Cuáles son excepciones al consentimiento del art. 5 de la Ley 25.326? (Hay dos)',
+ opts:['Datos de fuentes de acceso público irrestricto','Datos de salud','Listados básicos: nombre, DNI, ocupación y domicilio','Transferencia a países sin protección adecuada'],
+ a:[0,2],why:'Las excepciones del art. 5 incluyen fuentes de acceso público irrestricto, listados básicos, funciones del Estado u obligación legal, relación contractual, científica o profesional y entidades financieras. Los datos de salud son sensibles (art. 7) y la transferencia a países sin protección está prohibida.',
+ ref:'Ley 25.326, art. 5'},
+
+{id:'x-ms07',u:4,top:'Prueba digital',t:'ms',
+ q:'¿Cuáles de estas son características de la prueba digital? (Hay dos)',
+ opts:['Volátil','Inalterable','Deleble','Siempre está completa en un solo soporte'],
+ a:[0,2],why:'La prueba digital es intangible, replicable, volátil, deleble y parcial. No es inalterable (por eso existe la cadena de custodia) ni está siempre en un solo lugar.',
+ ref:'Unidad 4 · Forensia'},
+
+{id:'x-ms08',u:5,top:'Ley 1236-A',t:'ms',
+ q:'¿Cuáles de estas sanciones de la Ley 1236-A requieren unanimidad del Tribunal? (Hay dos)',
+ opts:['Suspensión de más de 6 meses','Llamado de atención','Cancelación de la matrícula','Apercibimiento privado'],
+ a:[0,2],why:'La suspensión de más de 6 meses y la cancelación de la matrícula exigen unanimidad. Las sanciones leves no.',
+ ref:'Ley 1236-A'},
+
+{id:'x-mt01',u:2,top:'Obra vs servicios',t:'match',
+ q:'Relacioná cada concepto con su característica.',
+ pairs:[['Locación de obra','Obligación de resultado'],['Locación de servicios','Obligación de medios'],['Software a medida','Objeto complejo'],['Contrato de adhesión','Cláusulas predispuestas por una parte']],
+ why:'La obra promete un resultado y el servicio una actividad diligente. El software a medida tiene objeto complejo (dar y hacer, bien intelectual, calificación dudosa) y la adhesión se caracteriza por cláusulas predispuestas.',
+ ref:'CCCN arts. 984-989, 1251 ss.'},
+
+{id:'x-mt02',u:1,top:'Plazos',t:'match',hist:'2024',
+ q:'Relacioná cada tipo de obra con su plazo de protección.',
+ pairs:[['Autor persona humana','Vida + 70 años'],['Obras anónimas de personas jurídicas','50 años desde la publicación'],['Obras fotográficas','20 años desde la primera publicación'],['Obras cinematográficas','50 años desde la muerte del último colaborador']],
+ why:'Art. 5 (vida + 70), art. 8 (50 desde la publicación), art. 34 (20 años las fotográficas; 25 es Berna) y arts. 20 y 34 (cinematográficas).',
+ ref:'Ley 11.723'},
+
+{id:'x-mt03',u:3,top:'Derechos y plazos',t:'match',trap:true,
+ q:'Relacioná cada derecho o dato de la Ley 25.326 con su plazo o monto.',
+ pairs:[['Respuesta al pedido de acceso','10 días corridos'],['Rectificación o supresión','5 días hábiles'],['Acceso gratuito','Cada 6 meses'],['Multas de la ley','$1.000 a $100.000']],
+ why:'Art. 14: 10 días corridos y gratuidad a intervalos de 6 meses. Art. 16: 5 días hábiles. Art. 31: multas de $1.000 a $100.000.',
+ ref:'Ley 25.326, arts. 14, 16 y 31'},
+
+{id:'x-mt04',u:4,top:'Artículos',t:'match',
+ q:'Relacioná cada hecho con el artículo del Código Penal.',
+ pairs:[['Interceptar una comunicación electrónica','Art. 153'],['Acceso ilegítimo a un sistema restringido','Art. 153 bis'],['Contactar a un menor para fines sexuales','Art. 131'],['Alterar pruebas bajo custodia','Art. 255']],
+ why:'153: comunicaciones. 153 bis: acceso ilegítimo a sistema o dato restringido. 131: grooming. 255: sustracción o alteración de pruebas.',
+ ref:'Código Penal'},
+
+{id:'x-mt05',u:5,top:'Ley 1236-A',t:'match',
+ q:'Relacioná cada elemento de la Ley 1236-A con su dato.',
+ pairs:[['Suspensión','Hasta 1 año'],['Cancelación de la matrícula','Inhabilita hasta 5 años'],['Prescripción disciplinaria','3 años'],['Multa','Se paga en 10 días hábiles']],
+ why:'La suspensión es de hasta 1 año, la cancelación inhabilita hasta 5 años y no es definitiva, la acción prescribe a los 3 años y la multa se paga dentro de los 10 días hábiles.',
+ ref:'Ley 1236-A'},
+
+{id:'x-mt06',u:1,top:'Licencias y software',t:'match',
+ q:'Relacioná cada tipo de licencia con lo que implica.',
+ pairs:[['Copyleft (GPL)','Las obras derivadas deben seguir siendo libres'],['Permisiva','Permite redistribuir cerrando el código'],['Freeware','Gratuito, pero no necesariamente libre'],['Software libre','Cuatro libertades; puede venderse']],
+ why:'El copyleft impide cerrar el código derivado; la permisiva lo permite. Libre no es gratuito: gratuito es freeware.',
+ ref:'Unidad 1 · Licencias'},
+
+{id:'x-mt07',u:3,top:'Conceptos',t:'match',
+ q:'Relacioná cada concepto de la unidad 3 con su definición.',
+ pairs:[['Intimidad','Ámbito propio y reservado, excluido de terceros'],['Autodeterminación informativa','Autogobierno del titular sobre sus datos'],['Derecho al olvido','Pedir suprimir o bloquear información obsoleta o excesiva'],['Derecho al anonimato','Que no se pueda asociar dato alguno a la persona']],
+ why:'Son los cinco conceptos que se confunden entre sí: la autodeterminación informativa supera a la intimidad y a la privacidad.',
+ ref:'Unidad 3'}
+];
+
+/* =========================================================
+   2. BANCO DE TRAMPAS (frase que parece cierta → corrección)
+   ========================================================= */
+const PAIRS = [
+{u:1,quote:'Una obra creada en el exterior no está protegida en la Argentina.',bad:'no está protegida',
+ fix:'La obra goza de la misma protección en todos los países, cualquiera sea su lugar de creación (internacionalidad, Convenio de Berna). Lo TERRITORIAL son las patentes y las marcas.'},
+{u:1,quote:'El software se patenta en Argentina.',bad:'se patenta',
+ fix:'Está excluido por el art. 6 de la Ley 24.481, salvo que esté embebido en un hardware y sea imprescindible para su funcionamiento. Se protege por derecho de autor.'},
+{u:1,quote:'Software libre quiere decir gratuito.',bad:'gratuito',
+ fix:'Libre refiere a las cuatro libertades (usar, estudiar y modificar, distribuir, mejorar y publicar mejoras). Puede venderse. Gratuito es freeware.'},
+{u:1,quote:'El derecho de autor protege las ideas y los algoritmos.',bad:'las ideas y los algoritmos',
+ fix:'Protege la EXPRESIÓN (el código concreto), no la idea, el algoritmo ni el método (art. 1 in fine).'},
+{u:1,quote:'Existe una copia privada general: puedo digitalizar cualquier libro para uso personal.',bad:'Existe una copia privada general',
+ fix:'No existe. Solo el derecho de cita (1.000 palabras u 8 compases) y UNA copia de salvaguardia del software (art. 9).'},
+{u:3,quote:'Un archivo de datos es ilícito cuando está inscripto en el Registro Nacional de Bases de Datos.',bad:'está inscripto',
+ fix:'Al revés: es ilícito el que NO está inscripto. La inscripción lo hace lícito (art. 3 de la Ley 25.326). Esta la fallaste en 2026.'},
+{u:1,quote:'El art. 2 de la Ley 11.723 es el que protege las obras extranjeras.',bad:'art. 2',
+ fix:'El art. 2 enumera las facultades del autor. La protección de obras extranjeras está en otro artículo (art. 14).'},
+{u:1,quote:'Las fotografías están protegidas 25 años según la Ley 11.723.',bad:'25 años',
+ fix:'Son 20 años desde la primera publicación (art. 34). Los 25 años son los de Berna, no los de la ley argentina.'},
+{u:1,quote:'El dominio público es gratuito: puedo usar comercialmente una obra vencida sin pagar nada.',bad:'sin pagar nada',
+ fix:'En Argentina el dominio público es PAGANTE: el uso comercial paga un gravamen al Fondo Nacional de las Artes.'},
+{u:2,quote:'Firma digital y firma electrónica son lo mismo.',bad:'son lo mismo',
+ fix:'La digital presume autoría (art. 7) e integridad (art. 8) y cumple el requisito de firma manuscrita. La electrónica no tiene ninguna presunción: quien la invoca debe acreditarla.'},
+{u:2,quote:'La firma digital cifra el mensaje, por eso garantiza confidencialidad.',bad:'cifra el mensaje',
+ fix:'Garantiza autoría, integridad y no repudio. NO cifra el contenido: para confidencialidad hace falta cifrado aparte.'},
+{u:2,quote:'En la locación de servicios se debe un resultado.',bad:'un resultado',
+ fix:'Servicio = obligación de MEDIOS (actividad diligente). Obra = obligación de RESULTADO.'},
+{u:2,quote:'Un incumplimiento contractual es un delito.',bad:'es un delito',
+ fix:'No: es responsabilidad civil contractual (caso Portal de Mendoza). Delito solo si hay una conducta típica, por ejemplo un engaño inicial.'},
+{u:2,quote:'Las cláusulas abusivas no valen porque el consumidor no las negoció.',bad:'porque el consumidor no las negoció',
+ fix:'Cuidado con el fundamento: se tienen por abusivas aunque HAYAN sido negociadas o aprobadas expresamente. Lo que las define es el desequilibrio significativo.'},
+{u:3,quote:'El perfil en redes sociales es un dato sensible.',bad:'es un dato sensible',
+ fix:'No lo es. Sensibles: origen racial y étnico, opiniones políticas, convicciones religiosas, filosóficas o morales, afiliación sindical, salud y vida sexual.'},
+{u:3,quote:'El consentimiento del titular es siempre necesario para tratar sus datos.',bad:'siempre',
+ fix:'Hay excepciones del art. 5: fuentes de acceso público irrestricto, funciones del Estado u obligación legal, listados básicos, relación contractual, científica o profesional, entidades financieras.'},
+{u:3,quote:'Los buscadores responden objetivamente por lo que indexan.',bad:'objetivamente',
+ fix:'Responden SUBJETIVAMENTE, desde que tomaron conocimiento efectivo: basta comunicación privada si la ilicitud es manifiesta; en los demás casos hace falta notificación judicial o administrativa.'},
+{u:4,quote:'El engaño informático siempre es estafa (art. 172).',bad:'siempre',
+ fix:'Solo si el engaño recae sobre una PERSONA que se perjudica con su propia disposición. Si la maniobra recae sobre el SISTEMA, es art. 173 inc. 16.'},
+{u:4,quote:'La evidencia digital es inalterable por naturaleza.',bad:'inalterable',
+ fix:'Es volátil y deleble: puede alterarse o perderse. Por eso existe la cadena de custodia.'},
+{u:4,quote:'El escribano certifica la integridad técnica del dato informático.',bad:'integridad técnica',
+ fix:'Da fe de lo que ve y del procedimiento que presencia. La integridad técnica del dato es materia pericial.'},
+{u:5,quote:'Los profesionales liberales responden objetivamente por actividad riesgosa.',bad:'objetivamente por actividad riesgosa',
+ fix:'Art. 1768: obligaciones de hacer con responsabilidad SUBJETIVA (se prueba la culpa), salvo que prometan un resultado. No les aplica el régimen de actividades riesgosas.'},
+{u:5,quote:'La cancelación de la matrícula es definitiva.',bad:'definitiva',
+ fix:'Inhabilita hasta 5 años. La suspensión es de hasta 1 año.'},
+{u:5,quote:'El Colegio puede sancionar o la Justicia puede condenar, pero no las dos cosas.',bad:'pero no las dos cosas',
+ fix:'El poder disciplinario se ejerce SIN PERJUICIO de la responsabilidad civil, penal o administrativa (art. 48 de la Ley 1236-A).'}
+];
+
+/* =========================================================
+   3. DATOS DUROS
+   ========================================================= */
+const CIFRAS = {
+ 'Derecho de autor':[
+  ['Autor persona humana','Vida + <b>70</b> años, desde el 1/1 del año siguiente a la muerte','art. 5'],
+  ['Obras anónimas de personas jurídicas','<b>50</b> años desde la publicación','art. 8'],
+  ['Obras fotográficas','<b>20</b> años desde la 1.ª publicación (Berna: 25)','art. 34'],
+  ['Obras cinematográficas','<b>50</b> años desde la muerte del último colaborador','arts. 20 y 34'],
+  ['Derecho de cita','<b>1.000</b> palabras u <b>8</b> compases','art. 10'],
+  ['Copia de salvaguardia','<b>1</b> única copia','art. 9'],
+  ['Pena por copia ilegal','<b>Estafa</b> — art. 172 CP (por remisión del art. 71)','art. 71'],
+  ['Registro','Dirección Nacional del Derecho de Autor (DNDA)','art. 57']
+ ],
+ 'Datos personales · Ley 25.326':[
+  ['Acceso','Respuesta en <b>10 días corridos</b>; gratuito cada <b>6 meses</b>','art. 14'],
+  ['Rectificación / supresión','<b>5 días hábiles</b>','art. 16'],
+  ['Multas','<b>$1.000 a $100.000</b>','art. 31'],
+  ['Inserto de datos falsos / acceso ilegítimo','<b>6 meses a 3 años</b>','art. 32 · CP 157 bis'],
+  ['Control','AAIP','—']
+ ],
+ 'Delitos informáticos':[
+  ['117 bis inc. 2 — información falsa','6 meses a 3 años',''],
+  ['131 — grooming','6 meses a 4 años',''],
+  ['153 — apoderarse / interceptar comunicaciones','15 días a 6 meses (1 mes a 1 año si publica)',''],
+  ['153 bis — acceso ilegítimo','15 días a 6 meses (1 mes a 1 año si es organismo público)',''],
+  ['155 — publicación indebida','multa $1.500 a $100.000',''],
+  ['157 bis — banco de datos personales','1 mes a 2 años',''],
+  ['172 — estafa','<b>1 mes a 6 años</b>',''],
+  ['173 inc. 15 / 16 — tarjeta / manipulación informática','escala del art. 172',''],
+  ['183 2.º párr. — daño informático','15 días a 1 año',''],
+  ['184 — agravantes (sistemas públicos)','3 meses a 4 años',''],
+  ['255 — destrucción de prueba','1 mes a 4 años',''],
+  ['Pericia sin plazo fijado','<b>15 días</b>','CPC SJ art. 423']
+ ],
+ 'Ley 1236-A · CPCI San Juan':[
+  ['Título habilitante','Grado ≥ <b>4 años</b> · terciario ≥ <b>3 años</b> · idóneo autorizado','art. 2'],
+  ['Suspensión','hasta <b>1 año</b>',''],
+  ['Cancelación de matrícula','inhabilita hasta <b>5 años</b>',''],
+  ['Prescripción disciplinaria','<b>3 años</b>','art. 55'],
+  ['Multa','se paga en <b>10 días hábiles</b>',''],
+  ['Suspensión > 6 meses y cancelación','requieren <b>unanimidad</b> del Tribunal','']
+ ]
+};
+
+/* =========================================================
+   4. ESTADO Y PERSISTENCIA
+   ========================================================= */
+const K_STATS='lp_integr_v1_stats';
+const K_HIST='lp_integr_v1_hist';
+const K_CFG='lp_integr_v1_cfg';
+
+function load(k,def){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch(e){ return def; } }
+function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+
+let stats = load(K_STATS,{});
+let hist  = load(K_HIST,[]);
+let cfg   = load(K_CFG,{mode:'estudio',len:10,src:'all',u:'all'});
+
+const S = { pool:[], idx:0, answers:[], locked:[], flags:[], t0:0, timer:null, mode:'estudio' };
+
+/* utilidades */
+function shuffle(a){ const r=a.slice(); for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; } return r; }
+function el(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* =========================================================
+   5. VISTAS / TABS
+   ========================================================= */
+document.querySelectorAll('#tabs button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    ['sim','casos','cazador','tarjetas','trampas','cifras','cob'].forEach(v=>{
+      el('view-'+v).classList.toggle('hidden', v!==b.dataset.view);
+    });
+    if(b.dataset.view==='casos' && !CS.cur) nextCase();
+    if(b.dataset.view==='cazador' && !HS.cur) nextHunt();
+    if(b.dataset.view==='tarjetas'){ renderCardChips(); if(!CD.cur) nextCard(); else renderCard(); }
+    if(b.dataset.view==='cob') renderCobertura();
+    if(b.dataset.view==='cifras') renderCifras();
+    if(b.dataset.view==='trampas') renderPairs();
+  });
+});
+
+/* =========================================================
+   6. CONFIGURACIÓN DEL SIMULADOR
+   ========================================================= */
+function bindChips(containerId, key, onSet){
+  document.querySelectorAll('#'+containerId+' .chip').forEach(c=>{
+    c.classList.toggle('on', String(cfg[key])===c.dataset[key]);
+    c.addEventListener('click',()=>{
+      document.querySelectorAll('#'+containerId+' .chip').forEach(x=>x.classList.remove('on'));
+      c.classList.add('on');
+      cfg[key]=c.dataset[key]; save(K_CFG,cfg); onSet && onSet();
+    });
+  });
+}
+document.querySelectorAll('#unitChips .chip').forEach(c=>c.dataset.key='u');
+document.querySelectorAll('#modeChips .chip').forEach(c=>c.dataset.key='mode');
+document.querySelectorAll('#lenChips .chip').forEach(c=>c.dataset.key='len');
+document.querySelectorAll('#srcChips .chip').forEach(c=>c.dataset.key='src');
+
+bindChips('unitChips','u',updatePoolInfo);
+bindChips('modeChips','mode');
+bindChips('lenChips','len',updatePoolInfo);
+bindChips('srcChips','src',updatePoolInfo);
+
+function filtered(){
+  let list = BANK.slice();
+  if(String(cfg.u)!=='all') list = list.filter(it=>String(it.u)===String(cfg.u));
+  if(cfg.src==='failed') list = list.filter(it=>(stats[it.id]&&stats[it.id].w>0));
+  if(cfg.src==='trap') list = list.filter(it=>it.trap);
+  return list;
+}
+
+function updatePoolInfo(){
+  const n = filtered().length;
+  const want = Number(cfg.len);
+  el('poolInfo').textContent = n>=want
+    ? n+' preguntas disponibles en ese filtro.'
+    : 'Solo hay '+n+' preguntas en ese filtro: el intento tendrá '+n+'.';
+  if(cfg.src==='failed' && n===0) el('poolInfo').textContent='Todavía no hay falladas guardadas.';
+}
+
+/* =========================================================
+   7. ARMADO DEL INTENTO
+   ========================================================= */
+function prepare(it){
+  if(it.t==='mc'){
+    const order = shuffle(it.opts.map((_,i)=>i));
+    return {...it, opts:order.map(i=>it.opts[i]), a:order.indexOf(it.a)};
+  }
+  if(it.t==='ms'){
+    const order = shuffle(it.opts.map((_,i)=>i));
+    return {...it, opts:order.map(i=>it.opts[i]), a:it.a.map(i=>order.indexOf(i)).sort((x,y)=>x-y)};
+  }
+  if(it.t==='match'){
+    const rights = shuffle(it.pairs.map(p=>p[1]));
+    return {...it, rights, lefts:it.pairs.map(p=>p[0]), a:it.pairs.map(p=>rights.indexOf(p[1]))};
+  }
+  return {...it};
+}
+
+// garantiza una cantidad mínima de un tipo de pregunta, reemplazando V/F
+function ensureType(pool, scored, want, type, min){
+  const have = pool.filter(it=>it.t===type).length;
+  if(have>=min) return;
+  const extra = scored.slice(want).map(x=>x.it).filter(it=>it.t===type);
+  for(let k=have;k<min && extra.length;k++){
+    let idx = pool.findIndex(it=>it.t==='vf');
+    if(idx<0) idx = pool.findIndex(it=>it.t==='mc');
+    if(idx>=0) pool[idx]=extra.shift();
+  }
+}
+
+function buildPool(){
+  const cand = shuffle(filtered());
+  const want = Math.min(Number(cfg.len), cand.length);
+  const now = Date.now();
+
+  // prioridad: falladas primero, después no vistas, después vistas correctas
+  const scored = cand.map(it=>{
+    const st = stats[it.id]||{r:0,w:0,last:0};
+    let s = Math.random();
+    if(st.w>0) s += 3;
+    if(st.pend>0) s += 1.6;              // fallada y todavía no recuperada
+    if(st.r>0 && st.w===0) s -= 1.5;
+    if(st.last && now-st.last < 12*60*60*1000) s -= 0.5;
+    return {it,s};
+  }).sort((a,b)=>b.s-a.s);
+
+  const pool = scored.slice(0,want).map(x=>x.it);
+
+  // mezcla parecida al parcial real: algo de opción múltiple, una de varias correctas y una de relacionar
+  if(want>=6) ensureType(pool, scored, want, 'mc', 2);
+  if(want>=10){
+    ensureType(pool, scored, want, 'ms', 1);
+    ensureType(pool, scored, want, 'match', 1);
+  }
+
+  return shuffle(pool).map(prepare);
+}
+
+/* =========================================================
+   8. EJECUCIÓN DEL INTENTO
+   ========================================================= */
+const UNIT_NAMES = {1:'Unidad 1 · Autor y software',2:'Unidad 2 · Contratos y firma',3:'Unidad 3 · Datos personales',4:'Unidad 4 · Delitos',5:'Unidad 5 · Responsabilidad'};
+const TYPE_NAMES = {vf:'Verdadero o falso', mc:'Opción múltiple', ms:'Varias correctas', match:'Relacionar'};
+
+function fmtClock(s){ return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+
+function isOk(it,val){
+  if(val===null||val===undefined) return false;
+  if(it.t==='vf'||it.t==='mc') return val===it.a;
+  if(it.t==='ms') return val.length===it.a.length && it.a.every(i=>val.includes(i));
+  if(it.t==='match') return val.length===it.a.length && it.a.every((v,i)=>val[i]===v);
+  return false;
+}
+function answered(i){
+  const v=S.answers[i];
+  if(v===null||v===undefined) return false;
+  if(Array.isArray(v)) return S.pool[i].t==='match' ? v.some(x=>x>=0) : v.length>0;
+  return true;
+}
+function answeredCount(){ let n=0; for(let i=0;i<S.pool.length;i++) if(answered(i)) n++; return n; }
+
+function fmtA(it,val){
+  if(val===null||val===undefined) return '(sin responder)';
+  if(it.t==='vf') return val?'Verdadero':'Falso';
+  if(it.t==='mc') return it.opts[val];
+  if(it.t==='ms') return val.length ? val.slice().sort((a,b)=>a-b).map(i=>it.opts[i]).join(' · ') : '(sin responder)';
+  if(it.t==='match') return it.lefts.map((l,i)=>l+' → '+(val[i]>=0?it.rights[val[i]]:'—')).join('  |  ');
+  return '';
+}
+
+function record(it,ok){
+  const st = stats[it.id] || {r:0,w:0,last:0,pend:0};
+  st.last=Date.now();
+  if(ok){ st.r++; st.pend=Math.max(0,(st.pend||0)-1); }
+  else { st.w++; st.pend=(st.pend||0)+1; }
+  stats[it.id]=st;
+  save(K_STATS,stats);
+}
+
+function startRun(pool){
+  S.pool=pool; S.idx=0;
+  S.answers=new Array(pool.length).fill(null);
+  S.locked=new Array(pool.length).fill(false);
+  S.flags=new Array(pool.length).fill(false);
+  S.mode = cfg.mode==='examen' ? 'examen' : 'estudio';
+  S.t0 = Date.now();
+  el('sim-setup').classList.add('hidden');
+  el('sim-done').classList.add('hidden');
+  el('sim-run').classList.remove('hidden');
+  startClock();
+  renderQ();
+}
+
+el('startBtn').addEventListener('click',()=>{
+  const pool = buildPool();
+  if(!pool.length){ alert('No hay preguntas con ese filtro.'); return; }
+  startRun(pool);
+});
+
+function startClock(){
+  clearInterval(S.timer);
+  const c = el('clock');
+  c.classList.remove('low');
+  const total = S.mode==='examen' ? Math.round(S.pool.length*90) : 0;   // 90 s por pregunta: 10 preguntas = 15 min
+  const tick=()=>{
+    const used = Math.floor((Date.now()-S.t0)/1000);
+    if(total){
+      const left = Math.max(0,total-used);
+      c.textContent = '⏱ '+fmtClock(left);
+      c.classList.toggle('low', left<=120);
+      if(left<=0){ clearInterval(S.timer); finish(true); }
+    } else {
+      c.textContent = fmtClock(used);
+    }
+  };
+  tick(); S.timer=setInterval(tick,1000);
+}
+
+function renderQ(){
+  const it = S.pool[S.idx];
+  const n = S.pool.length;
+  const exam = S.mode==='examen';
+  const locked = !!S.locked[S.idx];
+  const cur = S.answers[S.idx];
+
+  el('qCounter').textContent = 'Pregunta '+(S.idx+1)+' de '+n+(exam?' · '+answeredCount()+' respondidas':'');
+  el('progBar').style.width = ((exam?answeredCount():S.idx)/n*100)+'%';
+
+  let hint = '';
+  if(it.t==='ms') hint = '<div class="sub" style="margin-top:6px">Marcá <b>todas</b> las correctas.</div>';
+  if(it.t==='match') hint = '<div class="sub" style="margin-top:6px">Relacioná cada elemento con su par.</div>';
+  el('qText').innerHTML =
+    '<span class="tag">'+UNIT_NAMES[it.u]+' · '+TYPE_NAMES[it.t]+(it.hist?' · cayó en '+it.hist:'')+'</span>'
+    + '<div>'+esc(it.q)+'</div>'+hint;
+
+  const box = el('qOpts');
+  box.innerHTML='';
+
+  if(it.t==='vf'){
+    [['Verdadero',true],['Falso',false]].forEach(([label,val])=>{
+      const b=document.createElement('button');
+      b.className='opt vf';
+      b.textContent=label;
+      b.onclick=()=>setAns(val);
+      if(locked){
+        b.disabled=true;
+        if(val===it.a) b.classList.add('good');
+        else if(cur===val) b.classList.add('wrong');
+      } else if(cur===val) b.classList.add('sel');
+      box.appendChild(b);
+    });
+  } else if(it.t==='mc' || it.t==='ms'){
+    it.opts.forEach((o,i)=>{
+      const b=document.createElement('button');
+      const isMs = it.t==='ms';
+      b.className='opt'+(isMs?' chk':'');
+      b.innerHTML='<span class="k">'+'ABCDEF'[i]+'</span><span>'+esc(o)+'</span>';
+      const selected = isMs ? (cur||[]).includes(i) : cur===i;
+      if(locked){
+        b.disabled=true;
+        const correct = isMs ? it.a.includes(i) : i===it.a;
+        if(correct) b.classList.add('good');
+        else if(selected) b.classList.add('wrong');
+      } else {
+        if(selected) b.classList.add('sel');
+        b.onclick = isMs ? ()=>toggleMs(i) : ()=>setAns(i);
+      }
+      box.appendChild(b);
+    });
+  } else if(it.t==='match'){
+    const wrap=document.createElement('div');
+    it.lefts.forEach((l,li)=>{
+      const row=document.createElement('div');
+      row.className='mrow';
+      const left=document.createElement('div');
+      left.textContent=l;
+      const sel=document.createElement('select');
+      sel.className='msel';
+      sel.innerHTML='<option value="-1">Elegí el par…</option>'+it.rights.map((r,ri)=>'<option value="'+ri+'">'+esc(r)+'</option>').join('');
+      sel.value=String(Array.isArray(cur)?cur[li]:-1);
+      if(locked){
+        sel.disabled=true;
+        sel.classList.add(cur && cur[li]===it.a[li] ? 'good':'wrong');
+      } else {
+        sel.onchange=()=>setMatch(li,Number(sel.value));
+      }
+      row.appendChild(left); row.appendChild(sel);
+      wrap.appendChild(row);
+    });
+    box.appendChild(wrap);
+  }
+
+  el('qFb').innerHTML='';
+  if(locked) showFeedback();
+  refreshControls();
+}
+
+function refreshControls(){
+  const it = S.pool[S.idx];
+  const n = S.pool.length;
+  const exam = S.mode==='examen';
+  const locked = !!S.locked[S.idx];
+  const cur = S.answers[S.idx];
+  const last = S.idx===n-1;
+
+  el('prevBtn').classList.toggle('hidden', !(exam && S.idx>0));
+  el('flagBtn').classList.toggle('hidden', !exam);
+  el('flagBtn').textContent = S.flags[S.idx] ? '⚑ Quitar marca' : '⚑ Marcar para revisar';
+  el('finishBtn').classList.toggle('hidden', !exam);
+
+  // confirmar: solo en estudio, para las que no se resuelven con un clic
+  const needsConfirm = !exam && !locked && (it.t==='ms'||it.t==='match');
+  el('confirmBtn').classList.toggle('hidden', !needsConfirm);
+  if(needsConfirm){
+    const ready = it.t==='ms' ? (Array.isArray(cur)&&cur.length>0) : (Array.isArray(cur)&&cur.every(x=>x>=0));
+    el('confirmBtn').disabled = !ready;
+  }
+
+  // siguiente
+  if(exam){
+    el('nextBtn').classList.toggle('hidden', last);
+    el('nextBtn').textContent = 'Siguiente →';
+  } else {
+    el('nextBtn').classList.toggle('hidden', !locked);
+    el('nextBtn').textContent = last ? 'Ver resultado' : 'Siguiente';
+  }
+
+  // ayuda de teclado
+  let k='';
+  if(exam){
+    k = '<kbd>←</kbd> <kbd>→</kbd> moverte · <kbd>M</kbd> marcar';
+    if(it.t==='vf') k = '<kbd>V</kbd> <kbd>F</kbd> · '+k;
+    else if(it.t==='mc'||it.t==='ms') k = '<kbd>1</kbd>–<kbd>'+it.opts.length+'</kbd> · '+k;
+  } else if(!locked){
+    if(it.t==='vf') k='<kbd>V</kbd> verdadero · <kbd>F</kbd> falso';
+    else if(it.t==='mc') k='<kbd>1</kbd>–<kbd>'+it.opts.length+'</kbd> para elegir';
+    else if(it.t==='ms') k='<kbd>1</kbd>–<kbd>'+it.opts.length+'</kbd> para marcar · <kbd>Enter</kbd> confirmar';
+  } else k='<kbd>Enter</kbd> siguiente';
+  el('keysHint').innerHTML=k;
+
+  renderNav();
+}
+
+function renderNav(){
+  const g = el('navGrid');
+  if(S.mode!=='examen'){ g.classList.add('hidden'); return; }
+  g.classList.remove('hidden');
+  g.innerHTML='';
+  S.pool.forEach((_,i)=>{
+    const b=document.createElement('button');
+    b.textContent=i+1;
+    b.title='Ir a la pregunta '+(i+1);
+    if(answered(i)) b.classList.add('done');
+    if(S.flags[i]) b.classList.add('flag');
+    if(i===S.idx) b.classList.add('cur');
+    b.onclick=()=>{ S.idx=i; renderQ(); };
+    g.appendChild(b);
+  });
+}
+
+function setAns(val){
+  if(S.locked[S.idx]) return;
+  S.answers[S.idx]=val;
+  if(S.mode==='estudio') commit(S.idx); else renderQ();
+}
+function toggleMs(i){
+  if(S.locked[S.idx]) return;
+  const cur=(S.answers[S.idx]||[]).slice();
+  const k=cur.indexOf(i);
+  if(k>=0) cur.splice(k,1); else cur.push(i);
+  S.answers[S.idx]=cur.length?cur:null;
+  renderQ();
+}
+function setMatch(li,val){
+  if(S.locked[S.idx]) return;
+  const it=S.pool[S.idx];
+  const cur = Array.isArray(S.answers[S.idx]) ? S.answers[S.idx].slice() : new Array(it.lefts.length).fill(-1);
+  cur[li]=val;
+  S.answers[S.idx]=cur.some(x=>x>=0)?cur:null;
+  refreshControls();     // sin re-render para no perder el foco del select
+}
+function commit(i){
+  S.locked[i]=true;
+  const it=S.pool[i];
+  record(it,isOk(it,S.answers[i]));
+  renderQ();
+}
+
+function showFeedback(){
+  const it = S.pool[S.idx];
+  const val = S.answers[S.idx];
+  const ok = isOk(it,val);
+  el('qFb').innerHTML =
+    '<div class="fb '+(ok?'ok':'no')+'">'+
+      '<b>'+(ok?'Correcto':'Incorrecto')+'</b>'+
+      esc(it.why)+
+      (ok?'':'<span class="ref">Elegiste: <b>'+esc(fmtA(it,val))+'</b></span><span class="ref">Correcta: <b>'+esc(fmtA(it,it.a))+'</b></span>')+
+      (it.ref?'<span class="ref">Norma · '+esc(it.ref)+'</span>':'')+
+    '</div>';
+}
+
+el('confirmBtn').addEventListener('click',()=>{ if(!el('confirmBtn').disabled) commit(S.idx); });
+el('prevBtn').addEventListener('click',()=>{ if(S.idx>0){ S.idx--; renderQ(); } });
+el('nextBtn').addEventListener('click',()=>{
+  if(S.mode==='examen'){ if(S.idx<S.pool.length-1){ S.idx++; renderQ(); } return; }
+  if(S.idx < S.pool.length-1){ S.idx++; renderQ(); }
+  else finish();
+});
+function toggleFlag(){ S.flags[S.idx]=!S.flags[S.idx]; refreshControls(); }
+el('flagBtn').addEventListener('click',toggleFlag);
+el('finishBtn').addEventListener('click',()=>finish());
+
+el('abortBtn').addEventListener('click',()=>{
+  if(confirm('¿Abandonar el intento? No se va a guardar en el historial.')){
+    clearInterval(S.timer);
+    el('sim-run').classList.add('hidden');
+    el('sim-setup').classList.remove('hidden');
+    renderHist();
+  }
+});
+
+/* =========================================================
+   9. RESULTADO
+   ========================================================= */
+function finish(auto){
+  if(S.mode==='examen' && !auto){
+    const un = S.pool.filter((_,i)=>!answered(i)).length;
+    const fl = S.flags.filter(Boolean).length;
+    let msg = '¿Finalizar el intento y corregir?';
+    if(un) msg += '\nTe quedan '+un+' sin responder (cuentan como incorrectas).';
+    if(fl) msg += '\nTenés '+fl+' marcada(s) para revisar.';
+    if(!confirm(msg)) return;
+  }
+  clearInterval(S.timer);
+
+  // en examen las respuestas se registran recién al corregir
+  if(S.mode==='examen') S.pool.forEach((it,i)=>{ if(answered(i)) record(it,isOk(it,S.answers[i])); });
+
+  const n=S.pool.length;
+  const oks = S.pool.map((it,i)=>isOk(it,S.answers[i]));
+  const ok = oks.filter(Boolean).length;
+  const secs = Math.round((Date.now()-S.t0)/1000);
+  const pct = Math.round(ok/n*100);
+
+  el('sim-run').classList.add('hidden');
+  el('sim-done').classList.remove('hidden');
+  el('finalScore').innerHTML = ok+'<small> / '+n+'</small>';
+
+  let verdict;
+  if(pct>=90){ verdict='Listo. Ese nivel te alcanza y sobra para el integrador.'; }
+  else if(pct>=70){ verdict='Aprobado, pero mirá la corrección: en 10 preguntas dos errores son dos puntos.'; }
+  else if(pct>=50){ verdict='En zona de riesgo. Volvé al banco de trampas antes de repetir.'; }
+  else { verdict='Base floja todavía. Andá al resumen por unidad y volvé después.'; }
+  if(auto) verdict = 'Se acabó el tiempo. ' + verdict;
+  el('finalVerdict').textContent = verdict + '  Tiempo: ' + Math.floor(secs/60)+'m '+(secs%60)+'s.';
+
+  const byU={};
+  S.pool.forEach((it,i)=>{
+    byU[it.u]=byU[it.u]||{t:0,ok:0};
+    byU[it.u].t++; if(oks[i]) byU[it.u].ok++;
+  });
+  el('finalStats').innerHTML = Object.keys(byU).sort().map(u=>{
+    const d=byU[u];
+    return '<div>U'+u+'<b>'+d.ok+'/'+d.t+'</b></div>';
+  }).join('') + '<div>Tiempo<b>'+fmtClock(secs)+'</b></div>';
+
+  // temas a repasar
+  const bad={};
+  S.pool.forEach((it,i)=>{ if(!oks[i]){ const k='U'+it.u+' · '+it.top; bad[k]=(bad[k]||0)+1; } });
+  const keys=Object.keys(bad).sort((a,b)=>bad[b]-bad[a]);
+  el('repasar').innerHTML = keys.length
+    ? '<h3 style="margin-bottom:8px">Temas a repasar</h3>'+keys.map(k=>'<span class="pill no">'+esc(k)+(bad[k]>1?' ×'+bad[k]:'')+'</span>').join(' ')
+    : '<p class="sub" style="margin-top:14px">Sin errores: no hay temas pendientes en este intento.</p>';
+
+  // corrección completa
+  el('reviewBody').innerHTML = S.pool.map((it,i)=>{
+    const val=S.answers[i];
+    const isOkRow = oks[i];
+    return '<div class="rev">'
+      + '<div class="qq"><span class="pill '+(isOkRow?'ok':'no')+'">'+(isOkRow?'OK':'MAL')+'</span>'
+      + 'U'+it.u+' · '+esc(it.q)+'</div>'
+      + '<div class="aa">'+(isOkRow?'Tu respuesta: <b>'+esc(fmtA(it,val))+'</b>':'Tu respuesta: <b>'+esc(fmtA(it,val))+'</b><br>Correcta: <b>'+esc(fmtA(it,it.a))+'</b>')+'</div>'
+      + '<div class="aa" style="margin-top:5px;color:var(--tx)">'+esc(it.why)+'</div>'
+      + (it.ref?'<div class="aa" style="margin-top:4px">Norma · '+esc(it.ref)+'</div>':'')
+      + '</div>';
+  }).join('');
+
+  hist.unshift({ts:Date.now(),ok:ok,n:n,secs:secs,mode:S.mode});
+  hist = hist.slice(0,12);
+  save(K_HIST,hist);
+
+  // botón repetir falladas
+  const failedIds = S.pool.filter((it,i)=>!oks[i]).map(it=>it.id);
+  el('reviewFailBtn').classList.toggle('hidden', failedIds.length===0);
+  el('reviewFailBtn').onclick=()=>{
+    startRun(shuffle(BANK.filter(it=>failedIds.includes(it.id))).map(prepare));
+  };
+}
+
+el('againBtn').addEventListener('click',()=>{
+  el('sim-done').classList.add('hidden');
+  el('sim-setup').classList.remove('hidden');
+  updatePoolInfo(); renderHist();
+});
+
+/* =========================================================
+   10. HISTORIAL
+   ========================================================= */
+function renderHist(){
+  if(!hist.length){
+    el('histBody').innerHTML = 'Todavía no hiciste ningún intento.';
+    return;
+  }
+  const rows = hist.map(h=>{
+    const d=new Date(h.ts);
+    const date = d.toLocaleDateString('es-AR',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    const pct = Math.round(h.ok/h.n*100);
+    const pill = pct>=70?'ok':'no';
+    return '<div class="rev" style="padding:10px 0">'
+      + '<span class="pill '+pill+'">'+h.ok+'/'+h.n+'</span>'
+      + '<span style="font-size:14px">'+date+'</span>'
+      + '<span class="sub" style="margin-left:10px">'+h.mode+' · '+Math.floor(h.secs/60)+'m '+(h.secs%60)+'s</span>'
+      + '</div>';
+  }).join('');
+  const totalOk = hist.reduce((a,h)=>a+h.ok,0), totalN=hist.reduce((a,h)=>a+h.n,0);
+  el('histBody').innerHTML = rows
+    + '<div class="sub" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bd)">'
+    + 'Promedio acumulado: <b>'+Math.round(totalOk/totalN*100)+'%</b> en '+hist.length+' intento(s).</div>';
+}
+
+/* =========================================================
+   11. TRAMPAS
+   ========================================================= */
+let trapFilter='all';
+function renderPairs(){
+  const list = trapFilter==='all' ? PAIRS : PAIRS.filter(p=>String(p.u)===trapFilter);
+  el('pairsBody').innerHTML = list.map((p,i)=>
+    '<div class="pair" onclick="this.classList.toggle(\'open\')">'
+    + '<button><span class="quote">'+esc(p.quote)+'</span>'
+    + '<span style="color:var(--mut);font-size:12.5px;display:block;margin-top:7px">U'+p.u+' · tocá para ver la corrección</span></button>'
+    + '<div class="fix"><span class="lbl no">Lo correcto</span>'
+    + '<p class="why">'+esc(p.fix)+'</p></div>'
+    + '</div>'
+  ).join('');
+}
+document.querySelectorAll('#trapFilters .chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('#trapFilters .chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on');
+    trapFilter=c.dataset.tu; renderPairs();
+  });
+});
+
+/* =========================================================
+   12. DATOS DUROS
+   ========================================================= */
+function renderCifras(){
+  let html='';
+  Object.keys(CIFRAS).forEach(section=>{
+    html += '<div class="card"><h3 style="margin-top:0">'+esc(section)+'</h3><div class="tbl-wrap"><table><thead><tr><th>Dato</th><th>Valor</th><th>Norma</th></tr></thead><tbody>';
+    CIFRAS[section].forEach(r=>{
+      html += '<tr><td style="width:38%">'+esc(r[0])+'</td><td>'+r[1]+'</td><td style="width:16%;color:var(--mut);font-size:13px">'+esc(r[2]||'')+'</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+  });
+  el('cifrasBody').innerHTML = html;
+}
+
+/* =========================================================
+   13. COBERTURA
+   ========================================================= */
+function renderCobertura(){
+  const byU={};
+  BANK.forEach(it=>{
+    byU[it.u]=byU[it.u]||{items:0,mc:0,trap:0,topics:{}};
+    const g=byU[it.u];
+    g.items++;
+    if(it.t!=='vf') g.mc++;
+    if(it.trap) g.trap++;
+    g.topics[it.top]=g.topics[it.top]||{n:0,r:0,w:0};
+    g.topics[it.top].n++;
+    const st=stats[it.id];
+    if(st){ g.topics[it.top].r+=st.r||0; g.topics[it.top].w+=st.w||0; }
+  });
+
+  const names={1:'Unidad 1 · Propiedad intelectual y derecho de autor',2:'Unidad 2 · Contratos, firma digital y teletrabajo',3:'Unidad 3 · Intimidad, privacidad y datos personales',4:'Unidad 4 · Delitos informáticos y forensia',5:'Unidad 5 · Responsabilidad civil, penal y profesional'};
+
+  let html='';
+  [1,2,3,4,5].forEach(u=>{
+    const g=byU[u]; if(!g) return;
+    let totR=0,totW=0;
+    totR += Object.values(g.topics).reduce((a,t)=>a+t.r,0);
+    totW += Object.values(g.topics).reduce((a,t)=>a+t.w,0);
+    const acc = (totR+totW)? Math.round(totR/(totR+totW)*100) : null;
+
+    html += '<div class="card"><h3 style="margin-top:0">'+esc(names[u])+'</h3>';
+    html += '<div class="stat" style="margin-top:0;margin-bottom:14px">'
+      + '<div>Ítems<b>'+g.items+'</b></div>'
+      + '<div>No V/F<b>'+g.mc+'</b></div>'
+      + '<div>⚠️ Trampas<b>'+g.trap+'</b></div>'
+      + '<div>Tu acierto<b>'+(acc===null?'—':acc+'%')+'</b></div>'
+      + '</div>';
+    html += '<div class="tbl-wrap"><table><thead><tr><th>Tema</th><th class="num">Ítems</th><th class="num">Visto</th><th class="num">Acierto</th></tr></thead><tbody>';
+    Object.keys(g.topics).forEach(t=>{
+      const d=g.topics[t];
+      const seen=d.r+d.w;
+      const a = seen? Math.round(d.r/seen*100) : null;
+      const warn = (seen>=3 && a!==null && a<70) ? ' style="color:var(--bad);font-weight:600"' : '';
+      html += '<tr><td>'+esc(t)+'</td><td class="num">'+d.n+'</td><td class="num">'+seen+'</td>'
+        + '<td class="num"'+warn+'>'+(a===null?'—':a+'%')+'</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+  });
+
+  const seenTotal = Object.keys(stats).length;
+  html += '<div class="card"><h3 style="margin-top:0">Estado general</h3><div class="stat" style="margin-top:0">'
+    + '<div>Banco total<b>'+BANK.length+'</b></div>'
+    + '<div>Ítems ya practicados<b>'+seenTotal+'</b></div>'
+    + '<div>Trampas en el banco<b>'+BANK.filter(i=>i.trap).length+'</b></div>'
+    + '<div>Fichas de trampas<b>'+PAIRS.length+'</b></div>'
+    + '</div></div>';
+
+  el('cobBody').innerHTML = html;
+}
+
+el('resetBtn').addEventListener('click',()=>{
+  if(confirm('Esto borra tu progreso, tu historial, los casos, el cazador y las tarjetas guardados en este navegador. ¿Seguir?')){
+    [K_STATS,K_HIST,K_CASES,K_HUNT,K_CARDS].forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+    stats={}; hist=[]; cstats={}; hstats={}; cardState={};
+    CD.cur=null;
+    renderCobertura(); renderHist(); updatePoolInfo();
+  }
+});
+
+/* =========================================================
+   14. CASOS (hecho → figura → responsabilidades)
+   a = índice de la figura correcta · resp = planos de responsabilidad que se activan
+   ========================================================= */
+const RESP = [
+  {k:'civil',      l:'Civil',      d:'repara el daño'},
+  {k:'penal',      l:'Penal',      d:'castiga una conducta típica'},
+  {k:'profesional',l:'Profesional',d:'poder disciplinario del Colegio'}
+];
+const CASES = [
+{id:'c1',u:4,
+ hecho:'Un falso empleado del banco llama a una persona, la convence de que su cuenta corre riesgo y la víctima transfiere el dinero ella misma. El sistema bancario funcionó con total normalidad y la víctima perdió sus ahorros.',
+ opts:['Art. 172 · Estafa','Art. 173 inc. 16 · Defraudación informática','Art. 153 bis · Acceso ilegítimo','Art. 183 · Daño informático'],
+ a:0, resp:['penal','civil'],
+ why:'El engaño recayó sobre la PERSONA, que se perjudicó con su propia disposición: es estafa. El sistema no fue manipulado, así que no es el inc. 16. Además hay un daño que reparar.',
+ ref:'CP art. 172 · Práctico 4 (caso B)'},
+{id:'c2',u:4,
+ hecho:'Un técnico consigue la clave semilla del token de un cliente, se hace pasar por él ante la plataforma y el sistema ejecuta la transferencia de sus bitcoins. El cliente pierde el dinero.',
+ opts:['Art. 172 · Estafa','Art. 173 inc. 16 · Manipulación informática','Art. 157 bis · Banco de datos','Art. 255 · Alteración de prueba'],
+ a:1, resp:['penal','civil'],
+ why:'El engaño fue al SISTEMA, no a la víctima: art. 173 inc. 16. Es el caso Lazarte Di Lieto (3 años de prisión en suspenso), con responsabilidad civil concurrente.',
+ ref:'CP art. 173 inc. 16 · Lazarte Di Lieto'},
+{id:'c3',u:4,
+ hecho:'Un empleado usa las credenciales de un compañero para entrar a la base de clientes de la empresa, a la que no tiene autorización, y la consulta. No la modifica ni la difunde y no causa ningún perjuicio económico.',
+ opts:['Art. 153 bis · Acceso ilegítimo a un sistema o dato restringido','Art. 172 · Estafa','Art. 255 · Alteración de pruebas','Art. 131 · Grooming'],
+ a:0, resp:['penal'],
+ why:'Entrar sin autorización (o excediéndola) a un sistema o dato de acceso restringido es el art. 153 bis. Según el enunciado no hay daño, así que no se activa lo civil.',
+ ref:'CP art. 153 bis'},
+{id:'c4',u:4,
+ hecho:'Un adulto contacta por redes sociales a una menor de 14 años, fingiendo ser de su edad, para proponerle un encuentro con fines sexuales.',
+ opts:['Art. 128 · Pornografía infantil','Art. 131 · Grooming','Art. 153 · Comunicaciones','Art. 117 bis · Datos personales'],
+ a:1, resp:['penal'],
+ why:'Contactar a un menor por medios electrónicos para cometer un delito contra su integridad sexual es grooming (Ley 26.904): 6 meses a 4 años.',
+ ref:'CP art. 131'},
+{id:'c5',u:4,
+ hecho:'Una persona programa y distribuye un virus que destruye los datos de los equipos que infecta. Varias empresas pierden información y deben pagar su recuperación.',
+ opts:['Art. 183 · Daño informático','Art. 172 · Estafa','Art. 155 · Publicación indebida','Art. 157 · Revelación por funcionario'],
+ a:0, resp:['penal','civil'],
+ why:'Alterar, destruir o inutilizar datos, programas o sistemas, o introducir y distribuir programas dañinos, es el art. 183. Y hay pérdidas que se reparan por la vía civil.',
+ ref:'CP art. 183 (15 días a 1 año)'},
+{id:'c6',u:4,
+ hecho:'Un perito designado en una causa oculta y altera los registros digitales que estaban bajo custodia judicial.',
+ opts:['Art. 255 · Sustracción o alteración de pruebas','Art. 183 · Daño informático','Art. 153 · Comunicaciones','Art. 128 · Pornografía infantil'],
+ a:0, resp:['penal'],
+ why:'Sustraer, alterar u ocultar pruebas o registros bajo custodia afecta la administración de justicia: art. 255 (1 mes a 4 años).',
+ ref:'CP art. 255'},
+{id:'c7',u:4,
+ hecho:'Un funcionario público revela, sin autorización, datos personales que por ley debía mantener en secreto.',
+ opts:['Art. 157 · Revelación de secretos por funcionario','Art. 155 · Publicación indebida','Art. 172 · Estafa','Art. 173 inc. 15 · Tarjetas'],
+ a:0, resp:['penal'],
+ why:'El funcionario que revela datos que deben ser secretos incurre en el art. 157 (1 mes a 2 años más inhabilitación). No confundir con el 155, que es de un particular.',
+ ref:'CP art. 157'},
+{id:'c8',u:4,
+ hecho:'Alguien publica en su blog el contenido de un mail privado que no estaba destinado a la publicidad. El autor del mail sufre un perjuicio a raíz de esa publicación.',
+ opts:['Art. 155 · Publicación indebida de comunicación','Art. 157 bis · Banco de datos','Art. 172 · Estafa','Art. 255 · Alteración de prueba'],
+ a:0, resp:['penal','civil'],
+ why:'Publicar una comunicación no destinada a la publicidad, si causa o puede causar perjuicio, es el art. 155 (multa). El perjuicio abre además la vía civil.',
+ ref:'CP art. 155'},
+{id:'c9',u:4,
+ hecho:'Una persona usa sin autorización los datos de la tarjeta de crédito de otra para hacer compras online y le genera un perjuicio económico.',
+ opts:['Art. 173 inc. 15 · Uso no autorizado de datos de tarjeta','Art. 173 inc. 16 · Manipulación informática','Art. 153 bis · Acceso ilegítimo','Art. 131 · Grooming'],
+ a:0, resp:['penal','civil'],
+ why:'El uso no autorizado de los datos de una tarjeta es el art. 173 inc. 15, con la escala del art. 172. El perjuicio se reclama además por vía civil.',
+ ref:'CP art. 173 inc. 15'},
+{id:'c10',u:3,
+ hecho:'Una persona carga a sabiendas datos falsos en un archivo de datos personales y perjudica a su titular, que pierde un trabajo.',
+ opts:['Art. 117 bis inc. 2 · Información falsa de un archivo de datos personales','Art. 153 bis · Acceso ilegítimo','Art. 172 · Estafa','Art. 183 · Daño informático'],
+ a:0, resp:['penal','civil'],
+ why:'Proporcionar a sabiendas información falsa de un archivo de datos personales se castiga con 6 meses a 3 años (también art. 32 de la Ley 25.326). El daño al titular se repara por vía civil.',
+ ref:'CP art. 117 bis inc. 2 · Ley 25.326 art. 32'},
+{id:'c11',u:5,
+ hecho:'Una empresa contrata a un desarrollador para entregar un sitio web a medida. No lo entrega completo en el plazo pactado y el cliente reclama. No hubo engaño inicial ni ninguna conducta típica.',
+ opts:['Responsabilidad civil contractual por obligación de resultado, sin delito','Art. 172 · Estafa','Art. 173 inc. 16 · Manipulación informática','Solo responsabilidad profesional'],
+ a:0, resp:['civil'],
+ why:'Es el caso Portal de Mendoza c/ Soler: incumplir un contrato de obra es responsabilidad CIVIL de resultado (se presume al deudor; solo se libera con causa ajena). Un incumplimiento no es un delito.',
+ ref:'CCCN arts. 1723 y 1251 ss. · Portal de Mendoza c/ Soler'},
+{id:'c12',u:5,
+ hecho:'Un profesional matriculado es sancionado por el Colegio por negligencias reiteradas y frecuentes en su labor. No hubo daño a terceros ni delito alguno.',
+ opts:['Poder disciplinario del Colegio (art. 55 de la Ley 1236-A)','Responsabilidad objetiva por actividad riesgosa','Estafa (art. 172)','Ejercicio ilegítimo de la profesión (arts. 13-14)'],
+ a:0, resp:['profesional'],
+ why:'Las negligencias reiteradas y frecuentes son causal de sanción disciplinaria (art. 55). El ejercicio ilegítimo es de quien NO tiene matrícula. Sin daño ni delito, solo se activa el plano profesional.',
+ ref:'Ley 1236-A arts. 48 y 55'},
+{id:'c13',u:5,
+ hecho:'Un profesional matriculado es condenado en sede criminal por un delito doloso de acción pública.',
+ opts:['Causal de sanción disciplinaria, sin perjuicio de la condena penal','La condena penal excluye toda sanción del Colegio','Solo corresponde responsabilidad civil','La acción disciplinaria prescribe a los 10 años'],
+ a:0, resp:['penal','profesional'],
+ why:'La condena criminal por delito doloso de acción pública es causal del art. 55, y el poder disciplinario se ejerce SIN PERJUICIO de la responsabilidad civil, penal o administrativa (art. 48). No se excluyen.',
+ ref:'Ley 1236-A arts. 48 y 55'}
+];
+
+const K_CASES='lp_integr_v1_cases';
+let cstats = load(K_CASES,{});
+const CS = {filter:'all', cur:null, step:1, pick:null, resp:[], done:0, ok:0};
+
+function nextCase(){
+  const list = CASES.filter(c=>CS.filter==='all'||String(c.u)===CS.filter);
+  if(!list.length){ el('caseCard').innerHTML='<p class="sub">No hay casos para esa unidad.</p>'; return; }
+  const scored = list.map(c=>{
+    const st = cstats[c.id]||{r:0,w:0};
+    let s = Math.random();
+    if(st.w>st.r) s+=2;
+    if(!st.r && !st.w) s+=1;
+    if(CS.cur && CS.cur.c.id===c.id) s-=5;
+    return {c,s};
+  }).sort((a,b)=>b.s-a.s);
+  const c = scored[0].c;
+  const order = shuffle(c.opts.map((_,i)=>i));
+  CS.cur = {c, opts:order.map(i=>c.opts[i]), a:order.indexOf(c.a)};
+  CS.step=1; CS.pick=null; CS.resp=[];
+  renderCase();
+}
+
+function renderCase(){
+  const {c,opts,a} = CS.cur;
+  let h = '<span class="tag">'+UNIT_NAMES[c.u]+' · Caso</span><div class="q">'+esc(c.hecho)+'</div>';
+
+  h += '<h3 style="margin-top:0">1 · ¿Qué figura o régimen corresponde?</h3><div class="opts">';
+  opts.forEach((o,i)=>{
+    let cls='opt';
+    if(CS.step>1){ if(i===a) cls+=' good'; else if(i===CS.pick) cls+=' wrong'; }
+    h += '<button class="'+cls+'" data-act="fig" data-i="'+i+'"'+(CS.step>1?' disabled':'')+'><span class="k">'+'ABCD'[i]+'</span><span>'+esc(o)+'</span></button>';
+  });
+  h += '</div>';
+
+  if(CS.step>=2){
+    h += '<h3>2 · ¿Qué responsabilidades se activan con lo que dice el enunciado?</h3><div class="opts">';
+    RESP.forEach(r=>{
+      const sel = CS.resp.includes(r.k), want = c.resp.includes(r.k);
+      let cls='opt chk';
+      if(CS.step===3){ if(want) cls+=' good'; else if(sel) cls+=' wrong'; }
+      else if(sel) cls+=' sel';
+      h += '<button class="'+cls+'" data-act="resp" data-k="'+r.k+'"'+(CS.step===3?' disabled':'')+'><span class="k">'+(sel?'✓':'')+'</span><span><b>'+r.l+'</b> · '+r.d+'</span></button>';
+    });
+    h += '</div>';
+  }
+
+  if(CS.step===2) h += '<div class="row mt"><button class="btn" data-act="check">Comprobar</button><span class="sub">Podés marcar una, varias o ninguna.</span></div>';
+
+  if(CS.step===3){
+    const figOk = CS.pick===a;
+    const respOk = c.resp.length===CS.resp.length && c.resp.every(k=>CS.resp.includes(k));
+    const all = figOk && respOk;
+    h += '<div class="fb '+(all?'ok':'no')+'"><b>'+(all?'Caso resuelto':(figOk?'Figura bien, responsabilidades no':(respOk?'Responsabilidades bien, figura no':'Revisá este caso')))+'</b>'
+      + esc(c.why)
+      + '<span class="ref">Responsabilidades correctas: <b>'+c.resp.map(k=>RESP.find(r=>r.k===k).l).join(' + ')+'</b></span>'
+      + '<span class="ref">Norma · '+esc(c.ref)+'</span></div>';
+    h += '<div class="row mt"><button class="btn" data-act="next">Siguiente caso</button></div>';
+  }
+  el('caseCard').innerHTML = h;
+  el('caseScore').textContent = CS.done ? 'En esta sesión: '+CS.ok+' de '+CS.done+' casos resueltos completos.' : '';
+}
+
+el('caseCard').addEventListener('click',e=>{
+  const b = e.target.closest('button[data-act]'); if(!b || b.disabled) return;
+  const act = b.dataset.act;
+  if(act==='fig' && CS.step===1){ CS.pick=Number(b.dataset.i); CS.step=2; renderCase(); }
+  else if(act==='resp' && CS.step===2){
+    const k=b.dataset.k, i=CS.resp.indexOf(k);
+    if(i>=0) CS.resp.splice(i,1); else CS.resp.push(k);
+    renderCase();
+  }
+  else if(act==='check' && CS.step===2){
+    const {c,a}=CS.cur;
+    const all = CS.pick===a && c.resp.length===CS.resp.length && c.resp.every(k=>CS.resp.includes(k));
+    const st = cstats[c.id]||{r:0,w:0};
+    if(all) st.r++; else st.w++;
+    cstats[c.id]=st; save(K_CASES,cstats);
+    CS.done++; if(all) CS.ok++;
+    CS.step=3; renderCase();
+  }
+  else if(act==='next') nextCase();
+});
+document.querySelectorAll('#caseFilters .chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('#caseFilters .chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on'); CS.filter=c.dataset.cu; CS.cur=null; nextCase();
+  });
+});
+
+/* =========================================================
+   15. CAZADOR DE TRAMPAS (tocá la parte incorrecta)
+   ========================================================= */
+const K_HUNT='lp_integr_v1_hunt';
+let hstats = load(K_HUNT,{});
+const HS = {filter:'all', cur:null, sel:new Set(), done:false, total:0, ok:0};
+const huntKey = p => p.quote.slice(0,40);
+
+function tokenize(q,bad){
+  const toks=[]; const re=/\S+/g; let m;
+  while((m=re.exec(q))) toks.push({t:m[0], s:m.index, e:m.index+m[0].length});
+  const bi=q.indexOf(bad), be=bi+bad.length;
+  toks.forEach(k=>{ k.bad = bi>=0 && k.s<be && k.e>bi; });
+  return toks;
+}
+
+function nextHunt(){
+  const list = PAIRS.filter(p=>p.bad && (HS.filter==='all'||String(p.u)===HS.filter));
+  if(!list.length){ el('huntCard').innerHTML='<p class="sub">No hay frases para esa unidad.</p>'; return; }
+  const scored = list.map(p=>{
+    const st = hstats[huntKey(p)]||{r:0,w:0};
+    let s = Math.random();
+    if(st.w>st.r) s+=2;
+    if(!st.r && !st.w) s+=1;
+    if(HS.cur && HS.cur.p===p) s-=5;
+    return {p,s};
+  }).sort((a,b)=>b.s-a.s);
+  const p = scored[0].p;
+  HS.cur = {p, toks:tokenize(p.quote,p.bad)};
+  HS.sel = new Set(); HS.done=false; HS.revealed=false;
+  renderHunt();
+}
+
+function renderHunt(){
+  const {p,toks} = HS.cur;
+  let h = '<span class="tag">'+UNIT_NAMES[p.u]+' · Cazador</span>';
+  h += '<div class="sub" style="margin-bottom:12px">Esta frase parece cierta pero tiene un error. Tocá la parte incorrecta.</div><div class="hunt">';
+  toks.forEach((k,i)=>{
+    let cls='tok';
+    if(HS.done){
+      if(k.bad && HS.sel.has(i)) cls+=' hit';
+      else if(k.bad) cls+=' bad';
+      else if(HS.sel.has(i)) cls+=' miss';
+    } else if(HS.sel.has(i)) cls+=' sel';
+    h += '<span class="'+cls+'" data-i="'+i+'">'+esc(k.t)+'</span> ';
+  });
+  h += '</div>';
+
+  if(!HS.done){
+    h += '<div class="row mt"><button class="btn" data-act="check"'+(HS.sel.size?'':' disabled')+'>Comprobar</button>'
+      + '<button class="btn ghost" data-act="show">Mostrar el error</button></div>';
+  } else {
+    const badIdx = toks.map((k,i)=>k.bad?i:-1).filter(i=>i>=0);
+    const hits = badIdx.filter(i=>HS.sel.has(i)).length;
+    const extras = [...HS.sel].filter(i=>!toks[i].bad).length;
+    const ok = hits>0 && extras===0 && hits>=Math.ceil(badIdx.length/2);
+    h += '<div class="fb '+(ok?'ok':'no')+'"><b>'+(ok?'Lo cazaste':(HS.revealed?'Así se ve el error':'No era ahí'))+'</b>'
+      + '<span>El error está en: <b>«'+esc(p.bad)+'»</b>.</span><span class="ref">'+esc(p.fix)+'</span></div>'
+      + '<div class="row mt"><button class="btn" data-act="next">Siguiente</button></div>';
+  }
+  el('huntCard').innerHTML = h;
+  el('huntScore').textContent = HS.total ? 'En esta sesión: '+HS.ok+' de '+HS.total+' trampas cazadas.' : '';
+}
+
+el('huntCard').addEventListener('click',e=>{
+  if(!HS.cur) return;
+  const t = e.target.closest('.tok');
+  if(t && !HS.done){
+    const i=Number(t.dataset.i);
+    if(HS.sel.has(i)) HS.sel.delete(i); else HS.sel.add(i);
+    renderHunt(); return;
+  }
+  const b = e.target.closest('button[data-act]'); if(!b || b.disabled) return;
+  const {p,toks}=HS.cur;
+  if(b.dataset.act==='check' || b.dataset.act==='show'){
+    HS.revealed = b.dataset.act==='show';
+    const badIdx = toks.map((k,i)=>k.bad?i:-1).filter(i=>i>=0);
+    const hits = badIdx.filter(i=>HS.sel.has(i)).length;
+    const extras = [...HS.sel].filter(i=>!toks[i].bad).length;
+    const ok = !HS.revealed && hits>0 && extras===0 && hits>=Math.ceil(badIdx.length/2);
+    const st = hstats[huntKey(p)]||{r:0,w:0};
+    if(ok) st.r++; else st.w++;
+    hstats[huntKey(p)]=st; save(K_HUNT,hstats);
+    HS.total++; if(ok) HS.ok++;
+    HS.done=true; renderHunt();
+  } else if(b.dataset.act==='next') nextHunt();
+});
+document.querySelectorAll('#huntFilters .chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('#huntFilters .chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on'); HS.filter=c.dataset.hu; HS.cur=null; nextHunt();
+  });
+});
+
+/* =========================================================
+   16. TARJETAS DE DATOS (repetición espaciada)
+   caja 0 → 1 min · 1 → 10 min · 2 → 1 día · 3 → 3 días · 4 → 7 días
+   ========================================================= */
+const K_CARDS='lp_integr_v1_cards';
+let cardState = load(K_CARDS,{});
+const BOX_WAIT = [60e3, 10*60e3, 24*3600e3, 3*24*3600e3, 7*24*3600e3];
+const CARDS = [];
+Object.keys(CIFRAS).forEach(sec=>CIFRAS[sec].forEach(r=>CARDS.push({id:sec+'|'+r[0], sec, front:r[0], back:r[1], ref:r[2]})));
+const CD = {cur:null, shown:false, filter:'all'};
+const SEC_KEYS = Object.keys(CIFRAS);
+
+function cardDue(c){ const st=cardState[c.id]; return !st || Date.now()>=st.due; }
+function renderCardChips(){
+  el('cardFilters').innerHTML =
+    '<button class="chip'+(CD.filter==='all'?' on':'')+'" data-ci="all">Todas</button>'
+    + SEC_KEYS.map((s,i)=>'<button class="chip'+(CD.filter===String(i)?' on':'')+'" data-ci="'+i+'">'+esc(s)+'</button>').join('');
+}
+function cardPool(){ return CARDS.filter(c=>CD.filter==='all'||c.sec===SEC_KEYS[Number(CD.filter)]); }
+
+function nextCard(){
+  const due = cardPool().filter(cardDue);
+  if(!due.length){ CD.cur=null; }
+  else {
+    const scored = due.map(c=>({c, s:((cardState[c.id]||{box:-1}).box)+Math.random()*0.9})).sort((a,b)=>a.s-b.s);
+    CD.cur = (scored.find(x=>!(CD.cur&&CD.cur.id===x.c.id))||scored[0]).c;
+  }
+  CD.shown=false; renderCard();
+}
+
+function renderCard(){
+  const pool = cardPool();
+  const fresh = pool.filter(c=>!cardState[c.id]).length;
+  const review = pool.filter(c=>cardState[c.id] && Date.now()>=cardState[c.id].due).length;
+  const mastered = pool.filter(c=>cardState[c.id] && cardState[c.id].box>=3).length;
+  el('cardStats').innerHTML = '<div>Nuevas<b>'+fresh+'</b></div><div>Para repasar<b>'+review+'</b></div><div>Dominadas<b>'+mastered+'</b></div><div>Total<b>'+pool.length+'</b></div>';
+
+  if(!CD.cur){
+    el('cardBox').innerHTML = '<p class="center" style="margin:30px 0 6px;font-size:17px"><b>Mazo al día.</b></p><p class="sub center">No quedan tarjetas pendientes ahora. Las que fallaste vuelven en un minuto; las que sabés, en minutos, días o una semana según qué tan firmes estén.</p>';
+    return;
+  }
+  const c=CD.cur;
+  let h = '<span class="tag">'+esc(c.sec)+'</span><div class="flash"><div class="flash-q">'+esc(c.front)+'</div>';
+  if(CD.shown){
+    h += '<div class="flash-a">'+c.back+(c.ref&&c.ref!=='—'?'<div class="sub" style="margin-top:8px">'+esc(c.ref)+'</div>':'')+'</div>';
+  }
+  h += '</div><div class="row mt" style="justify-content:center">';
+  if(!CD.shown) h += '<button class="btn" data-act="reveal">Mostrar respuesta <kbd>Espacio</kbd></button>';
+  else h += '<button class="btn ghost" data-act="no">❌ No la sabía <kbd>1</kbd></button><button class="btn" data-act="yes">✅ La sabía <kbd>2</kbd></button>';
+  h += '</div>';
+  el('cardBox').innerHTML = h;
+}
+
+function gradeCard(ok){
+  const c=CD.cur; if(!c) return;
+  const st = cardState[c.id]||{box:-1};
+  const box = ok ? Math.min(4,(st.box<0?0:st.box)+1) : 0;
+  cardState[c.id] = {box, due:Date.now()+BOX_WAIT[box]};
+  save(K_CARDS,cardState);
+  nextCard();
+}
+el('cardBox').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]'); if(!b) return;
+  if(b.dataset.act==='reveal'){ CD.shown=true; renderCard(); }
+  else if(b.dataset.act==='yes') gradeCard(true);
+  else if(b.dataset.act==='no') gradeCard(false);
+});
+el('cardFilters').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-ci]'); if(!b) return;
+  CD.filter=b.dataset.ci; CD.cur=null; renderCardChips(); nextCard();
+});
+
+/* =========================================================
+   17. TECLADO
+   ========================================================= */
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  const tg=e.target.tagName;
+  if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT') return;
+  const k=e.key.toLowerCase();
+
+  // tarjetas
+  if(!el('view-tarjetas').classList.contains('hidden')){
+    if(!CD.cur) return;
+    if(!CD.shown && (e.key===' '||e.key==='Enter')){ e.preventDefault(); CD.shown=true; renderCard(); }
+    else if(CD.shown && k==='1') gradeCard(false);
+    else if(CD.shown && k==='2') gradeCard(true);
+    return;
+  }
+
+  // simulador
+  if(el('view-sim').classList.contains('hidden')) return;
+  if(el('sim-run').classList.contains('hidden')) return;
+  const it=S.pool[S.idx]; if(!it) return;
+  const exam = S.mode==='examen';
+  const locked = !!S.locked[S.idx];
+
+  if(exam){
+    if(e.key==='ArrowRight' && S.idx<S.pool.length-1){ e.preventDefault(); S.idx++; renderQ(); return; }
+    if(e.key==='ArrowLeft' && S.idx>0){ e.preventDefault(); S.idx--; renderQ(); return; }
+    if(k==='m'){ e.preventDefault(); toggleFlag(); return; }
+  }
+  if(locked){
+    if(e.key==='Enter'||e.key===' '){ e.preventDefault(); el('nextBtn').click(); }
+    return;
+  }
+  if(it.t==='vf'){
+    if(k==='v'){ e.preventDefault(); setAns(true); }
+    if(k==='f'){ e.preventDefault(); setAns(false); }
+  } else if(it.t==='mc'){
+    const n=parseInt(k,10);
+    if(n>=1&&n<=it.opts.length){ e.preventDefault(); setAns(n-1); }
+  } else if(it.t==='ms'){
+    const n=parseInt(k,10);
+    if(n>=1&&n<=it.opts.length){ e.preventDefault(); toggleMs(n-1); }
+    else if(e.key==='Enter' && !exam){ e.preventDefault(); el('confirmBtn').click(); }
+  } else if(it.t==='match'){
+    if(e.key==='Enter' && !exam){ e.preventDefault(); el('confirmBtn').click(); }
+  }
+});
+
+/* =========================================================
+   15. INICIALIZACIÓN
+   ========================================================= */
+updatePoolInfo();
+renderHist();
+renderPairs();
+renderCifras();
+</script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuestionario de práctica · Integrador Final</title>
+<style>
+  :root{--bg:#f6f5f1;--card:#fff;--ink:#1d1d1b;--mute:#6b6a64;--line:#dedcd3;--acc:#2f5d8a;--ok:#1f7a4d;--okbg:#e4f3ea;--bad:#b3261e;--badbg:#fbe9e7;--warn:#8a6100;--warnbg:#fff3d6}
+  @media (prefers-color-scheme:dark){:root{--bg:#161615;--card:#212120;--ink:#ecebe6;--mute:#a09f97;--line:#3a3a37;--acc:#7fb0e0;--ok:#6fd0a0;--okbg:#17332a;--bad:#ff8a80;--badbg:#3a1f1c;--warn:#f0c860;--warnbg:#3a3014}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:760px;margin:0 auto;padding:24px 16px 80px}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  .sub{color:var(--mute);margin:0 0 20px}
+  .bar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between;z-index:5;margin-bottom:16px}
+  .prog{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+  .meta{font-variant-numeric:tabular-nums;color:var(--mute);font-size:.9rem;white-space:nowrap}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;font-size:.75rem}
+  .tag{padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+  .tag.u{background:var(--acc);border-color:var(--acc);color:#fff}
+  .q h2{font-size:1rem;margin:0 0 10px}
+  .q p{margin:0 0 10px}
+  .case{border-left:3px solid var(--acc);padding-left:12px;color:var(--ink)}
+  label.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer}
+  label.opt:hover{border-color:var(--acc)}
+  label.opt input{margin-top:5px;accent-color:var(--acc)}
+  label.opt.ok{background:var(--okbg);border-color:var(--ok)}
+  label.opt.bad{background:var(--badbg);border-color:var(--bad)}
+  .quote{font-style:italic}
+  table{border-collapse:collapse;width:100%}
+  td{padding:6px 4px;vertical-align:middle;border-bottom:1px solid var(--line)}
+  select,textarea{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  select{max-width:100%}
+  textarea{width:100%;min-height:110px;resize:vertical}
+  select.ok{border-color:var(--ok);background:var(--okbg)} select.bad{border-color:var(--bad);background:var(--badbg)}
+  .fb{margin-top:12px;padding:12px;border-radius:8px;font-size:.93rem}
+  .fb.ok{background:var(--okbg)} .fb.bad{background:var(--badbg)} .fb.mid{background:var(--warnbg)}
+  .fb b.v{display:block;margin-bottom:4px}
+  .fb ul{margin:6px 0 0;padding-left:18px}
+  .rub label{display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer}
+  button{font:inherit;border:0;border-radius:8px;padding:10px 18px;background:var(--acc);color:#fff;cursor:pointer}
+  button.sec{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  #res{display:none;background:var(--card);border:2px solid var(--acc);border-radius:12px;padding:18px;margin-bottom:16px}
+  #res h2{margin:0 0 6px}
+  .score{font-size:2rem;font-weight:700}
+  .rev li{margin-bottom:6px}
+  .hint{color:var(--mute);font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+  <h1>Cuestionario de práctica · Integrador Final</h1>
+  <p class="sub">Legislación Profesional · Unidades 1 a 5 · dificultad alta · 10 preguntas (~15 min)</p>
+
+  <div class="bar">
+    <div class="prog"><i id="pb"></i></div>
+    <span class="meta"><span id="done">0</span>/10 respondidas · <span id="clock">00:00</span></span>
+  </div>
+
+  <div id="res"></div>
+  <div id="qs"></div>
+
+  <div class="actions">
+    <button id="grade">Corregir</button>
+    <button id="reset" class="sec">Reiniciar</button>
+  </div>
+  <p class="hint">Podés corregir con preguntas sin responder (cuentan como incorrectas).</p>
+</main>
+
+<script>
+const OPTS_REL = {A:"5 días hábiles",B:"20 años",C:"10 días corridos",D:"50 años",E:"25 años",F:"6 meses"};
+
+const Q = [
+ {t:"mc", u:"U1", tag:"Opción múltiple", topic:"Copia de salvaguardia y derecho de cita (Ley 11.723 arts. 9-10)",
+  q:"Sobre las excepciones y límites de la Ley 11.723, ¿cuál afirmación es correcta?",
+  o:{a:"Quien recibe una licencia de uso puede hacer las copias de salvaguardia que necesite, siempre que sean para uso personal.",
+     b:"Existe un derecho de copia privada que permite digitalizar un libro completo para uso propio.",
+     c:"Quien recibe una licencia de uso puede hacer una única copia de salvaguardia, que solo reemplaza al original si este se pierde o se inutiliza.",
+     d:"El derecho de cita permite reproducir hasta 1.000 palabras con fines comerciales, u 8 compases en obras musicales."},
+  a:"c",
+  e:"Art. 9 (Ley 25.036): una única copia de salvaguardia. (a) falla en «las que necesite»; (b) no existe copia privada general; (d) cambia el fin: la cita es con fines didácticos o científicos, no comerciales (art. 10)."},
+
+ {t:"vf", u:"U1", tag:"Verdadero / Falso", topic:"Software de dependientes (art. 4 inc. d) vs. derechos morales",
+  q:"«Si un empleado en relación de dependencia crea un programa de computación en el desempeño de sus funciones, la titularidad es siempre del programador, porque los derechos morales son inalienables e irrenunciables.»",
+  quote:true, a:"F",
+  e:"Art. 4 inc. d: son titulares las personas físicas o jurídicas cuyos dependientes crearon el programa en el desempeño de sus funciones, salvo estipulación en contrario. Los morales son inalienables, sí, pero lo que se explota (patrimonial) va al empleador. «Siempre» es la palabra trampa."},
+
+ {t:"mc2", u:"U2", tag:"Opción múltiple · DOS correctas", topic:"Firma digital vs. firma electrónica (Ley 25.506)",
+  q:"Sobre firma digital y firma electrónica (Ley 25.506), elegí las DOS correctas:",
+  o:{a:"La firma digital goza de presunción de autoría y de integridad.",
+     b:"La firma electrónica goza de presunción de autoría, pero no de integridad.",
+     c:"Si se desconoce una firma electrónica, quien la invoca debe acreditar su validez.",
+     d:"La firma digital garantiza la confidencialidad del contenido porque lo cifra.",
+     e:"La firma digital carece de valor legal equivalente a la manuscrita y solo sirve como indicio."},
+  a:["a","c"],
+  e:"Correctas: (a) arts. 7 y 8; (c) art. 5. (b) la electrónica no tiene ninguna presunción; (d) la digital garantiza autoría, integridad y no repudio, NO confidencialidad; (e) el art. 3 la equipara a la firma manuscrita."},
+
+ {t:"vf", u:"U2", tag:"Verdadero / Falso", topic:"Locación de obra vs. servicios (resultado vs. medios)",
+  q:"«En la locación de obra, si el resultado prometido no se logra, el acreedor debe probar el dolo o la culpa del deudor para que este responda.»",
+  quote:true, a:"F",
+  e:"Obra = obligación de resultado: se presume responsable el deudor que no lo logra. Probar dolo o culpa es lo propio del servicio (obligación de medios)."},
+
+ {t:"mc", u:"U3", tag:"Opción múltiple · cuál NO", topic:"Consentimiento (art. 5) vs. datos sensibles (art. 7) — Ley 25.326",
+  q:"¿Cuál de los siguientes NO es una excepción al requisito de consentimiento del art. 5 de la Ley 25.326?",
+  o:{a:"Datos obtenidos de fuentes de acceso público irrestricto.",
+     b:"Listados cuyos datos se limitan a nombre, DNI, ocupación y domicilio.",
+     c:"Datos que revelan opiniones políticas o afiliación sindical, que solo pueden tratarse por razones de interés general autorizadas por ley o con fines estadísticos sin identificar a sus titulares.",
+     d:"Datos recabados para el ejercicio de funciones propias de los poderes del Estado o en virtud de una obligación legal."},
+  a:"c",
+  e:"(c) es el régimen de datos sensibles del art. 7: es verdadero, pero de OTRO artículo; no es una excepción del art. 5. (a), (b) y (d) sí son excepciones del art. 5."},
+
+ {t:"vf", u:"U3", tag:"Verdadero / Falso", topic:"Fallo Rodríguez, María Belén c/ Google (CSJN, 2014)",
+  q:"«En el fallo Rodríguez, María Belén c/ Google, la Corte Suprema sostuvo que los buscadores responden de forma subjetiva: ante una ilicitud manifiesta alcanza con una comunicación privada del damnificado para que el buscador tome conocimiento efectivo, y en los demás casos se exige notificación judicial o administrativa.»",
+  quote:true, a:"V",
+  e:"Es exactamente la doctrina del fallo: sin responsabilidad objetiva, sin deber de monitoreo previo, y responsabilidad subjetiva desde el conocimiento efectivo. Acá la trampa era dudar de una frase que es correcta."},
+
+ {t:"rel", u:"U1 / U3", tag:"Relacionar", topic:"Plazos y números (Ley 11.723 y Ley 25.326)",
+  q:"Asociá cada situación con el valor correcto. Sobran dos valores.",
+  items:["Obras fotográficas (Ley 11.723)","Obra anónima de una persona jurídica, desde su publicación","Plazo para responder al pedido de acceso a datos personales (art. 14)","Plazo para rectificar, actualizar o suprimir datos (art. 16)"],
+  a:["B","D","C","A"],
+  e:"Fotográficas: 20 años (art. 34); el 25 es el de Berna. Persona jurídica: 50 años (art. 8). Acceso: 10 días corridos (art. 14). Rectificación/supresión: 5 días hábiles (art. 16). «6 meses» es cada cuánto el acceso es gratuito, no un plazo de respuesta."},
+
+ {t:"mc", u:"U5", tag:"Caso · opción múltiple", topic:"Responsabilidad civil contractual: obligación de resultado (art. 1723)",
+  case:"Una startup sanjuanina contrata a un desarrollador independiente para entregar un sistema de gestión de turnos «llave en mano» en 60 días. Vencido el plazo, el desarrollador entrega un módulo parcial que no funciona y se niega a completarlo. No hubo engaño al inicio ni acceso a datos ajenos. La empresa reclama una indemnización.",
+  q:"¿Qué responsabilidad aplica?",
+  o:{a:"Penal, por estafa (art. 172 CP), porque cobró y no entregó el sistema.",
+     b:"Civil contractual, por una obligación de resultado: el deudor se presume responsable y solo se libera acreditando una causa ajena.",
+     c:"Civil contractual, pero subjetiva: la empresa debe probar la culpa o el dolo del desarrollador, porque se trata de un servicio.",
+     d:"Profesional ante el Colegio, que desplaza la responsabilidad civil."},
+  a:"b",
+  e:"Software a medida = locación de obra, obligación de resultado (art. 1723; caso Portal de Mendoza c/ Soler). (a) un incumplimiento contractual no es delito sin engaño típico; (c) confunde obra con servicio; (d) la vía disciplinaria es independiente y no desplaza la civil (Ley 1236-A art. 48)."},
+
+ {t:"dev", u:"U4", tag:"Caso · desarrollo corto", topic:"Estafa (art. 172) vs. defraudación informática (art. 173 inc. 16)",
+  case:"Lucía recibe un llamado de alguien que se presenta como asesor de su banco y le dice que su cuenta fue vulnerada. La convence de que, para protegerla, debe transferir sus ahorros a una «cuenta segura». Lucía, engañada, hace ella misma la transferencia desde su home banking, que funcionó con normalidad.",
+  q:"¿Se configura delito? ¿Qué artículo del Código Penal? Explicá por qué NO corresponde la otra figura que se parece.",
+  rub:["Dice que sí hay delito y lo identifica como estafa, art. 172 CP (calidad simulada / ardid o engaño).",
+       "Explica que el engaño recae sobre una persona, que se perjudica con su propia disposición patrimonial.",
+       "Descarta el art. 173 inc. 16: ahí la maniobra actúa sobre el sistema o la transmisión de datos (ej. suplantar al titular ante el sistema).",
+       "Remarca que acá el sistema funcionó normalmente."],
+  model:"Sí: estafa, art. 172 CP. Un falso asesor (calidad simulada) engaña a Lucía, y ella misma dispone de su patrimonio. No es defraudación informática (art. 173 inc. 16) porque no se manipuló el sistema ni la transmisión de datos: el home banking funcionó normalmente y el engaño fue a la persona. Phishing/vishing quedan en estas figuras según cómo opere el engaño."},
+
+ {t:"dev", u:"U5", tag:"Caso · desarrollo corto", topic:"Responsabilidad civil, penal y profesional (CCCN 1768/1774, Ley 1236-A)",
+  case:"Un profesional matriculado en el Colegio de Profesionales de Ciencias Informáticas de San Juan entrega un informe técnico de auditoría sin firma ni número de matrícula. El informe tiene errores graves por negligencia, y no es la primera vez que le pasa. El cliente sufre pérdidas.",
+  q:"¿Qué tipos de responsabilidad pueden ponerse en juego? ¿Se excluyen entre sí? Citá la norma que respalda tu respuesta.",
+  rub:["Civil: obligación de reparar el daño al cliente (profesional liberal: responsabilidad subjetiva, CCCN art. 1768, salvo que haya prometido un resultado).",
+       "Profesional/disciplinaria (Ley 1236-A): el art. 11 exige firma y número de matrícula, y el art. 55 prevé sanción por negligencias reiteradas y frecuentes.",
+       "Penal: solo si además hay una conducta típica (no alcanza con la negligencia).",
+       "Aclara que NO se excluyen: el poder disciplinario se ejerce sin perjuicio de la responsabilidad civil, penal o administrativa (art. 48; CCCN art. 1774)."],
+  model:"Civil (reparar el daño; profesional liberal, subjetiva, art. 1768 CCCN), profesional/disciplinaria (Ley 1236-A: art. 11 firma y matrícula; art. 55 negligencias reiteradas; sanciones desde llamado de atención hasta cancelación de matrícula) y penal solo si existe una conducta típica. No se excluyen: art. 48 Ley 1236-A («sin perjuicio») y art. 1774 CCCN (independencia de acciones)."}
+];
+
+const $ = s => document.querySelector(s);
+const qs = $("#qs");
+let graded = false, t0 = Date.now(), timer;
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+
+function render(){
+  qs.innerHTML = "";
+  Q.forEach((q,i)=>{
+    const d = document.createElement("section");
+    d.className = "q"; d.id = "q"+i;
+    let h = `<div class="tags"><span class="tag u">${q.u}</span><span class="tag">${q.tag}</span></div><h2>Pregunta ${i+1}</h2>`;
+    if(q.case) h += `<p class="case">${esc(q.case)}</p>`;
+    h += `<p class="${q.quote?"quote":""}">${esc(q.q)}</p>`;
+    if(q.t==="mc"||q.t==="mc2"){
+      const type = q.t==="mc"?"radio":"checkbox";
+      for(const k in q.o) h += `<label class="opt" data-k="${k}"><input type="${type}" name="q${i}" value="${k}"><span><b>${k})</b> ${esc(q.o[k])}</span></label>`;
+    } else if(q.t==="vf"){
+      h += `<label class="opt" data-k="V"><input type="radio" name="q${i}" value="V"><span>Verdadero</span></label>
+            <label class="opt" data-k="F"><input type="radio" name="q${i}" value="F"><span>Falso</span></label>`;
+    } else if(q.t==="rel"){
+      h += `<table>`;
+      q.items.forEach((it,j)=>{
+        h += `<tr><td>${j+1}. ${esc(it)}</td><td><select data-j="${j}"><option value="">—</option>${Object.entries(OPTS_REL).map(([k,v])=>`<option value="${k}">${k}) ${v}</option>`).join("")}</select></td></tr>`;
+      });
+      h += `</table>`;
+    } else if(q.t==="dev"){
+      h += `<textarea placeholder="Escribí tu respuesta…"></textarea>`;
+    }
+    h += `<div class="fb-slot"></div>`;
+    d.innerHTML = h;
+    qs.appendChild(d);
+  });
+  qs.addEventListener("input", progress);
+}
+
+function answered(i){
+  const q = Q[i], d = $("#q"+i);
+  if(q.t==="mc"||q.t==="vf") return !!d.querySelector("input:checked");
+  if(q.t==="mc2") return d.querySelectorAll("input:checked").length>0;
+  if(q.t==="rel") return [...d.querySelectorAll("select")].some(s=>s.value);
+  if(q.t==="dev") return d.querySelector("textarea").value.trim().length>0;
+}
+function progress(){
+  let n=0; Q.forEach((_,i)=>{ if(answered(i)) n++; });
+  $("#done").textContent = n; $("#pb").style.width = (n*10)+"%";
+}
+function tick(){
+  const s = Math.floor((Date.now()-t0)/1000);
+  $("#clock").textContent = String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+}
+
+function fbBox(cls, head, body, extra=""){
+  return `<div class="fb ${cls}"><b class="v">${head}</b>${body}${extra}</div>`;
+}
+
+function grade(){
+  if(graded) return; graded = true; clearInterval(timer);
+  const results = [];
+  Q.forEach((q,i)=>{
+    const d = $("#q"+i), slot = d.querySelector(".fb-slot");
+    let pts = 0, html = "";
+    if(q.t==="mc"||q.t==="vf"){
+      const sel = d.querySelector("input:checked")?.value || null;
+      pts = sel===q.a ? 1 : 0;
+      d.querySelectorAll("label.opt").forEach(l=>{
+        l.querySelector("input").disabled = true;
+        if(l.dataset.k===q.a) l.classList.add("ok");
+        else if(l.dataset.k===sel) l.classList.add("bad");
+      });
+      const corr = q.t==="vf" ? (q.a==="V"?"Verdadero":"Falso") : q.a+") ";
+      html = fbBox(pts?"ok":"bad", pts?"✔ Correcta":`✘ Incorrecta · respuesta: ${corr}`, esc(q.e));
+    } else if(q.t==="mc2"){
+      const sel = [...d.querySelectorAll("input:checked")].map(x=>x.value).sort();
+      pts = (sel.join()===q.a.join()) ? 1 : 0;
+      d.querySelectorAll("label.opt").forEach(l=>{
+        const k = l.dataset.k; l.querySelector("input").disabled = true;
+        if(q.a.includes(k)) l.classList.add("ok");
+        else if(sel.includes(k)) l.classList.add("bad");
+      });
+      html = fbBox(pts?"ok":"bad", pts?"✔ Correcta":`✘ Incorrecta · respuestas: ${q.a.join(" y ")}`, esc(q.e));
+    } else if(q.t==="rel"){
+      let ok = 0;
+      d.querySelectorAll("select").forEach(s=>{
+        s.disabled = true;
+        const good = s.value===q.a[+s.dataset.j];
+        s.classList.add(good?"ok":"bad"); if(good) ok++;
+      });
+      pts = ok/q.items.length;
+      const key = q.items.map((it,j)=>`<li>${j+1} → ${q.a[j]}) ${OPTS_REL[q.a[j]]}</li>`).join("");
+      html = fbBox(ok===4?"ok":ok?"mid":"bad", `${ok===4?"✔":"~"} ${ok}/4 correctas`, esc(q.e), `<ul>${key}</ul>`);
+    } else if(q.t==="dev"){
+      d.querySelector("textarea").disabled = true;
+      html = `<div class="fb mid"><b class="v">Autoevaluación · marcá lo que tu respuesta incluyó</b>
+        <div class="rub">${q.rub.map(r=>`<label><input type="checkbox" class="rb" data-i="${i}"> <span>${esc(r)}</span></label>`).join("")}</div>
+        <p><b>Respuesta modelo:</b> ${esc(q.model)}</p></div>`;
+    }
+    slot.innerHTML = html;
+    results.push({i,pts});
+  });
+  d3 = results;
+  document.querySelectorAll(".rb").forEach(c=>c.addEventListener("change",summary));
+  summary();
+  $("#res").scrollIntoView({behavior:"smooth"});
+}
+let d3 = [];
+
+function summary(){
+  let total = 0; const weak = [];
+  Q.forEach((q,i)=>{
+    let pts;
+    if(q.t==="dev"){
+      const boxes = [...document.querySelectorAll(`.rb[data-i="${i}"]`)];
+      pts = boxes.filter(b=>b.checked).length / boxes.length;
+    } else pts = d3.find(r=>r.i===i).pts;
+    total += pts;
+    if(pts<1) weak.push({i,q,pts});
+  });
+  const r = $("#res"); r.style.display = "block";
+  const mins = $("#clock").textContent;
+  r.innerHTML = `<h2>Resultado</h2><div class="score">${total.toFixed(2).replace(/\.00$/,"")} / 10</div>
+    <p class="hint">Tiempo: ${mins}. Las de desarrollo se puntúan según lo que marques en la autoevaluación (se actualiza en vivo).</p>
+    ${weak.length? `<h3>Temas a repasar</h3><ul class="rev">${weak.map(w=>`<li><b>${w.q.u}</b> — ${esc(w.q.topic)} <span class="hint">(pregunta ${w.i+1})</span></li>`).join("")}</ul>
+    <p class="hint">Teoría: «Resumen Integrador Final - Unidades 1 a 5.md» y «Guia de Estudio - Preguntas de Parcial.md».</p>`
+    : `<p>Sin errores. Impecable.</p>`}`;
+}
+
+function reset(){
+  graded = false; d3 = []; t0 = Date.now();
+  $("#res").style.display = "none"; $("#res").innerHTML = "";
+  render(); progress(); tick();
+  clearInterval(timer); timer = setInterval(tick,1000);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+$("#grade").addEventListener("click",grade);
+$("#reset").addEventListener("click",reset);
+render(); timer = setInterval(tick,1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banco de 100 preguntas · Integrador Final</title>
+<style>
+  :root{--bg:#f6f5f1;--card:#fff;--ink:#1d1d1b;--mute:#6b6a64;--line:#dedcd3;--acc:#2f5d8a;--ok:#1f7a4d;--okbg:#e4f3ea;--bad:#b3261e;--badbg:#fbe9e7;--warnbg:#fff3d6}
+  @media (prefers-color-scheme:dark){:root{--bg:#161615;--card:#212120;--ink:#ecebe6;--mute:#a09f97;--line:#3a3a37;--acc:#7fb0e0;--ok:#6fd0a0;--okbg:#17332a;--bad:#ff8a80;--badbg:#3a1f1c;--warnbg:#3a3014}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:760px;margin:0 auto;padding:24px 16px 80px}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  .sub{color:var(--mute);margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  .modes{display:grid;gap:10px}
+  .mode{text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);padding:14px}
+  .mode:hover{border-color:var(--acc)}
+  .mode b{display:block}
+  .mode span{color:var(--mute);font-size:.9rem}
+  .bar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;z-index:5;margin-bottom:16px}
+  .prog{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+  .meta{font-variant-numeric:tabular-nums;color:var(--mute);font-size:.9rem;white-space:nowrap}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;font-size:.75rem}
+  .tag{padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+  .tag.u{background:var(--acc);border-color:var(--acc);color:#fff}
+  .case{border-left:3px solid var(--acc);padding-left:12px;margin:0 0 10px}
+  .qt{margin:0 0 12px;font-weight:600}
+  label.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer}
+  label.opt:hover{border-color:var(--acc)}
+  label.opt input{margin-top:5px;accent-color:var(--acc)}
+  label.opt.ok{background:var(--okbg);border-color:var(--ok)}
+  label.opt.bad{background:var(--badbg);border-color:var(--bad)}
+  table{border-collapse:collapse;width:100%}
+  td{padding:6px 4px;vertical-align:middle;border-bottom:1px solid var(--line)}
+  td:last-child{width:46%}
+  select,textarea{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:100%}
+  select.ok{border-color:var(--ok);background:var(--okbg)} select.bad{border-color:var(--bad);background:var(--badbg)}
+  textarea{min-height:120px;resize:vertical}
+  .fb{margin-top:12px;padding:12px;border-radius:8px;font-size:.93rem}
+  .fb.ok{background:var(--okbg)} .fb.bad{background:var(--badbg)} .fb.mid{background:var(--warnbg)}
+  .fb b.v{display:block;margin-bottom:4px}
+  .fb ul{margin:6px 0 0;padding-left:18px}
+  .rub label{display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer}
+  button{font:inherit;border:0;border-radius:8px;padding:10px 18px;background:var(--acc);color:#fff;cursor:pointer}
+  button.sec{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+  button:disabled{opacity:.5;cursor:default}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .score{font-size:2.2rem;font-weight:700}
+  .hint{color:var(--mute);font-size:.85rem}
+  .unit-row{display:flex;gap:10px;align-items:center;margin:4px 0}
+  .unit-row .ub{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+  .unit-row .ub i{display:block;height:100%;background:var(--acc)}
+  .rev li{margin-bottom:8px}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <h1>Banco de 100 preguntas · Integrador Final</h1>
+  <p class="sub">Legislación Profesional · Unidades 1 a 5 · dificultad alta · respuestas con el artículo clave</p>
+
+  <section id="menu"></section>
+  <section id="play" hidden>
+    <div class="bar">
+      <div class="prog"><i id="pb"></i></div>
+      <span class="meta"><span id="pos">1/10</span> · <span id="clock">00:00</span></span>
+      <button class="sec" id="quit">Salir</button>
+    </div>
+    <div id="qcard" class="card"></div>
+    <div class="actions"><button id="check">Comprobar</button><button id="next" hidden>Siguiente</button></div>
+  </section>
+  <section id="end" hidden></section>
+</main>
+
+<script>
+/* ============ BANCO ============ */
+const B=[];
+const M =(u,t,q,ok,bad,e,c)=>B.push({k:"mc", u,t,q,c,e,o:[{x:ok,ok:1},...bad.map(x=>({x}))]});
+const M2=(u,t,q,oks,bad,e,c)=>B.push({k:"mc2",u,t,q,c,e,o:[...oks.map(x=>({x,ok:1})),...bad.map(x=>({x}))]});
+const V =(u,t,q,a,e)=>B.push({k:"vf",u,t,q,a,e});
+const R =(u,t,q,pairs,extra,e)=>B.push({k:"rel",u,t,q,pairs,extra,e});
+const D =(u,t,q,rub,model,c)=>B.push({k:"dev",u,t,q,c,rub,model});
+
+/* ---------- U1 · Propiedad intelectual y derecho de autor (22) ---------- */
+M("U1","Qué protege el derecho de autor (art. 1)","Según el art. 1 de la Ley 11.723, ¿qué queda FUERA de la protección?",
+  "Las ideas, procedimientos, métodos de operación y conceptos matemáticos en sí mismos",
+  ["Los programas de computación en código fuente","Los programas de computación en código objeto","Las compilaciones de datos"],
+  "Se protege la expresión, no la idea (art. 1 in fine). Los programas (fuente y objeto) y las compilaciones de datos sí están incluidos.");
+M("U1","Plazo del derecho patrimonial (art. 5)","¿Cuánto dura el derecho patrimonial del autor persona humana?",
+  "Toda su vida más 70 años, contados desde el 1.º de enero del año siguiente a su muerte",
+  ["Toda su vida más 50 años desde la muerte","70 años desde la primera publicación","50 años desde el 1.º de enero siguiente a la muerte"],
+  "Art. 5: vida + 70 años desde el 1/1 del año siguiente a la muerte. Los 50 años son de personas jurídicas (art. 8) y cine.");
+M("U1","Titulares del derecho de autor (art. 4)","¿Quién NO figura entre los titulares del derecho de autor según el art. 4?",
+  "El usuario que adquirió una licencia de uso del programa",
+  ["Los herederos o derechohabientes del autor","Quien, con permiso del autor, traduce, adapta o modifica la obra","La persona jurídica cuyos dependientes crearon un programa en el desempeño de sus funciones, salvo pacto en contrario"],
+  "Quien compra una licencia recibe una autorización de uso, no la titularidad: el autor la conserva (art. 55 bis). Las otras tres sí están en el art. 4 (inc. d para dependientes).");
+M("U1","Software libre ≠ gratuito","¿Qué significa que un software sea «libre»?",
+  "Que el autor concede las libertades de usar, estudiar y modificar, distribuir copias, y mejorar y publicar las mejoras; puede venderse",
+  ["Que se distribuye sin costo y sin acceso al código fuente","Que su autor renunció a la titularidad y pasó a dominio público","Que no tiene licencia, por lo que puede usarse sin condiciones"],
+  "Libre se refiere a libertades (4 libertades, FSF/GNU), no al precio. Lo gratuito sin esas libertades es freeware. El autor conserva la titularidad y la licencia sigue existiendo.");
+M("U1","Copyleft vs. permisiva (fork)","Un equipo toma un proyecto bajo GPL v3, lo modifica y quiere venderlo como producto privativo de código cerrado. ¿Qué ocurre?",
+  "No puede: el copyleft exige que las obras derivadas sigan siendo libres y bajo la misma licencia",
+  ["Puede, porque la GPL permite cerrar el código si se menciona al autor original","Puede, porque el software libre es de dominio público","Puede, pero solo si paga una regalía a la FSF"],
+  "Con copyleft no se puede cerrar un derivado. Solo con licencia permisiva el fork a proyecto privativo es posible.",
+  "Caso");
+M("U1","Patentes y software (Ley 24.481 art. 6)","¿Por qué, en general, el software no se patenta en Argentina?",
+  "Porque el art. 6 de la Ley 24.481 lo excluye, salvo que esté embebido en hardware y sea imprescindible para su funcionamiento",
+  ["Porque la Ley 11.723 prohíbe expresamente patentarlo","Porque solo pueden patentarse inventos de empresas extranjeras","Porque ningún programa puede ser original"],
+  "Se protege por derecho de autor (obra literaria), complementado con medidas contractuales y técnicas. La patente exige novedad, altura inventiva y aplicabilidad industrial.");
+M("U1","Copia de salvaguardia y licencia de uso (art. 9)","Una empresa recibe una licencia de uso de un software. Respecto de las copias, ¿qué puede hacer?",
+  "Una única copia de salvaguardia, que solo reemplaza al original si este se pierde o se inutiliza",
+  ["Todas las copias que necesite para instalarlo en distintos equipos propios","Ninguna copia, bajo ninguna circunstancia","Una copia privada completa para cada empleado"],
+  "Art. 9 (Ley 25.036): una única copia. No existe un régimen general de copia privada.");
+M2("U1","Derechos morales: características","Elegí las DOS características correctas de los derechos morales del autor:",
+  ["Son perpetuos","Son inalienables, irrenunciables e inembargables"],
+  ["Son temporales: duran la vida del autor más 70 años","Son transmisibles y embargables"],
+  "Los morales son perpetuos e inalienables, irrenunciables e inembargables. Temporales, transmisibles, renunciables y embargables son los patrimoniales.");
+M("U1","Registro y art. 63","Según el art. 63 de la Ley 11.723, la falta de inscripción de la obra…",
+  "suspende el derecho del autor hasta que se inscribe",
+  ["extingue definitivamente el derecho del autor","hace que la obra pase al dominio público","no produce ninguna consecuencia sobre sus derechos"],
+  "Art. 63: la falta de inscripción suspende el derecho hasta que se inscribe. El art. 62 dice que el depósito garantiza los derechos; el registro se hace ante la DNDA (art. 57).");
+
+V("U1","Internacionalidad de la obra","«Las patentes y las marcas, a diferencia de las obras protegidas por derecho de autor, gozan de la misma protección en todos los países.»",false,
+  "Es al revés: la obra goza de internacionalidad; patentes y marcas son territoriales.");
+V("U1","Expresión vs. idea","«El derecho de autor protege la expresión de la obra, y por eso el software se tutela como obra literaria.»",true,
+  "El art. 1 incluye los programas fuente y objeto. Se protege la expresión, no la idea ni el método.");
+V("U1","Morales vs. patrimoniales","«Los derechos patrimoniales son temporales, transmisibles y embargables, mientras que los morales son perpetuos e inalienables.»",true,
+  "Es la distinción básica: explotación económica vs. personalidad del autor sobre su obra.");
+V("U1","Facultades morales: retracto vs. integridad","«El derecho de retracto permite al autor oponerse a deformaciones de su obra.»",false,
+  "Eso es el derecho a la integridad. El retracto es retirar la obra del comercio por cambio de convicciones.");
+V("U1","Sanción de la copia ilegal (art. 71)","«La Ley 11.723 sanciona la copia ilegal de software con la pena del hurto.»",false,
+  "El art. 71 remite al art. 172 del Código Penal: es estafa, no hurto, robo ni otra figura.");
+V("U1","Plazo de obras cinematográficas","«Las obras cinematográficas duran 50 años desde la muerte del último colaborador (autor del argumento, productor, director).»",true,
+  "Cine: 50 años desde la muerte del último colaborador (arts. 34 y 20). Fotográficas: 20 años desde la primera publicación.");
+V("U1","Símbolo © y tratados","«El símbolo © seguido del titular y el año de primera publicación fue introducido por el Convenio de Berna de 1886.»",false,
+  "Lo introdujo la Convención Universal (Ginebra, 1952), que permitió adherirse a países fuera de Berna, como EE. UU. Berna fijó el trato nacional y los derechos morales.");
+
+R("U1","Plazos de protección","Relacioná cada obra o titular con su plazo. Sobran valores.",
+  [["Autor, persona humana","Vida + 70 años desde el 1/1 siguiente a la muerte"],
+   ["Obra anónima de una persona jurídica","50 años desde la publicación"],
+   ["Obras fotográficas (Ley 11.723)","20 años desde la primera publicación"],
+   ["Obras cinematográficas","50 años desde la muerte del último colaborador"]],
+  ["25 años desde la primera publicación (Berna)","Vida + 50 años"],
+  "Persona jurídica: art. 8. Fotos: art. 34 (los 25 años son los de Berna). Cine: arts. 34 y 20.");
+R("U1","Facultades de los derechos morales","Relacioná cada facultad con su contenido. Sobra un valor.",
+  [["Divulgación","Publicar la obra o mantenerla inédita"],
+   ["Paternidad","Ser reconocido como autor"],
+   ["Integridad","Oponerse a deformaciones de la obra"],
+   ["Retracto","Retirar la obra del comercio por cambio de convicciones"]],
+  ["Traducir o adaptar la obra"],
+  "Traducir/adaptar es transformación, una facultad patrimonial (junto a reproducción, comunicación pública y distribución).");
+R("U1","Tratados internacionales","Relacioná cada tratado con su idea clave. Sobra un valor.",
+  [["Convenio de Berna (1886)","Trato nacional y derechos morales"],
+   ["Convención Universal de Ginebra (1952)","Permitió adherirse a países fuera de Berna; usa el símbolo ©"],
+   ["Convención de Roma (1961)","Derechos conexos: intérpretes, fonogramas, radiodifusión"],
+   ["Tratado OMPI (WCT)","Derecho de autor en el entorno digital: programas y compilaciones de datos"]],
+  ["Régimen territorial de patentes y marcas"],
+  "Patentes y marcas son territoriales y no son objeto de estos tratados de derecho de autor.");
+
+D("U1","Derechos morales y patrimoniales","Desarrollo corto: explicá y diferenciá los derechos morales y patrimoniales del autor. No alcanza con enumerar: clasificá y completá con las facultades.",
+  ["Define ambos: morales (personalidad del autor sobre su obra) y patrimoniales (explotación económica).",
+   "Morales: perpetuos, inalienables, irrenunciables e inembargables.",
+   "Facultades morales: divulgación, paternidad, integridad y retracto.",
+   "Patrimoniales: temporales (vida + 70), transmisibles, renunciables y embargables.",
+   "Facultades patrimoniales: reproducción, comunicación pública, transformación y distribución."],
+  "Morales: protegen la personalidad del autor; perpetuos, inalienables, irrenunciables, inembargables; divulgación, paternidad, integridad, retracto. Patrimoniales: protegen la explotación económica; temporales (vida + 70 años), transmisibles, renunciables, embargables; reproducción, comunicación pública, transformación, distribución. Art. 2 enumera las facultades y el autor elige la licencia (art. 55 bis).");
+D("U1","Elección de licencia (copyleft)","Desarrollo corto: ¿qué tipo de licencia elegirías y por qué? Explicá la diferencia con la alternativa y aclará si «libre» implica «gratis».",
+  ["Elige una licencia libre con copyleft (ej. GPL v3).",
+   "Explica que las obras derivadas deben seguir siendo libres bajo la misma licencia.",
+   "Contrasta con la licencia permisiva, que permite redistribuir incluso cerrando el código.",
+   "Aclara que libre no es gratuito (puede venderse) y que el autor conserva la titularidad."],
+  "Copyleft (ej. GPL v3): cualquiera puede usar, modificar y redistribuir, pero los derivados deben mantener la misma licencia, por lo que nadie puede convertir el código en privativo. Una permisiva permitiría cerrar el código en un fork. Libre refiere a libertades, no al precio; el autor conserva siempre la titularidad.",
+  "Caso: Un estudio publica una librería. Quiere que cualquiera la use y la modifique, pero que ningún tercero pueda convertirla en un producto cerrado.");
+D("U1","Registro de software ante la DNDA","Desarrollo corto: ¿dónde y cómo se registra un software? Citá los artículos clave y las consecuencias de no registrar.",
+  ["Indica la Dirección Nacional del Derecho de Autor (DNDA).",
+   "Cita el art. 57: depósito de lo que fije la reglamentación; lo hace el autor, titular o su designado.",
+   "Describe el trámite «Inscripción de obra publicada de Software»: completar datos, subir comprobante de pago del trámite y de la tasa, depositar la obra.",
+   "Cita el art. 62 (el depósito garantiza los derechos) y el art. 63 (la falta de inscripción suspende el derecho)."],
+  "Se registra ante la DNDA. Art. 57: se deposita lo que fije la reglamentación. Trámite: «Inscripción de obra publicada de Software», con datos, comprobante de pago del trámite y de la tasa, y depósito de la obra. Art. 62: el depósito garantiza los derechos. Art. 63: la falta de inscripción suspende el derecho hasta que se inscribe.");
+
+/* ---------- U2 · Contratos, firma digital y teletrabajo (18) ---------- */
+M("U2","Elementos del contrato","¿Cuál de los siguientes NO es un elemento del contrato?",
+  "La firma ológrafa de las partes",
+  ["El consentimiento","El objeto (que debe ser lícito)","La causa"],
+  "Los elementos son consentimiento, objeto y causa, todos lícitos. Rige la libertad de formas: no hace falta firma ológrafa (además existe la firma digital).");
+M("U2","Contratos informáticos","¿Qué caracteriza a los contratos informáticos?",
+  "Son atípicos (no regulados específicamente en el CCCN) y presentan especialidad técnica, vocabulario impreciso y estructura compleja",
+  ["Son contratos típicos, regulados por un capítulo específico del CCCN","Carecen de objeto determinado, por lo que no pueden exigirse","Son siempre de adhesión"],
+  "Se aplican las reglas generales del contrato. No siempre son de adhesión: el software a medida se negocia; el «enlatado» suele ser de adhesión.");
+M("U2","Servicios vs. obra (caso)","Una empresa contrata a un técnico por horas para el soporte de sus servidores, sin comprometer un resultado concreto. ¿Cómo se califica?",
+  "Locación de servicios: obligación de medios, donde el acreedor debe probar dolo o culpa",
+  ["Locación de obra: obligación de resultado, donde se presume responsable al deudor","Contrato de obra con objeto complejo","Compraventa de software"],
+  "Servicio = actividad diligente (arts. 1251 y 1278 ss.). Obra = resultado (arts. 1251 y 1262 ss.). Soporte por horas, consultoría y hosting son servicios.",
+  "Caso");
+M("U2","Tipos de mantenimiento","Un contrato de mantenimiento incluye adaptar el sistema a una nueva normativa fiscal. ¿Qué tipo de mantenimiento es?",
+  "Evolutivo",
+  ["Preventivo","Correctivo planificado","Correctivo de emergencia"],
+  "Evolutivo: adapta a nuevas necesidades o leyes. Preventivo evita fallas; correctivo repara fallas ya manifestadas (planificado o de emergencia).",
+  "Caso");
+M2("U2","Cláusulas abusivas (arts. 1092-1095)","En un contrato de consumo, elegí las DOS afirmaciones correctas sobre las cláusulas abusivas:",
+  ["Son las que causan un desequilibrio significativo entre derechos y obligaciones en perjuicio del consumidor","Pueden ser abusivas aunque hayan sido negociadas o aprobadas expresamente"],
+  ["Dejan de ser abusivas si el consumidor aceptó con un clic","Solo pueden existir en contratos de adhesión, nunca en negociados"],
+  "El desequilibrio significativo es el criterio, y la negociación o aprobación expresa no las convalida. La adhesión (arts. 984-989) es otro régimen.");
+M("U2","Infraestructura de firma digital","En la infraestructura de firma digital, ¿quién valida la identidad del solicitante de un certificado?",
+  "La Autoridad de Registro",
+  ["El certificador licenciado, que solo emite, revoca y publica certificados","El tercero usuario que recibe el documento","La clave pública del firmante"],
+  "Cadena: ente licenciante / AC Raíz → certificador licenciado → Autoridad de Registro (valida identidad) → certificado digital → titular → terceros.");
+M("U2","Teletrabajo: cuál NO es un derecho","Según la Ley 27.555, ¿cuál de las siguientes afirmaciones NO es un derecho del teletrabajador?",
+  "El empleador puede instalar libremente software de vigilancia en el equipo del trabajador",
+  ["Desconexión digital, sin sanción por ejercerla","Compensación de gastos: el empleador provee hardware y software y paga mantenimiento, energía y conectividad","Horarios compatibles con las tareas de cuidado de menores de 13 años, personas con discapacidad o adultos mayores convivientes"],
+  "Los controles requieren participación sindical y está prohibido el software de vigilancia que viole la intimidad.");
+
+V("U2","Objeto lícito","«El objeto del contrato puede ser ilícito siempre que el consentimiento haya sido libre.»",false,
+  "Consentimiento, objeto y causa deben ser lícitos. El objeto necesariamente debe ser lícito.");
+V("U2","Exclusiones de la firma digital (art. 4)","«La firma digital puede utilizarse en disposiciones por causa de muerte.»",false,
+  "El art. 4 la excluye para disposiciones por causa de muerte, derecho de familia, actos personalísimos y actos que deban ser ológrafos.");
+V("U2","Prueba en la locación de servicios","«En la locación de servicios, el acreedor debe probar el dolo o la culpa del deudor.»",true,
+  "Obligación de medios: hay que probar la falta de diligencia. En la obra (resultado) se presume responsable al deudor que no logra el resultado.");
+V("U2","Mantenimiento de software","«El mantenimiento de software es un contrato atípico y de tracto sucesivo.»",true,
+  "Es atípico, de tracto sucesivo y de hacer, de resultado. Tipos: preventivo, correctivo y evolutivo.");
+V("U2","Contratos de consumo a distancia (art. 1109)","«En los contratos de consumo a distancia, el lugar de cumplimiento es donde el proveedor tiene su domicilio.»",false,
+  "Art. 1109: es donde el consumidor recibió la prestación, y fija la jurisdicción; la prórroga de jurisdicción se tiene por no escrita.");
+
+R("U2","Firma digital y claves","Relacioná cada concepto con su descripción. Sobra un valor.",
+  [["Firma digital","Presunción de autoría (art. 7) y de integridad (art. 8)"],
+   ["Firma electrónica","Si se desconoce, quien la invoca debe acreditar su validez"],
+   ["Clave privada","La conoce solo el firmante y se usa para firmar"],
+   ["Clave pública","Está en el certificado y permite verificar la firma"]],
+  ["Cifra el contenido del documento para garantizar confidencialidad"],
+  "El par de claves garantiza autoría, integridad y no repudio, pero NO confidencialidad.");
+R("U2","Actores de la infraestructura PKI","Relacioná cada actor con su función. Sobra un valor.",
+  [["Certificador licenciado","Emite, revoca y publica certificados"],
+   ["Autoridad de Registro","Valida la identidad del solicitante"],
+   ["Certificado digital","Vincula la clave pública con su titular e indica su vigencia"],
+   ["Autoridad de aplicación (AC Raíz)","Ente licenciante de los certificadores"]],
+  ["Acredita el contenido del documento firmado"],
+  "El certificado no acredita el contenido del documento sino el vínculo clave–titular.");
+R("U2","Mantenimiento y objeto del contrato de obra","Relacioná cada figura con su definición. Sobra un valor.",
+  [["Mantenimiento preventivo","Evita que se produzcan fallas"],
+   ["Mantenimiento correctivo","Repara fallas ya manifestadas, planificado o de emergencia"],
+   ["Mantenimiento evolutivo","Adapta a nuevas necesidades o leyes"],
+   ["Contrato de obra de software","Objeto complejo: dar + hacer + bien intelectual de la Ley 11.723"]],
+  ["Obligación de medios exclusivamente"],
+  "El contrato de obra es de resultado; la calificación entre medios y resultado resulta difícil por la complejidad del objeto.");
+
+D("U2","Firma electrónica vs. firma digital","Desarrollo corto: compará firma electrónica y firma digital en tres planos: definición, presunciones y valor probatorio.",
+  ["Digital: procedimiento criptográfico con información de exclusivo conocimiento del firmante y certificado de certificador licenciado (art. 2).",
+   "Electrónica: datos asociados a otros como medio de identificación, que carecen de algún requisito de la digital (art. 5).",
+   "Digital: presunciones de autoría (art. 7) e integridad (art. 8); electrónica: ninguna.",
+   "Prueba: a quien niega la digital le toca probar; en la electrónica, quien la invoca debe acreditar su validez.",
+   "Valor legal: la digital cumple el requisito de firma manuscrita (art. 3); aclara que ninguna cifra el contenido."],
+  "Definición: la digital usa un procedimiento criptográfico y certificado de certificador licenciado (art. 2); la electrónica son datos de identificación que carecen de algún requisito de la digital (art. 5). Presunciones: la digital tiene autoría (art. 7) e integridad (art. 8); la electrónica ninguna. Prueba y valor: la digital equivale a firma manuscrita (art. 3) y quien la niega debe probar; la electrónica, si se desconoce, debe acreditarla quien la invoca. Ninguna garantiza confidencialidad.");
+D("U2","Obra vs. servicio (caso)","Desarrollo corto: calificá cada contrato, indicá el tipo de obligación y quién prueba qué.",
+  ["Contrato 1 (sistema a medida con entrega a los 90 días): locación de obra, obligación de resultado.",
+   "En la obra se presume responsable el deudor que no logra el resultado.",
+   "Contrato 2 (soporte técnico por horas): locación de servicios, obligación de medios.",
+   "En el servicio, el acreedor debe probar dolo o culpa.",
+   "Menciona el objeto complejo del contrato de obra (dar + hacer + bien intelectual) y los derechos de autor a definir."],
+  "El sistema a medida es locación de obra (arts. 1251 y 1262 ss.): obligación de resultado, el deudor se presume responsable si no lo logra; su objeto es complejo (dar y hacer, bien protegido por la Ley 11.723 y calificación difícil), por lo que conviene definir a quién pertenecen los derechos. El soporte por horas es locación de servicios (arts. 1251 y 1278 ss.): obligación de medios; el acreedor debe probar dolo o culpa.",
+  "Caso: Una cooperativa contrata a un programador para desarrollar a medida un sistema de inventario con entrega a los 90 días, y a un técnico para el soporte por horas.");
+D("U2","Contrato de adhesión y consumo (caso)","Desarrollo corto: analizá la validez de la cláusula de jurisdicción.",
+  ["Identifica un contrato de adhesión (cláusulas predispuestas, un clic) y de consumo.",
+   "Aclara que la cláusula puede ser abusiva aunque el consumidor la haya aceptado.",
+   "Cita el art. 1109: la prórroga de jurisdicción se tiene por no escrita.",
+   "Indica que el lugar de cumplimiento es donde el consumidor recibió la prestación y eso fija la jurisdicción."],
+  "Es un contrato de adhesión (arts. 984-989) y de consumo (arts. 1092-1095). Una cláusula con desequilibrio significativo es abusiva aun si fue aceptada. Art. 1109: en contratos a distancia o electrónicos la prórroga de jurisdicción se tiene por no escrita y el lugar de cumplimiento es donde el consumidor recibió la prestación, lo que fija la jurisdicción.",
+  "Caso: Un software se vende por internet a un consumidor de San Juan. Los términos, aceptados con un clic, fijan la jurisdicción en tribunales de otro país.");
+
+/* ---------- U3 · Intimidad, privacidad y datos personales (22) ---------- */
+M("U3","Datos sensibles","¿Cuál de los siguientes NO es un dato sensible según la Ley 25.326?",
+  "El perfil en una red social",
+  ["La afiliación sindical","Las convicciones religiosas, filosóficas o morales","La vida sexual"],
+  "Son sensibles: origen racial y étnico, opiniones políticas, convicciones religiosas/filosóficas/morales, afiliación sindical, salud y vida sexual. El perfil en redes no lo es.");
+M("U3","Licitud del archivo (art. 3)","Según el art. 3 de la Ley 25.326, un archivo de datos personales es lícito cuando…",
+  "está inscripto en el Registro Nacional de Bases de Datos",
+  ["ninguno de los titulares se ha opuesto a su existencia","es privado y no se comercializa","su responsable lo declara como de uso interno"],
+  "Sin inscripción el archivo es ilícito (no al revés). Control: AAIP.");
+M("U3","Consentimiento (art. 5)","El consentimiento para el tratamiento de datos debe ser…",
+  "libre, expreso e informado, por escrito o por un medio equivalente",
+  ["tácito: basta que el titular no se oponga","verbal y revocable sin necesidad de informar la finalidad","informado, pero no necesariamente expreso"],
+  "Art. 5: libre, expreso e informado. Se complementa con el deber de información del art. 6 (finalidad, destinatarios, responsable, carácter obligatorio o facultativo, derechos).");
+M("U3","Relevo de la confidencialidad (art. 10)","¿Cuándo puede relevarse el deber de confidencialidad del art. 10?",
+  "Por resolución judicial o por razones fundadas de seguridad pública, defensa nacional o salud pública",
+  ["Cuando el responsable del archivo lo decide por razones comerciales","Cuando los datos dejan de ser necesarios para los fines del tratamiento","Cuando se trata de listados de nombre y DNI"],
+  "El deber de secreto alcanza a todos los que intervienen en el tratamiento. Los otros distractores son principios de otros artículos (calidad, art. 4; excepción del art. 5).");
+M("U3","Transferencia internacional (art. 12)","¿Qué establece el art. 12 de la Ley 25.326?",
+  "Prohíbe transferir datos personales a países sin un nivel de protección adecuado",
+  ["Permite transferirlos a cualquier país con consentimiento verbal","Prohíbe transferirlos a cualquier país extranjero","Permite transferirlos siempre que el responsable lo informe a la AAIP"],
+  "La cesión (art. 11) exige consentimiento previo e informado; la transferencia internacional (art. 12) está prohibida hacia países sin protección adecuada.");
+M2("U3","Sanciones administrativas (art. 31)","Elegí las DOS sanciones administrativas correctas previstas en el art. 31:",
+  ["Multa de $1.000 a $100.000","Clausura o cancelación del archivo"],
+  ["Prisión de 6 meses a 3 años","Cancelación de la matrícula profesional"],
+  "Art. 31: apercibimiento, suspensión, multa, clausura o cancelación. La prisión por datos falsos es art. 32 (penal); la cancelación de matrícula es de la Ley 1236-A.");
+M("U3","Habeas Data","¿Qué es la acción de Habeas Data?",
+  "Una acción constitucional (art. 43 CN) para acceder a los datos y exigir su rectificación, supresión, confidencialidad o actualización, en bases públicas y también privadas destinadas a dar informes",
+  ["Una sanción administrativa que impone la AAIP a los responsables de archivos","Una acción que solo procede contra bases de datos públicas","El delito de acceso ilegítimo a un banco de datos"],
+  "Arts. 33 ss. de la Ley 25.326. Procede también contra bases privadas que den informes.");
+M("U3","Derecho al olvido","¿En qué consiste el derecho al olvido?",
+  "En pedir la supresión o el bloqueo de información obsoleta, irrelevante o excesiva, sobre todo en buscadores; el contenido original puede permanecer",
+  ["En que no pueda asociarse ningún dato a la persona (anonimato)","En el autogobierno del titular sobre todos sus datos (autodeterminación informativa)","En no sufrir injerencias arbitrarias en la vida privada (privacidad)"],
+  "Cada distractor es otro concepto de la unidad: anonimato, autodeterminación informativa y privacidad.");
+M("U3","Fallo Rodríguez c/ Google: thumbnails","En Rodríguez, María Belén c/ Google, ¿qué dijo la Corte sobre las vistas en miniatura (thumbnails)?",
+  "Son un mero enlace, por lo que no requieren consentimiento de la titular de la imagen",
+  ["Requieren autorización previa de quien aparece en la imagen","Generan responsabilidad objetiva del buscador","Deben eliminarse preventivamente por el buscador"],
+  "Además: no hay deber de monitoreo previo; indexar es libertad de expresión; responsabilidad subjetiva desde el conocimiento efectivo. Se rechazó la condena porque Google bloqueó al ser notificado.");
+
+V("U3","Inversión: archivo ilícito","«Un archivo de datos personales es ilícito cuando está inscripto en el Registro Nacional de Bases de Datos.»",false,
+  "Es ilícito cuando NO está inscripto (art. 3).");
+V("U3","Alcance de la ley","«La Ley 25.326 protege únicamente datos de personas físicas.»",false,
+  "La definición de dato personal abarca personas físicas o de existencia ideal, determinadas o determinables.");
+V("U3","Datos sensibles (art. 7)","«Nadie está obligado a proporcionar datos sensibles.»",true,
+  "Art. 7: solo se tratan por interés general legal o con fines estadísticos o científicos sin identificar al titular.");
+V("U3","Plazo de acceso (art. 14)","«El responsable del archivo debe responder al pedido de acceso en 10 días hábiles.»",false,
+  "Son 10 días corridos. Los 5 días hábiles son para rectificación o supresión (art. 16).");
+V("U3","Gratuidad del acceso","«El acceso a los propios datos es gratuito a intervalos no inferiores a 6 meses.»",true,
+  "Art. 14: 6 meses de intervalo mínimo para el acceso gratuito. El art. 19 dispone la gratuidad de la rectificación.");
+V("U3","Intimidad y privacidad","«La intimidad y la privacidad son derechos personalísimos.»",true,
+  "Base normativa: CN arts. 18 y 19; CCCN arts. 52 y 1770; PIDCP art. 17; DUDH art. 12.");
+V("U3","Buscadores y monitoreo","«Según Rodríguez c/ Google, los buscadores tienen el deber de monitorear previamente los contenidos que indexan.»",false,
+  "No hay deber de monitoreo previo. Responden de forma subjetiva desde el conocimiento efectivo.");
+
+R("U3","Principios de la Ley 25.326","Relacioná cada artículo con su principio. Sobra un valor.",
+  [["Art. 3","Licitud: el archivo debe estar inscripto"],
+   ["Art. 4","Calidad: datos ciertos, pertinentes y no excesivos"],
+   ["Art. 5","Consentimiento libre, expreso e informado"],
+   ["Art. 10","Confidencialidad: secreto de quienes intervienen"]],
+  ["Datos sensibles: nadie está obligado a proporcionarlos"],
+  "Los datos sensibles son el art. 7, no el art. 5 ni el art. 10.");
+R("U3","Conceptos de privacidad","Relacioná cada concepto con su definición. Sobra un valor.",
+  [["Intimidad","Ámbito propio y reservado, excluido del conocimiento e injerencia de terceros"],
+   ["Autodeterminación informativa","Autogobierno del titular sobre sus datos"],
+   ["Derecho al anonimato","Que no se pueda asociar ningún dato a la persona"],
+   ["Derecho al olvido","Pedir supresión o bloqueo de información obsoleta, irrelevante o excesiva"]],
+  ["Privacidad: no sufrir injerencias arbitrarias en la vida privada, la familia, el domicilio y la correspondencia"],
+  "La privacidad (no sufrir injerencias arbitrarias en la vida privada, familia, domicilio y correspondencia) es un concepto distinto de la intimidad y quedaba como valor sobrante.");
+R("U3","Derechos y números de la Ley 25.326","Relacioná cada artículo con su contenido. Sobra un valor.",
+  [["Art. 13","Derecho de información: consultar al organismo de control, gratuito"],
+   ["Art. 14","Acceso: respuesta en 10 días corridos"],
+   ["Art. 16","Rectificación, actualización o supresión en 5 días hábiles"],
+   ["Art. 31","Multa de $1.000 a $100.000, entre otras sanciones administrativas"]],
+  ["Art. 32: sanciones penales por insertar datos falsos"],
+  "El art. 32 es penal, no administrativo: 6 meses a 3 años por proporcionar información falsa.");
+
+D("U3","Derechos del titular de datos","Desarrollo corto: enumerá y explicá los derechos del titular de datos personales con sus artículos y plazos.",
+  ["Información (art. 13): consulta gratuita al organismo de control.",
+   "Acceso (art. 14): 10 días corridos; gratuito cada 6 meses.",
+   "Rectificación, actualización y supresión (art. 16): 5 días hábiles; gratuita (art. 19).",
+   "Acción de Habeas Data (arts. 33 ss.; art. 43 CN) contra bases públicas y privadas que den informes."],
+  "Información (art. 13), acceso (art. 14: 10 días corridos, gratuito cada 6 meses), rectificación, actualización o supresión (art. 16: 5 días hábiles, gratuita según art. 19), impugnación de valoraciones (art. 20) y la acción de Habeas Data (arts. 33 ss.), de rango constitucional, que procede contra bases públicas y privadas destinadas a dar informes.");
+D("U3","Base de datos sin cumplir la ley (caso)","Desarrollo corto: ¿qué principios o artículos de la Ley 25.326 se violan? ¿Qué sanciones puede haber?",
+  ["Art. 3: archivo no inscripto, por lo tanto ilícito.",
+   "Art. 5: falta consentimiento libre, expreso e informado y no aplica ninguna excepción.",
+   "Art. 6: no se informó la finalidad ni los demás datos exigidos.",
+   "Art. 7: la religión es dato sensible y nadie está obligado a proporcionarlo.",
+   "Sanciones administrativas del art. 31 (apercibimiento, suspensión, multa $1.000–$100.000, clausura o cancelación)."],
+  "Se viola la licitud (art. 3: sin inscripción es ilícito), el consentimiento libre, expreso e informado (art. 5), el deber de información (art. 6: finalidad, destinatarios, responsable) y el régimen de datos sensibles (art. 7: la religión lo es). Sanciones del art. 31: apercibimiento, suspensión, multa de $1.000 a $100.000, clausura o cancelación del archivo.",
+  "Caso: Una academia arma una base con nombre, DNI, correo y religión de sus alumnos para enviar publicidad. No la inscribió ni les informó la finalidad.");
+D("U3","Responsabilidad del buscador (caso)","Desarrollo corto: según la doctrina de Rodríguez c/ Google, ¿responde el buscador en cada caso si no actúa?",
+  ["Es responsabilidad subjetiva, no objetiva: depende del conocimiento efectivo.",
+   "Caso (a), ilicitud manifiesta: basta la comunicación privada del damnificado; si no actúa, responde.",
+   "Caso (b), contenido no manifiestamente ilícito: se exige notificación judicial o administrativa; la comunicación privada no alcanza.",
+   "Aclara que no hay deber de monitoreo previo."],
+  "La CSJN descartó la responsabilidad objetiva: los buscadores responden de forma subjetiva cuando tomaron conocimiento efectivo y no actuaron. (a) Contenido manifiestamente ilícito: alcanza la comunicación privada; si el buscador no bloquea, responde. (b) Otros contenidos: hace falta notificación judicial o administrativa; la comunicación privada no basta. No existe deber de monitoreo previo.",
+  "Caso: Un buscador recibe (a) una comunicación privada de una víctima que denuncia contenido de pornografía infantil y (b) una comunicación privada de una persona que se siente injuriada por un blog.");
+
+/* ---------- U4 · Delitos informáticos y forensia (19) ---------- */
+M("U4","Acceso a cuenta ajena (153 bis)","Un ex novio ingresa sin autorización a la cuenta de redes sociales de su expareja. ¿Qué artículo del Código Penal se configura?",
+  "Art. 153 bis: acceso ilegítimo a un sistema o dato informático de acceso restringido",
+  ["Art. 172: estafa","Art. 183: daño informático","Art. 197: interrupción de comunicaciones"],
+  "Acceso sin autorización (o excediéndola) a un sistema o dato restringido: 153 bis. Si además se apodera de comunicaciones o las publica, se suman 153 y 155.",
+  "Caso");
+M("U4","Ransomware (183)","Alguien introduce un ransomware en la red de una pyme y deja inutilizados sus datos. ¿Qué artículo corresponde?",
+  "Art. 183, 2.º párrafo: daño informático (programas dañinos)",
+  ["Art. 153: acceso a comunicaciones electrónicas","Art. 128: representaciones de menores","Art. 117 bis: información falsa de un archivo de datos"],
+  "Alterar, destruir o inutilizar datos o sistemas, o distribuir o introducir programas dañinos (virus, malware, ransomware): 183. Se agrava (art. 184) si es sistema público, de salud, etc.",
+  "Caso");
+M("U4","Tarjeta (173 inc. 15)","Una persona usa los datos de la tarjeta de crédito de otra, sin autorización, para comprar por internet. ¿Qué figura corresponde?",
+  "Art. 173 inc. 15: fraude con tarjeta de compra, crédito o débito, o uso no autorizado de sus datos",
+  ["Art. 173 inc. 16: manipulación informática del sistema","Art. 183: daño informático","Art. 197: interrupción de comunicaciones"],
+  "El inc. 15 contempla el uso no autorizado de los datos de una tarjeta. El inc. 16 exige una maniobra que altere el funcionamiento del sistema o la transmisión de datos.",
+  "Caso");
+M("U4","Grooming (131)","Un adulto contacta por redes a un menor y le propone un encuentro para cometer un delito contra su integridad sexual. ¿Qué artículo?",
+  "Art. 131: grooming",
+  ["Art. 128: producir o distribuir representaciones de menores","Art. 153 bis: acceso ilegítimo a un sistema","Art. 149 bis: coacción"],
+  "El grooming (Ley 26.904) consiste en contactar a un menor por medios electrónicos con ese fin. Pena: 6 meses a 4 años.",
+  "Caso");
+M("U4","Destrucción de prueba (255)","Un empleado de una dependencia destruye registros informáticos que estaban bajo custodia para una causa. ¿Qué artículo?",
+  "Art. 255: sustraer, alterar u ocultar pruebas o registros bajo custodia",
+  ["Art. 153: acceso a comunicaciones electrónicas","Art. 157: funcionario que revela datos secretos","Art. 197: interrupción de comunicaciones"],
+  "El art. 255 tutela la prueba y los registros en custodia. Pena: 1 mes a 4 años.",
+  "Caso");
+M("U4","Empleado público y base de datos (153 bis, 157 bis)","Un empleado del IPV entra sin autorización a la base del padrón y entrega los datos a un tercero. ¿Qué figuras se configuran?",
+  "Art. 153 bis (2.º párrafo, organismo público) y art. 157 bis (banco de datos personales), con inhabilitación por ser funcionario",
+  ["Solo el art. 172: estafa","Arts. 183 y 184: daño informático agravado","Solo el art. 255: destrucción de pruebas"],
+  "El acceso a un sistema de un organismo público agrava el 153 bis; el acceso ilegítimo a un banco de datos personales y su revelación son 157 bis. La estafa que luego cometa el tercero es otra conducta (172).",
+  "Caso");
+M("U4","Prueba digital: cuál NO","¿Cuál de las siguientes NO es una característica de la prueba digital?",
+  "Inalterable por naturaleza",
+  ["Intangible","Replicable: la copia bit a bit tiene igual fuerza","Volátil y deleble"],
+  "La prueba digital es intangible, replicable, volátil, deleble y parcial. Justamente por ser alterable importa la cadena de custodia.");
+M2("U4","Cadena de custodia","Elegí las DOS prácticas o afirmaciones correctas sobre la cadena de custodia:",
+  ["Se debe aislar el elemento de ingresos externos y rotularlo con precisión","Si la cadena se rompe, la prueba puede perder validez"],
+  ["El escribano da fe de la integridad del dato","La cadena puede reconstruirse después sin consecuencias, mientras exista la copia"],
+  "La cadena garantiza autenticidad e integridad. El escribano da fe de lo que ve y del procedimiento, no de la integridad del dato.");
+
+V("U4","Empleado y su propia PC","«Si un empleado solo opera su PC asignada y copia archivos propios de su tarea, en principio no hay delito informático.»",true,
+  "No hay acceso indebido (153 bis), interceptación (153), daño (183) ni datos personales (157 bis).");
+V("U4","Concepto de delito informático","«Es delito informático únicamente aquel en el que el dispositivo es el objeto o fin del delito; si es el medio, ya no lo es.»",false,
+  "El dispositivo puede ser medio (ej. estafa online) o fin/objeto (ej. un virus).");
+V("U4","Grooming: qué ley","«El grooming (art. 131 del Código Penal) fue incorporado por la Ley 26.388.»",false,
+  "Lo incorporó la Ley 26.904. La Ley 26.388 (2008) modificó el Código Penal en materia de delitos informáticos en general.");
+V("U4","Copia bit a bit","«Una copia bit a bit de la evidencia digital tiene igual fuerza probatoria que el original.»",true,
+  "La prueba digital es replicable; por eso se trabaja sobre copias, preservando el original bajo cadena de custodia.");
+V("U4","Pericia en el CPC de San Juan","«En el proceso civil de San Juan el perito es único de oficio por disciplina y cada parte puede designar un consultor técnico.»",true,
+  "Art. 421. Pericia admisible con conocimientos especiales (art. 420). Plazo supletorio: 15 días (art. 423).");
+
+R("U4","Artículo y conducta","Relacioná cada artículo del Código Penal con su conducta. Sobra un valor.",
+  [["Art. 153 bis","Acceso ilegítimo a sistema o dato informático de acceso restringido"],
+   ["Art. 155","Publicación indebida de una comunicación electrónica no destinada a publicidad"],
+   ["Art. 183","Daño informático y programas dañinos"],
+   ["Art. 255","Sustraer, alterar u ocultar pruebas o registros bajo custodia"]],
+  ["Interrumpir o entorpecer comunicaciones (art. 197)"],
+  "El 197 también es un delito de la Ley 26.388, pero acá no correspondía a ninguna fila.");
+R("U4","Fraude: distinguir figuras","Relacioná cada artículo con su descripción. Sobra un valor.",
+  [["Art. 172","Estafa: el engaño recae sobre una persona"],
+   ["Art. 173 inc. 15","Fraude con tarjeta falsificada, robada o con uso no autorizado de sus datos"],
+   ["Art. 173 inc. 16","Manipulación informática que altera el funcionamiento del sistema o la transmisión de datos"],
+   ["Art. 157 bis","Acceso ilegítimo a un banco de datos personales"]],
+  ["Daño a datos o sistemas informáticos"],
+  "El daño es el 183. Los 173 incs. 15 y 16 se castigan con la escala del 172.");
+R("U4","Leyes y convenios","Relacioná cada norma con su tema. Sobra un valor.",
+  [["Ley 26.388 (2008)","Modifica el Código Penal e incorpora delitos informáticos"],
+   ["Ley 26.904","Grooming (art. 131)"],
+   ["Ley 27.411","Adhesión de Argentina al Convenio de Budapest"],
+   ["Ley 27.436","Tenencia de pornografía infantil (art. 128)"]],
+  ["Responsabilidad penal de las personas jurídicas (Ley 27.401)"],
+  "La Ley 27.401 es de la Unidad 5: personas jurídicas pueden ser penadas por delitos cometidos en su beneficio.");
+
+D("U4","Empleado que copia archivos (caso)","Desarrollo corto: ¿se configura delito informático? Justificá con los artículos que descartás.",
+  ["Concluye que en principio no se configura delito informático.",
+   "Descarta el acceso indebido a un sistema ajeno (153 bis) porque usa su PC asignada.",
+   "Descarta interceptación o acceso a comunicaciones (153) y daño informático (183).",
+   "Descarta datos personales de terceros (157 bis) salvo que el caso lo indique."],
+  "En principio no hay delito informático: el empleado opera su propia PC asignada, por lo que no hay acceso ilegítimo (153 bis), ni interceptación o apoderamiento de comunicaciones (153), ni daño (183), ni acceso a un banco de datos personales (157 bis). Podría haber otras consecuencias (laborales o civiles), pero no una figura de la Ley 26.388.",
+  "Caso: Un empleado copia archivos de su PC asignada a un disco externo, se los envía por Drive y borra el historial de navegación.");
+D("U4","Imágenes íntimas (caso)","Desarrollo corto: identificá las conductas y los artículos que se configuran.",
+  ["153 bis por el acceso a la cuenta sin autorización.",
+   "153 por el apoderamiento de las fotos y videos y su difusión.",
+   "155 por la publicación indebida que puede causar perjuicio.",
+   "149 bis por la amenaza para retomar la relación (coacción)."],
+  "Acceso a la cuenta: art. 153 bis. Apoderamiento de comunicaciones y su difusión: art. 153 (1.º y 3.º párrafo). Publicación indebida con perjuicio: art. 155. Amenaza para retomar la relación: art. 149 bis. Si hubiera imágenes de menores, art. 128.",
+  "Caso: Aitor accede a la cuenta de Susana, descarga fotos y videos íntimos, los difunde por WhatsApp y la amenaza con difundir más si no retoma la relación.");
+D("U4","Estafa vs. defraudación informática (caso)","Desarrollo corto: ¿qué artículo se configura y por qué no corresponde la otra figura?",
+  ["Identifica el art. 173 inc. 16: defraudación por manipulación informática.",
+   "Explica que la maniobra recae sobre el sistema (suplantar al titular con la clave semilla).",
+   "Descarta la estafa del art. 172: el engaño no fue a la víctima.",
+   "Menciona que puede haber responsabilidad civil concurrente."],
+  "Art. 173 inc. 16: el técnico usó la clave semilla para hacerse pasar por el titular ante el sistema, que ejecutó la transferencia. El engaño fue al sistema, no a la persona, por eso no es estafa (172). Además hay responsabilidad civil concurrente por el daño.",
+  "Caso: Un técnico, con la clave semilla de su cliente, se hace pasar por él ante la billetera virtual y transfiere sus criptomonedas a otra cuenta.");
+
+/* ---------- U5 · Responsabilidad civil, penal y profesional (19) ---------- */
+M("U5","Servicio y carga de la prueba (caso)","Un cliente reclama a una consultora contratada por horas porque «no logró» mejorar sus ventas. ¿Qué responsabilidad civil aplica?",
+  "Contractual de medios: el cliente debe probar el dolo o la culpa de la consultora",
+  ["Contractual de resultado: se presume responsable a la consultora","Penal por estafa, por no cumplir lo prometido","Profesional ante el Colegio, que excluye la vía civil"],
+  "Consultoría = locación de servicios, obligación de medios. El incumplimiento contractual no es delito y las vías son independientes.",
+  "Caso");
+M("U5","Factores de atribución","¿Cuáles son los factores de atribución subjetivos de responsabilidad civil?",
+  "Culpa (negligencia, imprudencia, impericia) y dolo",
+  ["Solo el dolo","El daño y el nexo causal","El incumplimiento de una obligación de resultado"],
+  "En las obligaciones de resultado la responsabilidad es objetiva (art. 1723): solo se libera probando causa ajena.");
+M("U5","Profesionales liberales (art. 1768)","¿Cómo responden los profesionales liberales según el art. 1768 del CCCN?",
+  "Subjetivamente, salvo que prometan un resultado; no rige la responsabilidad por actividades riesgosas",
+  ["Objetivamente, por actividad riesgosa","Siempre por el resultado","No responden civilmente si están matriculados"],
+  "Son obligaciones de hacer. Se prueba la culpa salvo resultado prometido.");
+M("U5","Sanción más grave (Ley 1236-A)","¿Cuál es la sanción disciplinaria más grave de la Ley 1236-A?",
+  "Cancelación de la matrícula (inhabilita hasta 5 años)",
+  ["Suspensión de hasta 1 año","Multa, que se paga en 10 días hábiles","Apercibimiento público"],
+  "Escala: llamado de atención, apercibimiento (privado/público), multa, suspensión de hasta 1 año y cancelación de matrícula. Suspensión mayor a 6 meses y cancelación requieren unanimidad del Tribunal.");
+M("U5","Causales de sanción (art. 55): cuál NO","¿Cuál de las siguientes NO es causal de sanción disciplinaria del art. 55 de la Ley 1236-A?",
+  "Una condena con pena de multa por un delito culposo",
+  ["Facilitar el título a quien no lo tiene","Violar las incompatibilidades","Una condena criminal con pena privativa de libertad por delito doloso de acción pública"],
+  "El art. 55 menciona condena con pena privativa de libertad por delito doloso de acción pública, y también negligencias reiteradas y frecuentes. Prescripción: 3 años.");
+M("U5","Lazarte Di Lieto: 173 inc. 16","En Lazarte Di Lieto se aplicó el art. 173 inc. 16 y no el 172 porque…",
+  "el engaño recayó sobre el sistema, no sobre la víctima",
+  ["el delito se cometió con criptomonedas","la víctima era una persona jurídica","hubo daño a los datos de la víctima"],
+  "Con la clave semilla del cliente se hizo pasar por el titular ante el sistema. Condena: 3 años de prisión en suspenso, más responsabilidad civil concurrente.");
+M2("U5","Relación entre responsabilidades","Elegí las DOS afirmaciones correctas sobre la relación entre responsabilidades:",
+  ["El poder disciplinario del Colegio se ejerce sin perjuicio de la responsabilidad civil, penal o administrativa (art. 48)","La condena penal hace cosa juzgada en lo civil sobre el hecho y la culpa (art. 1776)"],
+  ["La sanción disciplinaria impide reclamar daños en sede civil","La acción civil y la penal son una sola acción (art. 1774)"],
+  "El art. 1774 dispone que son independientes. Las vías civil, penal y profesional pueden coexistir.");
+
+V("U5","Retraso en la entrega","«Retrasar la entrega de un software es, por sí solo, un delito.»",false,
+  "Es un incumplimiento contractual (civil). Para que haya delito hace falta una conducta típica, por ejemplo un engaño inicial.");
+V("U5","Actividad riesgosa y profesionales","«Los profesionales liberales responden de forma objetiva por actividad riesgosa (art. 1757).»",false,
+  "El art. 1768 los somete a responsabilidad subjetiva, salvo que prometan un resultado; no rige la responsabilidad por actividades riesgosas.");
+V("U5","Personas jurídicas (Ley 27.401)","«Las personas jurídicas pueden ser penadas por delitos cometidos en su beneficio, como el fraude informático.»",true,
+  "Ley 27.401: fraude informático, difusión de malware o violación de propiedad intelectual cometidos en su beneficio.");
+V("U5","Unanimidad del Tribunal","«La suspensión mayor a 6 meses y la cancelación de la matrícula requieren unanimidad del Tribunal.»",true,
+  "Ley 1236-A, sanciones (arts. 56-57).");
+V("U5","Prescripción disciplinaria","«En la Ley 1236-A la prescripción de las causales de sanción es de 5 años.»",false,
+  "Es de 3 años. Los 5 años son la inhabilitación que produce la cancelación de matrícula.");
+V("U5","Reglamento europeo de IA","«El Reglamento (UE) 2024/1689 prohíbe, entre otros, los sistemas de reconocimiento de emociones en el trabajo y la educación.»",true,
+  "También prohíbe la manipulación cognitivo-conductual y la actuación policial predictiva. Neuroderechos: privacidad mental, identidad, libre albedrío.");
+
+R("U5","Tipos de responsabilidad","Relacioná cada tipo con su característica. Sobra un valor.",
+  [["Civil contractual","Nace del incumplimiento de un contrato"],
+   ["Civil extracontractual","Nace de violar el deber general de no dañar"],
+   ["Penal","Lesión de un bien jurídico por un acto voluntario; se castiga con pena"],
+   ["Profesional (Ley 1236-A)","Sanciones del Colegio desde el llamado de atención hasta la cancelación de matrícula"]],
+  ["Reparación mediante daño emergente exclusivamente"],
+  "La reparación civil comprende daño emergente, lucro cesante y pérdida de chance (arts. 1738-1739), más intereses.");
+R("U5","Números de la Ley 1236-A","Relacioná cada concepto con su valor. Sobra un valor.",
+  [["Suspensión de la matrícula","Hasta 1 año"],
+   ["Cancelación de la matrícula","Inhabilita hasta 5 años"],
+   ["Prescripción de las causales","3 años"],
+   ["Pago de la multa","10 días hábiles"]],
+  ["2 años"],
+  "Estos números se preguntan: prescripción 3 años, suspensión hasta 1 año, cancelación hasta 5 años.");
+R("U5","Casos y tendencias","Relacioná cada caso o norma con su idea clave. Sobra un valor.",
+  [["Portal de Mendoza c/ Soler","Responsabilidad civil contractual por obligación de resultado"],
+   ["Lazarte Di Lieto","Penal, art. 173 inc. 16, con civil concurrente"],
+   ["Reglamento (UE) 2024/1689","Prohíbe manipulación cognitivo-conductual y actuación policial predictiva"],
+   ["Neuroderechos","Privacidad mental, identidad personal y libre albedrío"]],
+  ["Estafa del art. 172 con pena de 3 años en suspenso"],
+  "En Lazarte Di Lieto la condena fue de 3 años de prisión en suspenso, pero por el art. 173 inc. 16.");
+
+D("U5","Civil, penal y profesional","Desarrollo corto: compará la responsabilidad civil, penal y profesional.",
+  ["Civil: repara el daño (contractual o por deber de no dañar); culpa, dolo u objetiva; reclama la víctima.",
+   "Penal: castiga una conducta típica, antijurídica y culpable; reclama el Estado; pena.",
+   "Profesional: controla el ejercicio y la ética (Ley 1236-A); lo ejerce el Colegio; del llamado de atención a la cancelación.",
+   "Aclara que son independientes (CCCN art. 1774; Ley 1236-A art. 48) y que la condena penal pesa en lo civil (art. 1776)."],
+  "Civil: repara el daño; contractual (art. 1708 ss.) o extracontractual (art. 1717); culpa, dolo u objetiva; lo reclama la víctima. Penal: castiga una conducta típica, antijurídica y culpable con pena; lo persigue el Estado. Profesional: controla el ejercicio y la ética (Ley 1236-A); lo ejerce el Colegio con sanciones desde el llamado de atención hasta la cancelación. Son independientes (art. 1774 CCCN; art. 48 Ley 1236-A) y la condena penal hace cosa juzgada en lo civil (art. 1776).");
+D("U5","Dos hechos, dos responsabilidades (caso)","Desarrollo corto: indicá qué tipo de responsabilidad aplica a cada hecho y por qué.",
+  ["Hecho A: responsabilidad civil contractual por obligación de resultado (no es delito).",
+   "En el hecho A el deudor se presume responsable y solo se libera acreditando causa ajena (art. 1723).",
+   "Hecho B: responsabilidad penal, art. 173 inc. 16, porque el engaño fue al sistema.",
+   "Hecho B: puede haber además responsabilidad civil concurrente."],
+  "A: civil contractual por obligación de resultado (art. 1723): no hubo engaño, solo incumplimiento; no es delito. B: penal, art. 173 inc. 16, porque se manipuló el sistema usando la clave semilla del cliente, con responsabilidad civil concurrente por el daño.",
+  "Caso: (A) Un desarrollador no entrega completo el sitio web a medida que cobró. (B) Un técnico se apropia de bitcoins de su cliente usando su clave semilla.");
+D("U5","Ejercicio ilegítimo de la profesión (caso)","Desarrollo corto: ¿qué exige la Ley 1236-A y qué configura la conducta?",
+  ["El ejercicio exige título habilitante (art. 2) y matrícula (arts. 3 y 9).",
+   "Ejercer sin matrícula o arrogarse el título es ejercicio ilegítimo (arts. 13-14).",
+   "Cita el art. 11: la documentación debe llevar firma y número de matrícula del profesional, que se hace responsable."],
+  "La Ley 1236-A exige título habilitante (art. 2: grado de al menos 4 años, terciario de al menos 3 años o idóneo autorizado) y matrícula (arts. 3 y 9). Ejercer sin matrícula o arrogarse el título es ejercicio ilegítimo (arts. 13-14). La documentación debe llevar firma y número de matrícula (art. 11).",
+  "Caso: Una persona sin título ni matrícula se presenta como «Ingeniero en Sistemas» y firma informes técnicos para empresas de San Juan.");
+
+/* ============ MOTOR ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const KIND={mc:"Opción múltiple",mc2:"Opción múltiple · DOS correctas",vf:"Verdadero / Falso",rel:"Relacionar",dev:"Desarrollo corto"};
+B.forEach((q,i)=>q.id=i);
+
+let pool=[],idx=0,results=[],checked=false,t0=0,timer=null,cur=null,lastMode="";
+
+function showMenu(){
+  $("#play").hidden=true;$("#end").hidden=true;$("#menu").hidden=false;
+  const cnt=u=>B.filter(q=>q.u===u).length;
+  $("#menu").innerHTML=`<div class="card"><b>Banco: ${B.length} preguntas</b>
+    <p class="hint">${["mc","mc2","vf","rel","dev"].map(k=>KIND[k]+" "+B.filter(q=>q.k===k).length).join(" · ")}. Los casos de U4 y U5 piden identificar delito/artículo o tipo de responsabilidad.</p></div>
+    <div class="modes">
+      <button class="mode" data-m="sim"><b>Simulacro de examen (10 al azar)</b><span>4 opción múltiple, 3 V/F, 1 relacionar y 2 de desarrollo, de todas las unidades. Unos 15 minutos.</span></button>
+      <button class="mode" data-m="all"><b>Banco completo (100)</b><span>En orden de unidad, U1 a U5.</span></button>
+      <button class="mode" data-m="mix"><b>Banco completo mezclado (100)</b><span>Todas las preguntas en orden aleatorio.</span></button>
+      ${["U1","U2","U3","U4","U5"].map(u=>`<button class="mode" data-m="${u}"><b>Solo ${u} (${cnt(u)})</b><span>${{U1:"Propiedad intelectual y derecho de autor",U2:"Contratos, firma digital y teletrabajo",U3:"Intimidad, privacidad y datos personales",U4:"Delitos informáticos y forensia",U5:"Responsabilidad civil, penal y profesional"}[u]}</span></button>`).join("")}
+      <button class="mode" data-m="cases"><b>Solo casos (U4 y U5)</b><span>Casos breves: ¿delito?, ¿qué artículo?, ¿qué responsabilidad?</span></button>
+    </div>`;
+}
+
+function start(mode,custom){
+  lastMode=mode;
+  if(custom) pool=custom;
+  else if(mode==="sim"){
+    const pick=(k,n)=>shuffle(B.filter(q=>q.k===k||(k==="mc"&&q.k==="mc2"))).slice(0,n);
+    pool=shuffle([...pick("mc",4),...pick("vf",3),...pick("rel",1),...pick("dev",2)]);
+  }
+  else if(mode==="all") pool=[...B];
+  else if(mode==="mix") pool=shuffle(B);
+  else if(mode==="cases") pool=B.filter(q=>(q.u==="U4"||q.u==="U5")&&(q.c||q.k==="dev"));
+  else pool=B.filter(q=>q.u===mode);
+  idx=0;results=[];t0=Date.now();
+  clearInterval(timer);timer=setInterval(tick,1000);tick();
+  $("#menu").hidden=true;$("#end").hidden=true;$("#play").hidden=false;
+  show();
+}
+function tick(){const s=Math.floor((Date.now()-t0)/1000);$("#clock").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+
+function show(){
+  const q=pool[idx];checked=false;
+  cur={opts:q.o?shuffle(q.o):null,rights:q.pairs?shuffle([...q.pairs.map(p=>p[1]),...(q.extra||[])]):null};
+  $("#pos").textContent=(idx+1)+"/"+pool.length;
+  $("#pb").style.width=(idx/pool.length*100)+"%";
+  let h=`<div class="tags"><span class="tag u">${q.u}</span><span class="tag">${KIND[q.k]}</span>${q.c?'<span class="tag">Caso</span>':""}</div>`;
+  if(q.c) h+=`<p class="case">${esc(q.c.replace(/^Caso:\s*/,""))}</p>`;
+  h+=`<p class="qt">${esc(q.q)}</p>`;
+  if(q.k==="mc"||q.k==="mc2"){
+    const type=q.k==="mc"?"radio":"checkbox";
+    cur.opts.forEach((o,i)=>{h+=`<label class="opt" data-i="${i}"><input type="${type}" name="o" value="${i}"><span>${esc(o.x)}</span></label>`});
+  }else if(q.k==="vf"){
+    h+=`<label class="opt" data-i="V"><input type="radio" name="o" value="V"><span>Verdadero</span></label><label class="opt" data-i="F"><input type="radio" name="o" value="F"><span>Falso</span></label>`;
+  }else if(q.k==="rel"){
+    h+="<table>"+q.pairs.map((p,j)=>`<tr><td>${j+1}. ${esc(p[0])}</td><td><select data-j="${j}"><option value="">—</option>${cur.rights.map((r,k)=>`<option value="${k}">${esc(r)}</option>`).join("")}</select></td></tr>`).join("")+"</table>";
+  }else{
+    h+=`<textarea placeholder="Escribí tu respuesta…"></textarea>`;
+  }
+  h+=`<div id="fb"></div>`;
+  $("#qcard").innerHTML=h;
+  $("#check").hidden=false;$("#check").disabled=false;$("#next").hidden=true;
+  $("#next").textContent=idx===pool.length-1?"Ver resultado":"Siguiente";
+  window.scrollTo({top:0});
+}
+
+function fb(cls,head,body,extra=""){return `<div class="fb ${cls}"><b class="v">${head}</b>${esc(body||"")}${extra}</div>`}
+
+function check(){
+  if(checked) return;checked=true;
+  const q=pool[idx];let pts=0,html="";
+  const card=$("#qcard");
+  if(q.k==="mc"||q.k==="mc2"){
+    const sel=[...card.querySelectorAll("input:checked")].map(x=>+x.value);
+    const good=cur.opts.map((o,i)=>o.ok?i:-1).filter(i=>i>=0);
+    pts=(sel.length===good.length&&sel.every(i=>good.includes(i)))?1:0;
+    card.querySelectorAll("label.opt").forEach(l=>{const i=+l.dataset.i;l.querySelector("input").disabled=true;
+      if(good.includes(i)) l.classList.add("ok"); else if(sel.includes(i)) l.classList.add("bad")});
+    html=fb(pts?"ok":"bad",pts?"✔ Correcta":"✘ Incorrecta",q.e);
+  }else if(q.k==="vf"){
+    const sel=card.querySelector("input:checked")?.value;
+    const good=q.a?"V":"F";pts=sel===good?1:0;
+    card.querySelectorAll("label.opt").forEach(l=>{l.querySelector("input").disabled=true;
+      if(l.dataset.i===good) l.classList.add("ok"); else if(l.dataset.i===sel) l.classList.add("bad")});
+    html=fb(pts?"ok":"bad",pts?"✔ Correcta":`✘ Incorrecta · era ${q.a?"Verdadero":"Falso"}`,q.e);
+  }else if(q.k==="rel"){
+    let ok=0;
+    card.querySelectorAll("select").forEach(s=>{s.disabled=true;const j=+s.dataset.j;
+      const g=s.value!==""&&cur.rights[+s.value]===q.pairs[j][1];s.classList.add(g?"ok":"bad");if(g) ok++});
+    pts=ok/q.pairs.length;
+    html=fb(ok===q.pairs.length?"ok":ok?"mid":"bad",`${ok===q.pairs.length?"✔":"~"} ${ok}/${q.pairs.length} correctas`,q.e,
+      "<ul>"+q.pairs.map((p,j)=>`<li>${esc(p[0])} → ${esc(p[1])}</li>`).join("")+"</ul>");
+  }else{
+    card.querySelector("textarea").disabled=true;
+    html=`<div class="fb mid"><b class="v">Autoevaluación: marcá lo que tu respuesta incluyó</b><div class="rub">${q.rub.map(r=>`<label><input type="checkbox" class="rb"> <span>${esc(r)}</span></label>`).join("")}</div><p><b>Respuesta modelo:</b> ${esc(q.model)}</p></div>`;
+    pts=null;
+  }
+  $("#fb").innerHTML=html;
+  results[idx]={q,pts};
+  $("#check").hidden=true;$("#next").hidden=false;
+}
+
+function next(){
+  const q=pool[idx];
+  if(q.k==="dev"){const b=[...document.querySelectorAll(".rb")];results[idx]={q,pts:b.filter(x=>x.checked).length/b.length}}
+  idx++;
+  if(idx>=pool.length) finish(); else show();
+}
+
+function finish(){
+  clearInterval(timer);
+  $("#play").hidden=true;$("#end").hidden=false;
+  const total=results.reduce((a,r)=>a+r.pts,0),n=pool.length;
+  const byU={};results.forEach(r=>{const o=byU[r.q.u]||(byU[r.q.u]={s:0,n:0});o.s+=r.pts;o.n++});
+  const weak=results.filter(r=>r.pts<1);
+  const pct=Math.round(total/n*100);
+  $("#end").innerHTML=`<div class="card"><h2 style="margin:0 0 4px">Resultado</h2>
+    <div class="score">${total.toFixed(1).replace(/\.0$/,"")} / ${n} <span class="hint">(${pct}%)</span></div>
+    <p class="hint">Tiempo: ${$("#clock").textContent}. Las de desarrollo cuentan según lo que marcaste en la autoevaluación.</p>
+    <h3>Por unidad</h3>
+    ${Object.keys(byU).sort().map(u=>{const o=byU[u],p=Math.round(o.s/o.n*100);return `<div class="unit-row"><b style="width:28px">${u}</b><div class="ub"><i style="width:${p}%"></i></div><span class="meta">${o.s.toFixed(1).replace(/\.0$/,"")}/${o.n}</span></div>`}).join("")}
+    </div>
+    <div class="card"><h3 style="margin-top:0">Temas a repasar (${weak.length})</h3>
+    ${weak.length?`<ul class="rev">${weak.map(r=>`<li><b>${r.q.u}</b> · ${esc(r.q.t)} <span class="hint">(${KIND[r.q.k]})</span></li>`).join("")}</ul>
+    <p class="hint">Teoría: «Resumen Integrador Final - Unidades 1 a 5.md» y «Guia de Estudio - Preguntas de Parcial.md».</p>`:"<p>Sin errores. Impecable.</p>"}
+    </div>
+    <div class="actions">
+      ${weak.length?'<button id="redo">Repetir solo las falladas</button>':""}
+      <button class="sec" id="again">Repetir este modo</button>
+      <button class="sec" id="tomenu">Menú</button>
+    </div>`;
+  if(weak.length) $("#redo").onclick=()=>start("redo",shuffle(weak.map(r=>r.q)));
+  $("#again").onclick=()=>start(lastMode==="redo"?"mix":lastMode);
+  $("#tomenu").onclick=showMenu;
+  window.scrollTo({top:0});
+}
+
+$("#menu").addEventListener("click",e=>{const b=e.target.closest(".mode");if(b) start(b.dataset.m)});
+$("#check").onclick=check;$("#next").onclick=next;
+$("#quit").onclick=()=>{clearInterval(timer);showMenu()};
+showMenu();
+</script>
+</body>
+</html>

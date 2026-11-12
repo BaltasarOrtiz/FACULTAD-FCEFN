@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verdadero o Falso · Integrador Final</title>
+<style>
+  :root{--bg:#f6f5f1;--card:#fff;--ink:#1d1d1b;--mute:#6b6a64;--line:#dedcd3;--acc:#2f5d8a;--ok:#1f7a4d;--okbg:#e4f3ea;--bad:#b3261e;--badbg:#fbe9e7}
+  @media (prefers-color-scheme:dark){:root{--bg:#161615;--card:#212120;--ink:#ecebe6;--mute:#a09f97;--line:#3a3a37;--acc:#7fb0e0;--ok:#6fd0a0;--okbg:#17332a;--bad:#ff8a80;--badbg:#3a1f1c}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:720px;margin:0 auto;padding:24px 16px 80px}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  .sub{color:var(--mute);margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .modes{display:grid;gap:10px}
+  button{font:inherit;border:0;border-radius:10px;padding:10px 18px;background:var(--acc);color:#fff;cursor:pointer}
+  button.sec{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+  .mode{text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);padding:14px}
+  .mode:hover{border-color:var(--acc)}
+  .mode b{display:block}.mode span{color:var(--mute);font-size:.9rem}
+  .bar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;z-index:5;margin-bottom:16px}
+  .prog{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+  .meta{font-variant-numeric:tabular-nums;color:var(--mute);font-size:.9rem;white-space:nowrap}
+  .tags{display:flex;gap:6px;margin-bottom:10px;font-size:.75rem}
+  .tag{padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+  .tag.u{background:var(--acc);border-color:var(--acc);color:#fff}
+  .stmt{font-size:1.15rem;font-weight:600;margin:0 0 16px;line-height:1.5}
+  .vf{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .vf button{padding:16px;font-size:1.05rem;background:var(--card);color:var(--ink);border:2px solid var(--line)}
+  .vf button:hover:not(:disabled){border-color:var(--acc)}
+  .vf button.ok{background:var(--okbg);border-color:var(--ok)}
+  .vf button.bad{background:var(--badbg);border-color:var(--bad)}
+  .vf button:disabled{cursor:default}
+  kbd{font:inherit;font-size:.75rem;border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-left:6px;color:var(--mute)}
+  .fb{margin-top:14px;padding:12px;border-radius:8px;font-size:.95rem}
+  .fb.ok{background:var(--okbg)}.fb.bad{background:var(--badbg)}
+  .fb b{display:block;margin-bottom:4px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .score{font-size:2.2rem;font-weight:700}
+  .hint{color:var(--mute);font-size:.85rem}
+  .unit-row{display:flex;gap:10px;align-items:center;margin:4px 0}
+  .unit-row .ub{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+  .unit-row .ub i{display:block;height:100%;background:var(--acc)}
+  .rev{padding-left:0;list-style:none}
+  .rev li{border-top:1px solid var(--line);padding:10px 0}
+  .rev em{font-style:normal;font-weight:600}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <h1>Verdadero o Falso · Integrador Final</h1>
+  <p class="sub">Legislación Profesional · U1 a U5 · 60 afirmaciones con una palabra cambiada, como en el parcial</p>
+
+  <section id="menu"></section>
+  <section id="play" hidden>
+    <div class="bar">
+      <div class="prog"><i id="pb"></i></div>
+      <span class="meta"><span id="pos"></span> · racha <span id="streak">0</span> · <span id="clock">00:00</span></span>
+      <button class="sec" id="quit">Salir</button>
+    </div>
+    <div class="card">
+      <div class="tags"><span class="tag u" id="tu"></span><span class="tag" id="tt"></span></div>
+      <p class="stmt" id="stmt"></p>
+      <div class="vf">
+        <button id="bv">Verdadero<kbd>V</kbd></button>
+        <button id="bf">Falso<kbd>F</kbd></button>
+      </div>
+      <div id="fb"></div>
+    </div>
+    <div class="actions"><button id="next" hidden>Siguiente <kbd style="color:#fff;border-color:#fff8">↵</kbd></button></div>
+  </section>
+  <section id="end" hidden></section>
+</main>
+
+<script>
+const S=[];
+const T=(u,t,s,a,e)=>S.push({u,t,s,a,e});
+
+/* ---------- U1 ---------- */
+T("U1","Expresión vs. idea","El derecho de autor protege las ideas y los métodos de operación siempre que sean originales.",false,"Se protege la expresión, no las ideas, procedimientos, métodos de operación ni conceptos matemáticos en sí mismos (art. 1 in fine).");
+T("U1","Derechos conexos","Los derechos conexos protegen a los intérpretes, los productores de fonogramas y los organismos de radiodifusión.",true,"Es el contenido de los derechos conexos (Convención de Roma, 1961), con una protección más limitada que la del autor.");
+T("U1","Tradiciones jurídicas","Argentina sigue la tradición anglosajona del copyright.",false,"Argentina adopta la tradición continental del derecho de autor, no el copyright de common law.");
+T("U1","Requisitos de la obra","Para la Ley 11.723 no importan el valor, el mérito ni la importancia de la obra: debe ser inédita y original.",true,"Esos son los requisitos; no se valora la calidad artística o científica.");
+T("U1","Independencia del soporte","Quien vende el original de un cuadro cede también el derecho de reproducción.",false,"El derecho es independiente del soporte físico: vender el cuadro no cede la reproducción (arts. 51-52).");
+T("U1","Derecho de cita (art. 10)","El derecho de cita con fines didácticos o científicos permite reproducir hasta 8 palabras o 1.000 compases.",false,"Es al revés: hasta 1.000 palabras u 8 compases en música.");
+T("U1","Dominio público pagante","En Argentina el dominio público es «pagante»: el uso comercial paga un gravamen al Fondo Nacional de las Artes.",true,"Hay exención para usos culturales o didácticos sin publicidad en lugares de acceso libre y gratuito.");
+T("U1","Open source","La licencia open source se distingue de la libre porque no permite acceder al código fuente.",false,"Es el mismo modelo de desarrollo, enfocado en las ventajas prácticas de abrir el código (OSI). Sí da acceso al código.");
+T("U1","Secreto comercial","El secreto comercial (Ley 24.766) se pierde cuando la información se hace pública.",true,"Requisitos: ser secreto, tener valor comercial por serlo y haber tomado medidas razonables de resguardo.");
+T("U1","Patentes y software embebido","El software embebido en hardware e imprescindible para su funcionamiento está siempre excluido de la patentabilidad.",false,"El art. 6 de la Ley 24.481 excluye el software, salvo que esté embebido en hardware y sea imprescindible para su funcionamiento.");
+T("U1","EULA","El EULA es la licencia típica del software propietario: autoriza el uso en código objeto con límites de equipos y fines.",true,"También prohíbe copiar, modificar o distribuir. El autor conserva la titularidad.");
+T("U1","Cesión y registro","Según el criterio del parcial 2026, la cesión de derechos patrimoniales presupone que la obra esté registrada.",true,"Criterio de la cátedra: la cesión presupone obra registrada. Recordá que la falta de inscripción suspende el derecho (art. 63).");
+
+/* ---------- U2 ---------- */
+T("U2","Contratos informáticos atípicos","Los contratos informáticos no están regulados específicamente en el CCCN.",true,"Son atípicos: se aplican las reglas generales del contrato.");
+T("U2","Libertad de formas","El CCCN exige firma ológrafa para que un contrato sea válido.",false,"Rige la libertad de formas. No hace falta firma ológrafa.");
+T("U2","Buena fe (art. 961)","La buena fe es un principio de la contratación consagrado en el art. 961.",true,"Junto con la libertad de contratación (art. 958) y el principio protectorio de la parte débil.");
+T("U2","Relación de dependencia","Si hay relación de dependencia, igual se aplica la locación de servicios del CCCN.",false,"Con dependencia no rige esta figura: se aplica el derecho laboral (LCT 20.744).");
+T("U2","Confidencialidad","La cláusula de confidencialidad es obligatoria para los empleados de la empresa.",true,"Está entre las cláusulas típicas del contrato informático.");
+T("U2","Contrato de adhesión","En el contrato de adhesión las cláusulas se negocian una por una.",false,"En la adhesión (arts. 984-989) las cláusulas las predispone una parte y el adherente solo acepta o no.");
+T("U2","Documento original (art. 11)","El documento firmado digitalmente se considera original.",true,"Art. 11. Además, la firma digital cumple el requisito de firma manuscrita (art. 3).");
+T("U2","Validez de la firma digital (art. 9)","Una firma digital es válida aunque se haya creado después de vencido el certificado.",false,"Art. 9: debe crearse durante la vigencia del certificado, verificarse con él y haber sido emitido por un certificador licenciado.");
+T("U2","No repudio","El no repudio es una de las garantías del par de claves de la criptografía asimétrica.",true,"Garantiza autoría, integridad y no repudio, pero no confidencialidad.");
+T("U2","Teletrabajo voluntario","El teletrabajo de la Ley 27.555 puede imponerse unilateralmente por el empleador, sin acuerdo escrito.",false,"Es voluntario y por escrito.");
+T("U2","Teletrabajo transnacional","En el teletrabajo transnacional se aplica la ley del lugar de ejecución o la del domicilio del empleador, la más favorable al trabajador.",true,"Los extranjeros no residentes requieren autorización previa.");
+T("U2","Autoridad del teletrabajo","La autoridad de aplicación del teletrabajo es la Agencia de Acceso a la Información Pública.",false,"Es el Ministerio de Trabajo, Empleo y Seguridad Social. La AAIP controla la Ley 25.326.");
+
+/* ---------- U3 ---------- */
+T("U3","Alcance de la ley","La Ley 25.326 protege los datos asentados en archivos públicos o privados destinados a dar informes.",true,"Art. 1: archivos, registros, bancos de datos u otros medios técnicos, públicos o privados destinados a dar informes.");
+T("U3","Datos sensibles","Los datos de salud y de vida sexual son datos sensibles.",true,"También: origen racial y étnico, opiniones políticas, convicciones religiosas, filosóficas o morales y afiliación sindical.");
+T("U3","Art. 7 vs. art. 5","El régimen de datos sensibles del art. 7 es una de las excepciones al consentimiento del art. 5.",false,"Es otro régimen: los sensibles solo se tratan por interés general legal o con fines estadísticos o científicos sin identificar al titular.");
+T("U3","Calidad (art. 4)","Los datos deben ser exactos y actualizarse, y destruirse cuando dejan de ser necesarios.",true,"Principio de calidad: ciertos, adecuados, pertinentes y no excesivos; medios leales; sin fines incompatibles.");
+T("U3","Información (art. 6)","Para cumplir el deber de información alcanza con comunicar la finalidad de la recolección.",false,"También se informa destinatarios, existencia y responsable del archivo, carácter obligatorio o facultativo, consecuencias y posibilidad de acceso, rectificación y supresión.");
+T("U3","Seguridad (art. 9)","El art. 9 exige medidas técnicas y organizativas contra la adulteración, la pérdida y el acceso no autorizado.",true,"Es el principio de seguridad.");
+T("U3","Cesión (art. 11)","Los datos pueden cederse sin consentimiento previo del titular.",false,"La cesión requiere consentimiento previo e informado.");
+T("U3","Órgano de control","El control de la Ley 25.326 lo ejerce la Agencia de Acceso a la Información Pública (AAIP).",true,"Allí se inscriben las bases de datos, por TAD con clave fiscal.");
+T("U3","Consentimiento informado (CCCN)","El consentimiento informado es la declaración de voluntad emitida antes de recibir la información.",false,"Se emite tras recibir información clara, precisa y adecuada.");
+T("U3","Derecho al olvido","El derecho al olvido puede dejar el contenido original en su sitio y limitarse a su bloqueo o supresión en buscadores.",true,"Se aplica a información obsoleta, irrelevante o excesiva, sobre todo en buscadores.");
+T("U3","Habeas Data","La acción de Habeas Data es una vía puramente administrativa ante la AAIP.",false,"Es una acción constitucional (art. 43 CN), judicial, y procede contra bases públicas y privadas destinadas a dar informes.");
+T("U3","Condena a Google","En Rodríguez c/ Google la Corte condenó al buscador por los contenidos de terceros desde que los indexó.",false,"Se rechazó la condena: no hay responsabilidad objetiva ni deber de monitoreo previo, y Google bloqueó al ser notificado.");
+
+/* ---------- U4 ---------- */
+T("U4","Budapest","El Convenio de Budapest es de 2001 y Argentina adhirió a él por la Ley 27.411.",true,"La Ley 26.388 (2008) modificó el Código Penal con los delitos informáticos.");
+T("U4","Menores (art. 128)","El art. 128 protege a menores de 16 años en representaciones de actividades sexuales explícitas.",false,"Son menores de 18 años. Pena: 6 meses a 4 años para producir, publicar o distribuir.");
+T("U4","Interés público (art. 155)","Quien publica una comunicación electrónica privada para proteger un interés público está exento de la multa del art. 155.",true,"Art. 155: publicación indebida, si causa o puede causar perjuicio. Multa de $1.500 a $100.000.");
+T("U4","Acceso ilegítimo (153 bis)","El art. 153 bis sanciona únicamente el acceso a sistemas de organismos públicos.",false,"Sanciona el acceso a cualquier sistema o dato informático de acceso restringido; si es de un organismo público o de servicios públicos o financieros, se agrava.");
+T("U4","Definición de delito","El delito es una conducta típica, antijurídica, culpable y punible.",true,"El delito informático es esa conducta cuando el dispositivo es medio o fin.");
+T("U4","Pena de la estafa","La estafa del art. 172 se castiga con una pena de 15 días a 1 año.",false,"La pena es de 1 mes a 6 años. Los 15 días a 1 año son del daño informático (art. 183).");
+T("U4","Destrucción de prueba (255)","El art. 255 castiga sustraer, alterar u ocultar pruebas o registros bajo custodia.",true,"Pena: 1 mes a 4 años.");
+T("U4","Metadatos","Los metadatos no sirven como evidencia porque solo describen el contenido principal.",false,"Los metadatos (datos sobre datos: fecha de creación, autor, modificaciones, geolocalización) son evidencia digital relevante.");
+T("U4","Evidencia en todos los fueros","La evidencia digital puede utilizarse en todos los fueros y en cualquier tipo de delito.",true,"Correos, mensajería, redes, GPS, cámaras, bases de datos y metadatos.");
+T("U4","Rol del escribano","El escribano garantiza la integridad del dato digital.",false,"Da fe de lo que ve y del procedimiento, no de la integridad del dato.");
+T("U4","Phishing y afines","El phishing, el vishing, el smishing y la clonación quedan comprendidos en las figuras de fraude de los arts. 172 y 173.",true,"Según cómo opere el engaño: a la persona (172) o al sistema (173 inc. 16).");
+T("U4","Plazo de pericia","En el CPC de San Juan, si no se fija plazo, la pericia debe presentarse en 5 días.",false,"El plazo supletorio es de 15 días (art. 423).");
+
+/* ---------- U5 ---------- */
+T("U5","Extracontractual","La responsabilidad extracontractual nace de la violación del deber general de no dañar.",true,"Art. 1717. La contractual nace del incumplimiento de un contrato (art. 1708 ss.).");
+T("U5","Obligación de resultado (art. 1723)","En las obligaciones de resultado, el deudor se libera probando que no tuvo culpa.",false,"Es responsabilidad objetiva: solo se libera probando causa ajena.");
+T("U5","Reparación","La reparación comprende daño emergente, lucro cesante y pérdida de chance, más intereses.",true,"Arts. 1738-1739.");
+T("U5","Efecto de la condena penal","La condena penal no tiene ningún efecto en el juicio civil.",false,"Hace cosa juzgada en lo civil sobre el hecho y la culpa (art. 1776), aunque las acciones son independientes (art. 1774).");
+T("U5","Título habilitante (art. 2)","El título habilitante exige grado de al menos 4 años, terciario de al menos 3 años o idóneo autorizado.",true,"Además se exige matrícula (arts. 3 y 9).");
+T("U5","Inicio del proceso disciplinario","El proceso disciplinario solo puede iniciarse por denuncia, nunca de oficio.",false,"Se inicia de oficio o por denuncia (art. 53).");
+T("U5","Firma y matrícula (art. 11)","La documentación del ejercicio profesional debe llevar firma y número de matrícula, y el profesional se hace responsable.",true,"Es el artículo clave de la responsabilidad profesional de la Ley 1236-A.");
+T("U5","Pago de la multa","La multa disciplinaria se paga en 10 días corridos.",false,"Son 10 días hábiles.");
+T("U5","Portal de Mendoza: cláusula penal","En Portal de Mendoza c/ Soler la cláusula penal fue reducida porque un 1 % diario era excesivo.",true,"Condena: $62.225,25 más intereses y costas. Responsabilidad civil contractual de resultado.");
+T("U5","Portal de Mendoza: naturaleza","En Portal de Mendoza c/ Soler la condena fue de naturaleza penal.",false,"Fue civil contractual: un incumplimiento contractual no es delito.");
+T("U5","Lazarte Di Lieto","En Lazarte Di Lieto la condena fue de 3 años de prisión en suspenso, con reglas de conducta y prohibición de contacto.",true,"Art. 173 inc. 16, con responsabilidad civil concurrente.");
+T("U5","Reglamento europeo de IA","El Reglamento (UE) 2024/1689 permite la actuación policial predictiva si hay control judicial.",false,"La prohíbe, igual que la manipulación cognitivo-conductual y el reconocimiento de emociones en el trabajo y la educación.");
+
+/* ============ MOTOR ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let pool=[],idx=0,res=[],done=false,streak=0,t0=0,timer=null,lastMode="";
+
+function menu(){
+  $("#play").hidden=true;$("#end").hidden=true;$("#menu").hidden=false;
+  const n=u=>S.filter(s=>s.u===u).length;
+  const names={U1:"Propiedad intelectual y derecho de autor",U2:"Contratos, firma digital y teletrabajo",U3:"Intimidad, privacidad y datos personales",U4:"Delitos informáticos y forensia",U5:"Responsabilidad civil, penal y profesional"};
+  $("#menu").innerHTML=`<div class="card"><b>${S.length} afirmaciones</b><p class="hint" style="margin:4px 0 0">Mitad verdaderas, mitad falsas. Teclado: <b>V</b> verdadero, <b>F</b> falso, <b>Enter</b> siguiente.</p></div>
+  <div class="modes">
+    <button class="mode" data-m="r10"><b>Ronda rápida (10 al azar)</b><span>Dos minutos para entrar en clima.</span></button>
+    <button class="mode" data-m="all"><b>Las 60 mezcladas</b><span>Todas las unidades en orden aleatorio.</span></button>
+    ${["U1","U2","U3","U4","U5"].map(u=>`<button class="mode" data-m="${u}"><b>Solo ${u} (${n(u)})</b><span>${names[u]}</span></button>`).join("")}
+  </div>`;
+}
+function start(m,custom){
+  lastMode=m;
+  pool=custom||(m==="r10"?shuffle(S).slice(0,10):m==="all"?shuffle(S):shuffle(S.filter(s=>s.u===m)));
+  idx=0;res=[];streak=0;t0=Date.now();clearInterval(timer);timer=setInterval(tick,1000);tick();
+  $("#menu").hidden=true;$("#end").hidden=true;$("#play").hidden=false;show();
+}
+function tick(){const s=Math.floor((Date.now()-t0)/1000);$("#clock").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function show(){
+  const q=pool[idx];done=false;
+  $("#pos").textContent=(idx+1)+"/"+pool.length;$("#pb").style.width=(idx/pool.length*100)+"%";$("#streak").textContent=streak;
+  $("#tu").textContent=q.u;$("#tt").textContent=q.t;$("#stmt").textContent="«"+q.s+"»";
+  for(const id of ["#bv","#bf"]){$(id).disabled=false;$(id).className=""}
+  $("#fb").innerHTML="";$("#next").hidden=true;window.scrollTo({top:0});
+}
+function answer(v){
+  if(done) return;done=true;
+  const q=pool[idx],ok=v===q.a;
+  res[idx]={q,ok,v};streak=ok?streak+1:0;$("#streak").textContent=streak;
+  $("#bv").disabled=$("#bf").disabled=true;
+  $(q.a?"#bv":"#bf").classList.add("ok");
+  if(!ok) $(v?"#bv":"#bf").classList.add("bad");
+  $("#fb").innerHTML=`<div class="fb ${ok?"ok":"bad"}"><b>${ok?"✔ Correcto":"✘ Incorrecto"} · es ${q.a?"VERDADERO":"FALSO"}</b>${esc(q.e)}</div>`;
+  $("#next").hidden=false;$("#next").textContent=idx===pool.length-1?"Ver resultado":"Siguiente";
+  const nx=$("#next");nx.innerHTML=nx.textContent+' <kbd style="color:#fff;border-color:#fff8">↵</kbd>';
+}
+function next(){if(!done) return;idx++;idx>=pool.length?finish():show()}
+function finish(){
+  clearInterval(timer);$("#play").hidden=true;$("#end").hidden=false;
+  const ok=res.filter(r=>r.ok).length,n=pool.length,wrong=res.filter(r=>!r.ok);
+  const by={};res.forEach(r=>{const o=by[r.q.u]||(by[r.q.u]={s:0,n:0});o.n++;if(r.ok)o.s++});
+  $("#end").innerHTML=`<div class="card"><h2 style="margin:0 0 4px">Resultado</h2>
+    <div class="score">${ok} / ${n} <span class="hint">(${Math.round(ok/n*100)}%)</span></div>
+    <p class="hint">Tiempo: ${$("#clock").textContent}</p>
+    ${Object.keys(by).sort().map(u=>{const o=by[u],p=Math.round(o.s/o.n*100);return `<div class="unit-row"><b style="width:28px">${u}</b><div class="ub"><i style="width:${p}%"></i></div><span class="meta">${o.s}/${o.n}</span></div>`}).join("")}</div>
+    <div class="card"><h3 style="margin-top:0">Para repasar (${wrong.length})</h3>
+    ${wrong.length?`<ul class="rev">${wrong.map(r=>`<li><b>${r.q.u}</b> · ${esc(r.q.t)}<br><span class="hint">«${esc(r.q.s)}»</span><br>Era <em>${r.q.a?"VERDADERO":"FALSO"}</em>. ${esc(r.q.e)}</li>`).join("")}</ul>
+    <p class="hint">Teoría: «Resumen Integrador Final - Unidades 1 a 5.md».</p>`:"<p>Sin errores. Impecable.</p>"}</div>
+    <div class="actions">${wrong.length?'<button id="redo">Repetir solo las falladas</button>':""}<button class="sec" id="again">Repetir este modo</button><button class="sec" id="tomenu">Menú</button></div>`;
+  if(wrong.length) $("#redo").onclick=()=>start("redo",shuffle(wrong.map(r=>r.q)));
+  $("#again").onclick=()=>start(lastMode==="redo"?"all":lastMode);$("#tomenu").onclick=menu;window.scrollTo({top:0});
+}
+$("#menu").addEventListener("click",e=>{const b=e.target.closest(".mode");if(b)start(b.dataset.m)});
+$("#bv").onclick=()=>answer(true);$("#bf").onclick=()=>answer(false);$("#next").onclick=next;
+$("#quit").onclick=()=>{clearInterval(timer);menu()};
+document.addEventListener("keydown",e=>{
+  if($("#play").hidden) return;
+  const k=e.key.toLowerCase();
+  if(k==="v") answer(true); else if(k==="f") answer(false); else if(k==="enter"||k==="arrowright") next();
+});
+menu();
+</script>
+</body>
+</html>

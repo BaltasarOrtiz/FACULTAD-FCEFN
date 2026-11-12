@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legislación Profesional · Guía visual del integrador</title>
+<style>
+:root{
+  --bg:#0a0a0b; --panel:#141416; --panel2:#1c1c20; --bd:#2c2c32;
+  --tx:#f4f4f5; --mut:#a1a1aa; --dim:#71717a;
+  --acc:#ff7a1a; --acc-d:#e8590c; --accbg:#241608; --accbd:#7a4a12;
+  --red:#ef4444; --redbg:#2a1113; --redbd:#7f2d33;
+  --rd:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:radial-gradient(900px 480px at 85% -12%, #261a10 0%, transparent 62%), var(--bg);
+  color:var(--tx);
+  font:15.5px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:26px 18px 100px}
+
+/* ---------- header ---------- */
+header.top{margin-bottom:8px}
+h1{font-size:23px;line-height:1.25;margin:0 0 5px;letter-spacing:-.015em;color:#fff}
+.sub{color:var(--mut);font-size:13.5px;margin:0}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0 0;font-size:12.5px;color:var(--mut)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* ---------- sticky nav ---------- */
+nav.sticky{
+  position:sticky;top:0;z-index:40;
+  background:rgba(10,10,11,.93);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--bd);
+  margin:18px -18px 22px;padding:10px 18px;
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+}
+nav.sticky a{
+  color:var(--mut);text-decoration:none;font-size:13px;font-weight:600;
+  padding:6px 11px;border-radius:9px;border:1px solid transparent;
+}
+nav.sticky a:hover{color:var(--acc);background:var(--panel);border-color:var(--bd)}
+nav.sticky .grow{flex:1}
+nav.sticky input{
+  background:var(--panel);border:1px solid var(--bd);color:var(--tx);
+  border-radius:9px;padding:7px 11px;font:inherit;font-size:13px;width:180px;
+}
+nav.sticky input:focus{outline:none;border-color:var(--acc)}
+nav.sticky input::placeholder{color:var(--dim)}
+.progress-mini{font-size:12.5px;color:var(--mut);font-variant-numeric:tabular-nums}
+
+/* ---------- unit blocks ---------- */
+.unit{margin:0 0 46px;scroll-margin-top:70px}
+.unit-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 4px}
+.unit-num{
+  font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:7px;background:transparent;
+  border:1px solid var(--accbd);color:var(--acc);
+}
+.unit h2{font-size:19px;margin:0;letter-spacing:-.01em;color:#fff}
+.unit-desc{color:var(--mut);font-size:13.5px;margin:0 0 18px}
+
+/* ---------- section card ---------- */
+.sec{
+  background:var(--panel);border:1px solid var(--bd);border-radius:var(--rd);
+  padding:18px 20px 20px;margin:0 0 14px;border-left:2px solid #34343a;
+}
+.sec-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:4px}
+.sec-title{font-size:15.5px;font-weight:650;margin:0;flex:1;letter-spacing:-.005em;color:#fff}
+.sec-sub{color:var(--mut);font-size:13px;margin:2px 0 16px}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.badge{
+  font-size:11px;font-weight:700;letter-spacing:.04em;
+  padding:2px 8px;border-radius:99px;border:1px solid var(--bd);
+  background:transparent;color:var(--mut);white-space:nowrap;
+}
+.badge.p{border-color:var(--accbd);background:var(--accbg);color:var(--acc)}
+.badge.p::before{content:"★ "}
+.badge.t{border-color:var(--redbd);background:var(--redbg);color:#ff9b9b}
+.chk{
+  flex:0 0 auto;width:24px;height:24px;border-radius:7px;cursor:pointer;
+  background:transparent;border:1px solid #3d3d45;color:var(--dim);
+  display:grid;place-items:center;font-size:13px;padding:0;margin-top:1px;
+}
+.chk:hover{border-color:var(--acc);color:var(--acc)}
+.sec.done{border-left-color:var(--acc)}
+.sec.done .chk{background:var(--accbg);border-color:var(--acc);color:var(--acc)}
+
+/* ---------- clickable nodes ---------- */
+.node{
+  all:unset;box-sizing:border-box;cursor:pointer;display:block;
+  border-radius:11px;border:1px solid var(--bd);background:var(--panel2);
+  padding:10px 13px;font-size:14px;transition:border-color .12s,background .12s;
+}
+.node:hover{border-color:var(--acc)}
+.node .lbl{font-weight:600}
+.node .d{
+  display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--bd);
+  font-size:13.5px;color:var(--mut);line-height:1.5;
+}
+.node.open{border-color:var(--acc);background:#221a12}
+.node.open .d{display:block}
+.hint{font-size:11.5px;color:var(--dim);margin:10px 0 0}
+
+/* ---------- tree ---------- */
+.tree{display:flex;flex-direction:column;align-items:center;gap:0}
+.tree .root{
+  background:linear-gradient(180deg,#1f1f24,#17171a);border:1px solid #3d3d45;
+  border-radius:11px;padding:11px 20px;font-weight:700;font-size:14.5px;text-align:center;color:#fff;
+}
+.tree .stem{width:1px;height:18px;background:#3d3d45}
+.tree .branches{
+  display:grid;gap:12px;width:100%;align-items:start;
+  grid-template-columns:repeat(auto-fit,minmax(172px,1fr));
+}
+.branch{
+  border:1px dashed #33333a;border-radius:12px;padding:12px;
+  display:flex;flex-direction:column;gap:8px;background:#0f0f11;
+}
+.branch > .bhead{
+  font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:#e4e4e7;text-align:center;padding-bottom:2px;
+}
+.branch .leaf{
+  all:unset;box-sizing:border-box;cursor:pointer;display:block;
+  font-size:13.5px;padding:8px 11px;border-radius:9px;
+  background:var(--panel2);border:1px solid #2e2e35;
+}
+.branch .leaf:hover{border-color:var(--acc)}
+.branch .leaf .d{display:none;margin-top:7px;padding-top:7px;border-top:1px solid var(--bd);color:var(--mut);font-size:13px;line-height:1.45}
+.branch .leaf.open{border-color:var(--acc);background:#221a12}
+.branch .leaf.open .d{display:block}
+
+/* ---------- flow ---------- */
+.flow{display:flex;gap:0;align-items:stretch;flex-wrap:wrap}
+.fstep{
+  all:unset;box-sizing:border-box;cursor:pointer;flex:1 1 120px;min-width:120px;
+  border:1px solid var(--bd);background:var(--panel2);border-radius:11px;
+  padding:11px 12px;font-size:13px;position:relative;
+}
+.fstep:hover{border-color:var(--acc)}
+.fstep .n{
+  display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;
+  background:#0a0a0b;border:1px solid var(--bd);font-size:11px;font-weight:800;
+  color:var(--acc);margin-bottom:7px;
+}
+.fstep .lbl{font-weight:600;display:block}
+.fstep .d{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd);color:var(--mut);font-size:13px;line-height:1.45}
+.fstep.open{border-color:var(--acc);background:#221a12}
+.fstep.open .d{display:block}
+.farrow{display:grid;place-items:center;color:#4a4a52;font-size:14px;padding:0 5px;flex:0 0 auto}
+
+/* ---------- compare ---------- */
+.cmp{border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.cmp-row{display:grid;grid-template-columns:minmax(120px,.85fr) 1fr 1fr;border-bottom:1px solid var(--bd)}
+.cmp-row:last-child{border-bottom:0}
+.cmp-row > div{padding:10px 13px;font-size:13.5px;border-right:1px solid var(--bd)}
+.cmp-row > div:last-child{border-right:0}
+.cmp-row .k{color:var(--mut);font-size:12.5px;font-weight:600;background:#101012}
+.cmp-head > div{font-weight:800;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;background:#101012;color:var(--acc)}
+.cmp-head .k{color:var(--mut)}
+.cmp-row:not(.cmp-head):hover > div:not(.k){background:#1f1f24}
+.cmp-3 .cmp-row{grid-template-columns:minmax(105px,.75fr) 1fr 1fr 1fr}
+
+/* ---------- timeline ---------- */
+.tl{display:flex;gap:10px;flex-wrap:wrap;position:relative;padding-top:6px}
+.tl-item{
+  all:unset;box-sizing:border-box;cursor:pointer;flex:1 1 150px;min-width:150px;
+  border-top:3px solid var(--acc);padding:12px 4px 0;position:relative;
+}
+.tl-item::before{
+  content:"";position:absolute;top:-8px;left:0;width:11px;height:11px;border-radius:50%;
+  background:var(--acc);border:2px solid var(--bg);
+}
+.tl-item .v{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--acc);display:block;line-height:1.1}
+.tl-item .lbl{font-size:13px;font-weight:600;display:block;margin-top:3px;color:#fff}
+.tl-item .d{display:none;margin-top:8px;font-size:13px;color:var(--mut);line-height:1.45}
+.tl-item.open .d{display:block}
+
+/* ---------- ladder ---------- */
+.ladder{display:flex;flex-direction:column;gap:7px}
+.lstep{
+  all:unset;box-sizing:border-box;cursor:pointer;display:flex;gap:12px;align-items:flex-start;
+  border:1px solid var(--bd);border-radius:10px;padding:10px 13px;font-size:13.5px;
+  background:var(--panel2);
+}
+.lstep:hover{border-color:var(--acc)}
+.lstep .lv{
+  flex:0 0 auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  font-size:11.5px;font-weight:800;background:#0a0a0b;border:1px solid var(--bd);color:var(--acc);
+}
+.lstep .lbl{font-weight:600}
+.lstep .d{display:none;margin-top:7px;padding-top:7px;border-top:1px solid var(--bd);color:var(--mut);font-size:13px;line-height:1.45}
+.lstep.open{border-color:var(--acc);background:#221a12}
+.lstep.open .d{display:block}
+.lstep[data-lv="1"]{margin-right:32%}
+.lstep[data-lv="2"]{margin-right:24%}
+.lstep[data-lv="3"]{margin-right:16%}
+.lstep[data-lv="4"]{margin-right:8%}
+.lstep[data-lv="5"]{margin-right:0}
+
+/* ---------- decide ---------- */
+.decide{display:flex;flex-direction:column;gap:12px}
+.dq{
+  border:1px solid var(--accbd);background:linear-gradient(180deg,#241a12,#17171a);
+  border-radius:11px;padding:12px 16px;font-weight:650;font-size:14.5px;text-align:center;color:#fff;
+}
+.dbranches{display:grid;gap:12px;grid-template-columns:1fr 1fr;align-items:start}
+.dbr{border:1px dashed #33333a;border-radius:12px;padding:12px;background:#0f0f11}
+.dtag{
+  display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;
+  padding:2px 8px;border-radius:99px;margin-bottom:9px;
+}
+.dtag.si{background:var(--accbg);color:var(--acc);border:1px solid var(--accbd)}
+.dtag.no{background:var(--redbg);color:#ff9b9b;border:1px solid var(--redbd)}
+.dtag.q{background:var(--accbg);color:var(--acc);border:1px solid var(--accbd)}
+.dcond{font-size:13px;color:var(--mut);margin:0 0 10px}
+.dout{display:flex;flex-direction:column;gap:7px}
+
+/* ---------- cards ---------- */
+.cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.fcard{
+  all:unset;box-sizing:border-box;cursor:pointer;display:block;
+  border:1px solid var(--bd);border-radius:11px;padding:12px 14px;
+  background:var(--panel2);font-size:13.5px;
+}
+.fcard:hover{border-color:var(--acc)}
+.fcard .lbl{font-weight:650;display:block}
+.fcard .d{display:none;margin-top:9px;padding-top:9px;border-top:1px solid var(--bd);color:var(--mut);font-size:13px;line-height:1.45}
+.fcard.open{border-color:var(--acc);background:#221a12}
+.fcard.open .d{display:block}
+
+/* ---------- misc ---------- */
+.note{
+  font-size:13px;color:var(--mut);background:var(--panel2);border:1px solid var(--bd);
+  border-left:3px solid var(--acc);border-radius:9px;padding:11px 14px;margin:0 0 18px;
+}
+.note b{color:#fff}
+.hidden{display:none}
+.nores{color:var(--mut);text-align:center;padding:30px;font-size:14px}
+@media (max-width:640px){
+  .wrap{padding:18px 13px 80px}
+  nav.sticky{margin:14px -13px 18px;padding:9px 13px}
+  nav.sticky input{width:120px}
+  .cmp-row,.cmp-3 .cmp-row,.cmp-2 .cmp-row{grid-template-columns:1fr}
+  .cmp-row > div{border-right:0;border-bottom:1px solid var(--bd)}
+  .cmp-row .k{background:#0f0f11}
+  .dbranches{grid-template-columns:1fr}
+  .lstep[data-lv]{margin-right:0}
+  .unit h2{font-size:17px}
+}
+@media print{
+  body{background:#fff;color:#000}
+  nav.sticky,.chk,.hint,.note{display:none!important}
+  .sec{border:1px solid #bbb;background:#fff;break-inside:avoid;border-left:2px solid #999}
+  .node,.branch,.branch .leaf,.fstep,.tl-item,.lstep,.fcard,.dq,.dbr,.tree .root{background:#fff!important;border-color:#bbb!important;color:#000!important}
+  .node .d,.branch .leaf .d,.fstep .d,.tl-item .d,.lstep .d,.fcard .d{display:block!important;color:#333}
+  .badge,.tagrow,.legend{display:none!important}
+  .cmp-row > div{border-color:#ccc}
+  .tl-item .v,.cmp-head > div,.fstep .n,.lstep .lv{color:#c2410c!important}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Legislación Profesional · Guía visual del integrador</h1>
+  <p class="sub">Los conceptos del resumen convertidos en mapas, comparaciones y flujos. Tocá cualquier recuadro para ver el detalle.</p>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--acc)"></i> naranja: estructura y todo lo que podés tocar</span>
+    <span><i class="dot" style="background:var(--red)"></i> rojo: trampas y alertas</span>
+    <span>★ = ya cayó en un parcial</span>
+  </div>
+</header>
+
+<nav class="sticky">
+  <a href="#u1" class="u1">U1</a>
+  <a href="#u2" class="u2">U2</a>
+  <a href="#u3" class="u3">U3</a>
+  <a href="#u4" class="u4">U4</a>
+  <a href="#u5" class="u5">U5</a>
+  <span class="grow"></span>
+  <input id="q" type="search" placeholder="Buscar concepto…">
+  <span class="progress-mini" id="pmin">0/0</span>
+</nav>
+
+<div class="note" id="topNote">
+  <b>Cómo usarla:</b> recorré los esquemas, tocá cada recuadro para leer el detalle y marcá con el ✓ las secciones que ya repasaste.
+  Los números y artículos están en la app <em>Simulador Integrador Final.html</em>; acá el foco es entender cómo se conecta todo.
+</div>
+
+<main id="main"></main>
+<p class="sub" style="text-align:center;margin-top:30px">
+  Basada en <em>Resumen Integrador Final - Unidades 1 a 5</em> y en los modelos de parcial 2022, 2024, 2025 y 2026.
+</p>
+</div>
+
+<script>
+/* =========================================================
+   CONTENIDO
+   tipos: tree · compare · flow · timeline · ladder · decide · cards
+   ========================================================= */
+const UNITS = [
+{u:1, name:'Propiedad intelectual y derecho de autor', color:'var(--u1)',
+ desc:'Qué protege la ley, a quién, por cuánto tiempo y cómo se comercializa el software.', sections:[
+
+{title:'Mapa de la propiedad intelectual', type:'tree', p:'2022 · 2026', t:true,
+ sub:'La primera bifurcación del examen: derecho de autor, derechos conexos y propiedad industrial no son lo mismo.',
+ tree:{root:{l:'Propiedad intelectual', d:'Derecho personalísimo con valor económico. Se subdivide en dos grandes ramas, y solo una de ellas es la que regula el software.'},
+ branches:[
+  {l:'Derecho de autor', bc:'var(--u1)', d:'Rama continental. Protege obras literarias, artísticas y científicas.',
+   leaves:[
+    {l:'Obras literarias y artísticas', d:'Libros, música, plástica, arquitectura. Requisito: obra inédita y original; no importan valor, mérito ni importancia.'},
+    {l:'Programas de computación', d:'Fuente y objeto, expresamente incluidos por el art. 1 (Ley 25.036). Por eso el software es obra literaria y NO se patenta.'},
+    {l:'Bases de datos', d:'Compilaciones de datos protegidas como tales (art. 1 y Tratado OMPI WCT).'},
+    {l:'Tratados: Berna 1886', d:'Trato nacional: misma protección que a los ciudadanos de cada país. Protege formas de expresión y derechos morales.'},
+    {l:'Ginebra 1952', d:'Permitió adherirse a países fuera de Berna (EE. UU.). Introduce el símbolo © con titular y año de primera publicación.'}
+   ]},
+  {l:'Derechos conexos', bc:'#e0a458', d:'Protección más limitada, de la Convención de Roma (1961).',
+   leaves:[
+    {l:'Intérpretes', d:'Quienes ejecutan la obra (músicos, actores).'},
+    {l:'Productores de fonogramas', d:'Quienes fijan el sonido.'},
+    {l:'Organismos de radiodifusión', d:'Quienes emiten.'}
+   ]},
+  {l:'Propiedad industrial', bc:'#8fa3c8', d:'Patentes y marcas. A diferencia del derecho de autor, es TERRITORIAL.',
+   leaves:[
+    {l:'Patentes (Ley 24.481)', d:'Novedad, altura inventiva, aplicabilidad industrial. El software está excluido por el art. 6, salvo embebido en hardware imprescindible.'},
+    {l:'Marcas', d:'Signos distintivos; requieren registro país por país.'}
+   ]}
+ ]}},
+
+{title:'Derechos morales vs. patrimoniales', type:'compare', p:'2024', t:true,
+ sub:'La tabla que más se pide en desarrollo. Memorizá las tres filas: duración, transmisión y facultades.',
+ cmp:{cols:['Morales','Patrimoniales'], rows:[
+   {k:'Protegen', c:['La personalidad del autor respecto de su obra','La explotación económica']},
+   {k:'Duración', c:['Perpetuos','Temporales: vida + 70 años']},
+   {k:'Transmisión', c:['Inalienables, irrenunciables, inembargables','Transmisibles, renunciables, embargables']},
+   {k:'Facultades', c:['Divulgación · Paternidad · Integridad · Retracto','Reproducción · Comunicación pública · Transformación · Distribución']},
+   {k:'En una frase', c:['No se pueden ceder nunca','Se ceden, pero solo si la obra está registrada (criterio 2026)']}
+ ]}},
+
+{title:'Plazos de protección', type:'timeline',
+ sub:'Los números se preguntan. Cada plazo arranca de un hecho distinto: muerte, publicación o primera publicación.',
+ tl:[
+  {v:'70', l:'Autor persona humana', d:'Vida + 70 años, contados desde el 1 de enero del año siguiente a la muerte. Art. 5.'},
+  {v:'50', l:'Personas jurídicas', d:'Obras anónimas de instituciones, corporaciones o personas jurídicas: 50 años desde la publicación. Art. 8.'},
+  {v:'50', l:'Cinematográficas', d:'50 años desde la muerte del último colaborador: autor del argumento, productor y director. Arts. 20 y 34.'},
+  {v:'20', l:'Fotográficas', d:'20 años desde la primera publicación. Art. 34. Los 25 años son de Berna, no de la ley argentina. ⚠️ Cayó en 2026.'}
+ ]},
+
+{title:'Qué se protege: expresión, no idea', type:'flow', p:'2025', t:true,
+ sub:'De esta cadena sale la pregunta clásica "cuál NO": por qué el software es obra literaria y no invención patentable.',
+ flow:[
+  {l:'La ley protege la EXPRESIÓN', d:'Art. 1 in fine: quedan fuera las ideas, los procedimientos, los métodos de operación y los conceptos matemáticos en sí mismos.'},
+  {l:'El código es la expresión', d:'Se protege cómo está escrito el programa, no lo que hace ni el algoritmo que usa.'},
+  {l:'Entonces el software es obra literaria', d:'El art. 1 equipara los programas fuente y objeto a los escritos.'},
+  {l:'Y no es patentable', d:'El régimen de patentes exige transformar materia o energía y el art. 6 de la Ley 24.481 excluye el software, salvo embebido en hardware.'}
+ ]},
+
+{title:'Licencias de software', type:'tree', p:'2022', t:true,
+ sub:'El autor conserva siempre la titularidad; lo que cambia es qué autoriza. La trampa es confundir libre con gratuito.',
+ tree:{root:{l:'El autor licencia, no vende la titularidad', d:'Art. 55 bis: el software se comercializa por licencias, que son autorizaciones contractuales. El autor conserva la titularidad.'},
+ branches:[
+  {l:'Propietario', bc:'#8fa3c8',
+   leaves:[
+    {l:'Código fuente cerrado', d:'Se entrega código objeto bajo una EULA de uso, con límites de equipos, fines y prohibición de copiar, modificar o distribuir.'},
+    {l:'Se parece a un contrato de adhesión', d:'Cláusulas predispuestas: el usuario solo acepta o rechaza, típicamente con un clic.'}
+   ]},
+  {l:'Libre (free software)', bc:'var(--u3)',
+   leaves:[
+    {l:'4 libertades', d:'Usar, estudiar y modificar, distribuir copias, y mejorar y publicar las mejoras (Stallman / FSF / GNU, 1985).'},
+    {l:'Libre ≠ gratuito', d:'Se refiere a libertades, no a precio: puede venderse. Gratuito es freeware. ⚠️ Trampa recurrente.'},
+    {l:'Open source', d:'Mismo modelo de desarrollo, pero el énfasis está en las ventajas prácticas de abrir el código (OSI).'}
+   ]},
+  {l:'Copyleft vs. permisiva', bc:'var(--u1)',
+   leaves:[
+    {l:'Copyleft (GPL v3)', d:'Las obras derivadas deben seguir siendo libres y bajo la misma licencia. No se puede cerrar el código.'},
+    {l:'Permisiva', d:'Permite redistribuir incluso cerrando el código.'},
+    {l:'Fork a proyecto privativo', d:'Solo con licencia permisiva. Con copyleft no se puede. ⚠️ Cayó en 2022.'}
+   ]}
+ ]}},
+
+{title:'Registro y sus efectos', type:'flow', p:'2026',
+ sub:'El registro no crea el derecho, pero condiciona su ejercicio. Ahí está la trampa del 62 y 63.',
+ flow:[
+  {l:'Se registra en la DNDA', d:'Dirección Nacional del Derecho de Autor. El trámite es Inscripción de obra publicada de Software.'},
+  {l:'Qué se presenta', d:'El autor, titular o su designado completa los datos, sube el comprobante de pago del trámite y de la tasa, y deposita lo que fije la reglamentación (art. 57).'},
+  {l:'El depósito garantiza', d:'Art. 62: el depósito garantiza los derechos del autor.'},
+  {l:'Sin inscripción, suspendido', d:'Art. 63: la falta de inscripción SUSPENDE el derecho hasta que se inscriba. No lo extingue.'},
+  {l:'Consecuencia práctica', d:'La cesión de derechos patrimoniales presupone obra registrada: es el criterio que tomó la cátedra en 2026.'}
+ ]},
+
+{title:'Límites y excepciones', type:'cards', t:true,
+ sub:'La regla general es que toda reproducción requiere autorización expresa u onerosa del autor. Esto es lo que escapa a la regla.',
+ cards:[
+  {l:'Derecho de cita', d:'Con fines didácticos o científicos: hasta 1.000 palabras u 8 compases en música (art. 10).'},
+  {l:'Copia de salvaguardia', d:'Quien recibe una licencia de uso puede hacer UNA única copia, que solo reemplaza al original si se pierde o inutiliza (art. 9).'},
+  {l:'Normas y resoluciones', d:'Normas oficiales y resoluciones judiciales quedan fuera de la protección.'},
+  {l:'Enseñanza gratuita', d:'Actos de enseñanza gratuitos, sin difusión fuera del lugar.'},
+  {l:'Lo que NO existe', d:'No hay copia privada general: no se puede digitalizar un libro entero para uso personal. ⚠️'},
+  {l:'Dominio público pagante', d:'Vencidos los plazos se puede usar sin autorización, pero el uso comercial paga un gravamen al Fondo Nacional de las Artes.'}
+ ]},
+
+{title:'Copia ilegal de software: es estafa', type:'flow', p:'2022 · 2024 · 2026', t:true,
+ sub:'La pregunta más repetida de la materia. Tres eslabones, uno solo correcto.',
+ flow:[
+  {l:'Se copia software sin licencia', d:'Reproducción no autorizada de una obra protegida.'},
+  {l:'Art. 71 de la Ley 11.723', d:'La ley no crea una figura propia: remite a la pena del Código Penal.'},
+  {l:'Art. 172 CP: ESTAFA', d:'Defraudación mediante ardid o engaño. No es hurto, no es robo, no es homicidio.'},
+  {l:'Además, vía civil', d:'Caso Microsoft c/ Mattina: valor de los productos, más 15 % de ganancias, más multa por conducta maliciosa.'}
+ ]}
+]},
+
+{u:2, name:'Contratos informáticos, firma digital y teletrabajo', color:'var(--u2)',
+ desc:'Cómo se forma un contrato, cómo se califica un desarrollo de software y cómo se firma en digital.', sections:[
+
+{title:'Elementos del contrato', type:'flow', p:'2026',
+ sub:'Todo contrato necesita tres elementos lícitos y capacidad. La libertad de formas es lo que habilita lo electrónico.',
+ flow:[
+  {l:'Consentimiento', d:'Manifestación de voluntad de dos o más partes para crear, regular, modificar, transferir o extinguir relaciones jurídicas patrimoniales.'},
+  {l:'Objeto', d:'Debe ser lícito. ⚠️ Decir que "no necesariamente debe ser lícito" es falso: objeto ilícito invalida el contrato.'},
+  {l:'Causa', d:'También debe ser lícita.'},
+  {l:'Capacidad', d:'La tienen las personas humanas Y las jurídicas (arts. 22-23). ⚠️ Cayó en 2026.'},
+  {l:'Libertad de formas', d:'No hace falta firma ológrafa: por eso son válidos los contratos electrónicos.'}
+ ]},
+
+{title:'Locación de obra vs. locación de servicios', type:'compare', p:'2026', t:true,
+ sub:'La distinción que decide quién debe probar. Software a medida = obra, pero con objeto complejo.',
+ cmp:{cols:['Locación de obra','Locación de servicios'], rows:[
+   {k:'Norma', c:['Arts. 1251 y 1262 ss.','Arts. 1251 y 1278 ss.']},
+   {k:'Se debe', c:['Un resultado','Una actividad diligente']},
+   {k:'Obligación', c:['De resultado','De medios']},
+   {k:'Prueba', c:['Se presume responsable el deudor que no logra el resultado','El acreedor debe probar dolo o culpa']},
+   {k:'Ejemplos', c:['Software a medida, sitio web con entrega, pericia','Soporte por horas, consultoría, hosting']},
+   {k:'Ante la duda', c:['Art. 1252 resuelve por obligación de medios o resultado','Si hay relación de dependencia rige la LCT, no esta figura']}
+ ]}},
+
+{title:'Objeto complejo del software a medida', type:'cards', p:'2025', t:true,
+ sub:'Tres complejidades a la vez. Es la respuesta esperada cuando preguntan cómo se califica el contrato.',
+ cards:[
+  {l:'Obligaciones de dar y de hacer', d:'Combina entrega de un bien con prestaciones de hacer: no es una figura pura.'},
+  {l:'Bien intelectual protegido', d:'El resultado está protegido por la Ley 11.723, así que hay que definir a quién pertenecen los derechos.'},
+  {l:'Calificación dudosa', d:'Es discutible si la obligación es de medios o de resultado, y el vocabulario técnico es impreciso.'},
+  {l:'Cláusulas típicas', d:'Objeto, precio, plazo, confidencialidad, propiedad intelectual, rescisión y cláusula penal, comisión de seguimiento y anexos técnicos.'},
+  {l:'Mantenimiento', d:'Preventivo (evitar fallas), correctivo (reparar fallas ya manifestadas) y evolutivo (adaptar a nuevas necesidades o leyes).'},
+  {l:'Es de tracto sucesivo', d:'Contrato atípico que se prolonga en el tiempo, con obligación de hacer y de resultado.'}
+ ]},
+
+{title:'Infraestructura de firma digital (PKI)', type:'flow', p:'2024',
+ sub:'La cadena completa, de la autoridad raíz al documento. Cada eslabón tiene una función distinta.',
+ flow:[
+  {l:'Ente licenciante / AC Raíz', d:'Autoridad de aplicación del sistema. Encabeza la cadena de confianza.'},
+  {l:'Certificador licenciado', d:'Emite, revoca y publica los certificados digitales.'},
+  {l:'Autoridad de Registro', d:'Valida la identidad del titular antes de que se emita el certificado.'},
+  {l:'Certificado digital', d:'Vincula la clave pública con su titular e indica su período de vigencia.'},
+  {l:'Titular / suscriptor', d:'Firma con su clave privada, que solo él conoce.'},
+  {l:'Terceros usuarios', d:'Verifican con la clave pública del certificado. Más auditoría y comisión asesora.'}
+ ]},
+
+{title:'Firma digital vs. firma electrónica', type:'compare', p:'2024', t:true,
+ sub:'Todo el peso está en las presunciones: la digital presume, la electrónica no presume nada.',
+ cmp:{cols:['Firma digital','Firma electrónica'], rows:[
+   {k:'Qué es', c:['Procedimiento criptográfico con información de exclusivo conocimiento del firmante y certificado de certificador licenciado (art. 2)','Datos electrónicos que identifican, pero que carecen de algún requisito de la digital (art. 5)']},
+   {k:'Presunciones', c:['Autoría (art. 7) e integridad (art. 8)','Ninguna']},
+   {k:'Quién prueba', c:['Quien la niega debe probar','Si se desconoce, quien la invoca debe acreditar su validez']},
+   {k:'Valor legal', c:['Cumple el requisito de firma manuscrita (art. 3) y produce documento original (art. 11)','Eficacia relativa: se asemeja a un instrumento particular no firmado']},
+   {k:'Exclusiones', c:['Art. 4: causa de muerte, familia, actos personalísimos, los que deben ser ológrafos','No aplica']}
+ ]}},
+
+{title:'Criptografía asimétrica: qué garantiza y qué no', type:'tree',
+ sub:'El par de claves no hace todo. Saber qué NO garantiza es la trampa favorita.',
+ tree:{root:{l:'Par de claves', d:'Criptografía asimétrica: dos claves matemáticamente vinculadas, cada una con una función distinta.'},
+ branches:[
+  {l:'Clave privada', bc:'var(--u2)', leaves:[
+    {l:'Solo la conoce el firmante', d:'Con ella se firma. Su custodia es la que sostiene todo el sistema.'}
+  ]},
+  {l:'Clave pública', bc:'var(--u3)', leaves:[
+    {l:'Va en el certificado', d:'Con ella se verifica la firma. Cualquiera puede usarla, incluso un tercero.'}
+   ]},
+  {l:'Garantiza', bc:'var(--u3)', leaves:[
+    {l:'Autoría', d:'Solo el titular de la clave privada pudo firmar.'},
+    {l:'Integridad', d:'Si el contenido cambia, la firma deja de verificar.'},
+    {l:'No repudio', d:'El firmante no puede negar razonablemente haber firmado.'},
+    {l:'Verificabilidad por terceros', d:'Cualquiera con la clave pública puede comprobar.'}
+   ]},
+  {l:'NO garantiza', bc:'var(--u4)', leaves:[
+    {l:'Confidencialidad', d:'No cifra el contenido. Para confidencialidad hace falta cifrado aparte. ⚠️ Trampa.'}
+   ]}
+ ]}},
+
+{title:'Teletrabajo: derechos (Ley 27.555)', type:'cards',
+ sub:'Ley reglamentada por el Decreto 27/2021. Autoridad de aplicación: Ministerio de Trabajo.',
+ cards:[
+  {l:'Definición', d:'Prestación total o parcial desde el domicilio u otro lugar distinto al establecimiento, con TIC. Es voluntario y por escrito.'},
+  {l:'Igualdad', d:'Mismos derechos que el trabajador presencial; remuneración no inferior.'},
+  {l:'Desconexión digital', d:'No puede haber sanción por ejercerla.'},
+  {l:'Compensación de gastos', d:'El empleador provee hardware y software y paga mantenimiento, energía y conectividad.'},
+  {l:'Cuidados', d:'Menores de 13 años, personas con discapacidad o adultos mayores convivientes: horarios compatibles.'},
+  {l:'Reversibilidad', d:'Solo si se pactó en el convenio o contrato, y en los que nacieron como teletrabajo. ⚠️'},
+  {l:'Higiene y seguridad', d:'Accidentes en el lugar y jornada se presumen laborales (Ley 24.557).'},
+  {l:'Intimidad', d:'Controles con participación sindical; prohibido el software de vigilancia que la viole.'},
+  {l:'Transnacional', d:'Ley del lugar de ejecución o del domicilio del empleador, la más favorable.'}
+ ]},
+
+{title:'Adhesión y consumo', type:'compare', p:'2026',
+ sub:'El software enlatado es el ejemplo perfecto de adhesión; el consumidor es quien adquiere como destinatario final.',
+ cmp:{cols:['Contrato de adhesión','Contrato de consumo'], rows:[
+   {k:'Norma', c:['Arts. 984-989','Arts. 1092-1095']},
+   {k:'Qué es', c:['Cláusulas predispuestas por una parte; el adherente solo acepta o no','Consumidor: quien adquiere o utiliza bienes o servicios como destinatario final']},
+   {k:'Cláusulas abusivas', c:['Desequilibrio significativo en perjuicio del consumidor, AUNQUE hayan sido negociadas','Mismo criterio: lo negociado no las salva']},
+   {k:'Jurisdicción', c:['—','Art. 1109: lugar donde el consumidor recibió la prestación; la prórroga se tiene por no escrita']}
+ ]}}
+]},
+
+{u:3, name:'Intimidad, privacidad y datos personales', color:'var(--u3)',
+ desc:'Los ocho principios, las excepciones al consentimiento, los plazos y el fallo de los buscadores.', sections:[
+
+{title:'Los 8 principios del tratamiento', type:'flow', p:'2024', t:true,
+ sub:'Es la columna vertebral de la ley. En desarrollo hay que enumerarlos y explicar cada uno en una línea.',
+ flow:[
+  {l:'1. Licitud', d:'El archivo es lícito si está inscripto en el Registro Nacional de Bases de Datos (AAIP). Sin inscripción es ilícito. ⚠️ Trampa: se invierte la frase.'},
+  {l:'2. Calidad', d:'Datos ciertos, adecuados, pertinentes y no excesivos; medios leales; exactos y actualizados; sin fines incompatibles; destruirlos cuando dejan de ser necesarios.'},
+  {l:'3. Consentimiento', d:'Libre, expreso e informado, por escrito o medio equivalente. Con excepciones.'},
+  {l:'4. Información', d:'Al recabar: finalidad, destinatarios, responsable del archivo, carácter obligatorio o facultativo, consecuencias y derechos del titular.'},
+  {l:'5. Datos sensibles', d:'Nadie está obligado a darlos; solo por interés general legal o con fines estadísticos o científicos sin identificar.'},
+  {l:'6. Seguridad', d:'Medidas técnicas y organizativas contra adulteración, pérdida y acceso no autorizado.'},
+  {l:'7. Confidencialidad', d:'Secreto profesional de todos los que intervienen. Se releva solo por resolución judicial o razones fundadas de seguridad pública, defensa nacional o salud pública.'},
+  {l:'8. Cesión y transferencia', d:'Cesión con consentimiento previo e informado; transferencia internacional prohibida a países sin nivel de protección adecuado.'}
+ ]},
+
+{title:'¿Necesito consentimiento?', type:'decide', p:'2025',
+ sub:'Regla: sí. Pero el art. 5 tiene excepciones, y los datos sensibles van por otro carril (art. 7).',
+ decide:{q:'¿Voy a tratar datos personales de alguien?',
+  branches:[
+   {tag:'SÍ, hace falta', cond:'No cae en ninguna excepción del art. 5', out:[
+     {l:'Consentimiento libre, expreso e informado', d:'Por escrito o por medio equivalente. Debe poder probarse.'}
+   ]},
+   {tag:'NO hace falta', cond:'Cae en una excepción del art. 5', out:[
+     {l:'Fuentes de acceso público irrestricto', d:'Excepción más preguntada del parcial 2025.'},
+     {l:'Funciones del Estado u obligación legal', d:'Cuando una norma lo impone.'},
+     {l:'Listados básicos', d:'Nombre, DNI, ocupación y domicilio.'},
+     {l:'Relación contractual, científica o profesional', d:'Los datos necesarios para esa relación.'},
+     {l:'Entidades financieras', d:'Régimen propio.'}
+   ]}
+  ]}},
+
+{title:'Datos sensibles vs. no sensibles', type:'tree', p:'2022 · 2024', t:true,
+ sub:'La pregunta "¿qué dato NO es sensible?" cayó dos veces. La respuesta es siempre el perfil en redes sociales.',
+ tree:{root:{l:'Datos sensibles (art. 2)', d:'Revelan aspectos íntimos de la persona. Nadie está obligado a darlos.'},
+ branches:[
+  {l:'SÍ son sensibles', bc:'var(--u4)', leaves:[
+    {l:'Origen racial y étnico', d:'Categoría protegida especialmente.'},
+    {l:'Opiniones políticas', d:'Ideología y militancia.'},
+    {l:'Convicciones religiosas, filosóficas o morales', d:'Creencias en sentido amplio.'},
+    {l:'Afiliación sindical', d:'Pertenencia gremial.'},
+    {l:'Salud', d:'Datos de salud física o mental.'},
+    {l:'Vida sexual', d:'Esfera íntima.'}
+   ]},
+  {l:'NO es sensible', bc:'var(--u3)', leaves:[
+    {l:'El perfil en redes sociales', d:'No está en la enumeración del art. 2. ⚠️ Es la respuesta correcta a "cuál NO es sensible".'},
+    {l:'Datos de contacto y básicos', d:'Nombre, DNI, domicilio, ocupación: son los listados básicos del art. 5.'}
+   ]}
+ ]}},
+
+{title:'Derechos del titular y sus plazos', type:'timeline', p:'2026',
+ sub:'Confundir días corridos con hábiles es la forma más fácil de perder un punto.',
+ tl:[
+  {v:'10', l:'Acceso: días corridos', d:'Art. 14: la respuesta al pedido de acceso es en 10 días CORRIDOS. Gratuito a intervalos no inferiores a 6 meses.'},
+  {v:'6', l:'Acceso: meses', d:'Gratuidad del derecho de acceso cada 6 meses (art. 14).'},
+  {v:'5', l:'Rectificación: días hábiles', d:'Art. 16: rectificación, actualización o supresión en 5 días HÁBILES desde el reclamo. Gratuita (art. 19).'},
+  {v:'∞', l:'Habeas Data', d:'Acción constitucional (CN art. 43; arts. 33 ss.) para acceder, rectificar, suprimir, actualizar o pedir confidencialidad, en bases públicas y privadas.'}
+ ]},
+
+{title:'Fallo Rodríguez: ¿cuándo responde el buscador?', type:'decide', p:'2026',
+ sub:'CSJN 2014. No hay responsabilidad objetiva ni deber de monitoreo previo: se responde desde el conocimiento efectivo.',
+ decide:{q:'¿El buscador tomó conocimiento efectivo del contenido ilícito y no actuó?',
+  branches:[
+   {tag:'NO', cond:'Sin notificación ni comunicación, no hay deber de actuar', out:[
+     {l:'No responde', d:'Indexar es ejercicio de la libertad de expresión y no hay deber de monitoreo previo.'},
+     {l:'Los thumbnails son un mero enlace', d:'No requieren consentimiento del titular.'}
+   ]},
+   {tag:'SÍ', cond:'Entonces hay que ver cómo se anotició', out:[
+     {l:'Ilicitud manifiesta', d:'Pornografía infantil, apología del genocidio, etc.: basta una comunicación PRIVADA del damnificado.'},
+     {l:'Resto de los casos', d:'Se exige notificación JUDICIAL o ADMINISTRATIVA.'},
+     {l:'Resultado en el caso', d:'Google bloqueó cuando fue notificado, por eso se rechazó la condena. Responsabilidad subjetiva, nunca objetiva. ⚠️'}
+   ]}
+  ]}},
+
+{title:'Sanciones de la Ley 25.326', type:'ladder',
+ sub:'Administrativas para el responsable del archivo, penales para quien comete el delito.',
+ ladder:[
+  {l:'Apercibimiento', d:'Llamado de atención administrativo.'},
+  {l:'Suspensión', d:'Del archivo o del responsable.'},
+  {l:'Multa de $1.000 a $100.000', d:'Art. 31. La cifra se pregunta.'},
+  {l:'Clausura o cancelación del archivo', d:'La sanción más grave en sede administrativa.'},
+  {l:'Penales (art. 32)', d:'Insertar datos falsos o proporcionar información falsa: 6 meses a 3 años. Acceso ilegítimo a bancos de datos: CP 157 bis.'}
+ ]},
+
+{title:'Habeas Data: cómo llego', type:'flow',
+ sub:'Acción constitucional, no un simple reclamo administrativo.',
+ flow:[
+  {l:'Base constitucional', d:'Art. 43 de la CN: acción expedita y rápida contra cualquier forma de discriminación y para tomar conocimiento de datos.'},
+  {l:'Ley 25.326, arts. 33 ss.', d:'Regula la acción de protección de los datos personales.'},
+  {l:'Alcance', d:'Bases públicas Y privadas destinadas a dar informes.'},
+  {l:'Para qué', d:'Acceder a los datos y exigir rectificación, supresión, confidencialidad o actualización.'},
+  {l:'Antes o además', d:'Existe el reclamo ante el responsable (arts. 14 y 16) y la denuncia ante la AAIP.'}
+ ]},
+
+{title:'Los cinco conceptos que hay que distinguir', type:'cards',
+ sub:'Se preguntan como definiciones y se confunden entre sí.',
+ cards:[
+  {l:'Intimidad', d:'Ámbito propio y reservado, excluido del conocimiento y la injerencia de terceros.'},
+  {l:'Privacidad', d:'No sufrir injerencias arbitrarias en la vida privada, familia, domicilio y correspondencia, y poder impedir la difusión de datos privados.'},
+  {l:'Autodeterminación informativa', d:'Autogobierno del titular sobre sus datos. Supera a la intimidad y a la privacidad.'},
+  {l:'Derecho al anonimato', d:'Que no se pueda asociar dato alguno a la persona.'},
+  {l:'Derecho al olvido', d:'Pedir supresión o bloqueo de información obsoleta, irrelevante o excesiva, sobre todo en buscadores. El contenido original puede permanecer.'},
+  {l:'Derechos personalísimos', d:'Intimidad y privacidad lo son: CN arts. 18 y 19; CCCN arts. 52 y 1770. ⚠️ Cayó en 2024.'}
+ ]}
+]},
+
+{u:4, name:'Delitos informáticos y forensia', color:'var(--u4)',
+ desc:'Sin modelo de parcial: se estudia por casos. El mapa se ordena por bien jurídico protegido.', sections:[
+
+{title:'Mapa de delitos por bien jurídico', type:'tree', p:'Prácticos 3 y 4',
+ sub:'No memorices la lista: agrupá por lo que se lesiona. Así, frente a un caso, primero identificás el bien y después el artículo.',
+ tree:{root:{l:'Delito = típico + antijurídico + culpable + punible', d:'En el delito informático el dispositivo puede ser MEDIO (estafa online) o FIN u OBJETO (virus).'},
+ branches:[
+  {l:'Confidencialidad e información', bc:'var(--u4)', leaves:[
+    {l:'153 · Comunicaciones', d:'Abrir o acceder indebidamente a una comunicación electrónica, apoderarse, suprimirla o desviarla; interceptar. 15 días a 6 meses (1 mes a 1 año si la publica).'},
+    {l:'153 bis · Acceso ilegítimo', d:'Entrar a un sistema o dato de acceso restringido sin autorización o excediéndola. 15 días a 6 meses; agravado si es organismo público o entidad financiera.'},
+    {l:'155 · Publicación indebida', d:'Publicar una comunicación no destinada a publicidad si causa o puede causar perjuicio. Multa. Exento si protege un interés público.'},
+    {l:'157 · Funcionario', d:'Funcionario que revela datos que deben ser secretos. 1 mes a 2 años más inhabilitación.'},
+    {l:'157 bis · Banco de datos', d:'Acceder ilegítimamente a un banco de datos personales, revelar su información o insertar datos ilegítimamente. 1 mes a 2 años.'}
+   ]},
+  {l:'Patrimonio', bc:'#f0b429', leaves:[
+    {l:'172 · Estafa', d:'Defraudar con nombre supuesto, calidad simulada, ardid o engaño. 1 mes a 6 años.'},
+    {l:'173 inc. 15 · Tarjeta', d:'Tarjeta falsificada, robada o uso no autorizado de sus datos.'},
+    {l:'173 inc. 16 · Manipulación informática', d:'Alterar el funcionamiento de un sistema o la transmisión de datos para defraudar. Escala del 172.'},
+    {l:'117 bis inc. 2 · Información falsa', d:'Proporcionar a sabiendas información falsa de un archivo de datos personales. 6 meses a 3 años.'}
+   ]},
+  {l:'Integridad sexual de menores', bc:'#c084fc', leaves:[
+    {l:'128 · Pornografía infantil', d:'Producir, publicar, distribuir con menores de 18. 6 meses a 4 años. Tenencia: 4 meses a 1 o 2 años.'},
+    {l:'131 · Grooming', d:'Contactar a un menor por medios electrónicos para cometer un delito contra su integridad sexual. 6 meses a 4 años (Ley 26.904).'}
+   ]},
+  {l:'Sistemas y servicios', bc:'#8fa3c8', leaves:[
+    {l:'183 · Daño informático', d:'Alterar, destruir o inutilizar datos, documentos, programas o sistemas; introducir o distribuir programas dañinos. 15 días a 1 año.'},
+    {l:'184 · Agravantes', d:'Sistemas públicos, de salud, comunicaciones, energía o transporte. 3 meses a 4 años.'},
+    {l:'197 · Comunicaciones', d:'Interrumpir o entorpecer comunicaciones. 6 meses a 2 años.'}
+   ]},
+  {l:'Administración de justicia', bc:'#94a3c2', leaves:[
+    {l:'255 · Prueba', d:'Sustraer, alterar u ocultar pruebas o registros bajo custodia. 1 mes a 4 años.'}
+   ]}
+ ]}},
+
+{title:'¿Estafa o defraudación informática?', type:'decide', p:'2026', t:true,
+ sub:'La única pregunta que decide entre 172 y 173 inc. 16: ¿a quién se engañó, a la persona o al sistema?',
+ decide:{q:'¿El engaño recayó sobre una persona o sobre el sistema?',
+  branches:[
+   {tag:'SOBRE LA PERSONA', cond:'La víctima se perjudica con su propia disposición', out:[
+     {l:'Art. 172 · Estafa', d:'Caso B del práctico: un falso funcionario convence a la víctima de aceptar una transferencia. El sistema funcionó normalmente.'},
+     {l:'Phishing, vishing, smishing', d:'Quedan en esta figura cuando el engaño es a la persona.'}
+   ]},
+   {tag:'SOBRE EL SISTEMA', cond:'Se manipula el sistema o la transmisión de datos', out:[
+     {l:'Art. 173 inc. 16', d:'Caso Lazarte Di Lieto: con la clave semilla se hizo pasar por el titular y el sistema ejecutó la transferencia.'},
+     {l:'Lección del caso', d:'El engaño no fue a la víctima sino al sistema. Condena: 3 años de prisión en suspenso.'}
+   ]}
+  ]}},
+
+{title:'Cadena de custodia', type:'flow',
+ sub:'Garantiza autenticidad e integridad. Si se rompe, la prueba puede perder validez y el delito quedar impune.',
+ flow:[
+  {l:'Aislar', d:'Separar el dispositivo de ingresos externos para que no se altere ni se borre.'},
+  {l:'Rotular', d:'Formulario de rótulo con precisión: qué, dónde, cuándo, quién.'},
+  {l:'Acta', d:'Acta firmada en el momento del secuestro.'},
+  {l:'Testigos', d:'Presencia de testigos en el acto.'},
+  {l:'Escribano', d:'Da fe de lo que ve y del procedimiento, NO de la integridad técnica del dato.'}
+ ]},
+
+{title:'Características de la prueba digital', type:'cards',
+ sub:'Cinco propiedades. La pregunta típica es "cuál NO corresponde": la respuesta suele ser inalterable.',
+ cards:[
+  {l:'Intangible', d:'No tiene cuerpo: no se puede "tocar" ni embalar como un objeto.'},
+  {l:'Replicable', d:'La copia bit a bit tiene la misma fuerza probatoria que el original.'},
+  {l:'Volátil', d:'Puede desaparecer sola: apagones, reinicios, sobrescritura.'},
+  {l:'Deleble', d:'Se puede borrar fácilmente, a veces sin dejar rastro evidente.'},
+  {l:'Parcial', d:'Puede estar repartida en varios soportes o en la nube: nunca está toda en un solo lugar.'},
+  {l:'Lo que NO es', d:'No es inalterable por naturaleza. ⚠️ Justamente por eso existe la cadena de custodia.'}
+ ]},
+
+{title:'Pericia y forensia', type:'cards',
+ sub:'CPC de San Juan. Los artículos son fáciles de recordar porque son consecutivos.',
+ cards:[
+  {l:'Art. 420 · Procedencia', d:'La pericia es admisible cuando se requieren conocimientos especiales.'},
+  {l:'Art. 421 · Quién la hace', d:'Perito único de oficio por disciplina; cada parte puede designar un consultor técnico.'},
+  {l:'Art. 423 · Plazo', d:'Si no se fija plazo, la pericia se produce en 15 días.'},
+  {l:'Evidencia digital', d:'Sirve en todos los fueros y en cualquier delito: correos, mensajería, redes, GPS, cámaras, bases de datos.'},
+  {l:'Metadatos', d:'Datos sobre datos: fecha de creación, autor, modificaciones, geolocalización.'},
+  {l:'Budapest (Ley 27.411)', d:'Clasifica: acceso ilícito, interceptación, interferencia de sistemas, abuso de dispositivos, falsificación y fraude informáticos, pornografía infantil, infracciones de propiedad intelectual.'}
+ ]}
+]},
+
+{u:5, name:'Responsabilidad civil, penal y profesional', color:'var(--u5)',
+ desc:'Tres planos independientes que se activan a la vez, más el poder disciplinario del Colegio.', sections:[
+
+{title:'Civil vs. penal vs. profesional', type:'compare', t:true,
+ sub:'La tabla que resuelve el Práctico 4. Son planos independientes: pueden convivir en el mismo hecho.',
+ cmp:{cols:['Civil','Penal','Profesional'], cls:'cmp-3', rows:[
+   {k:'Finalidad', c:['Reparar el daño','Castigar una conducta típica','Controlar el ejercicio y la ética']},
+   {k:'Origen', c:['Incumplimiento de contrato o deber de no dañar','Acto voluntario que lesiona un bien jurídico','Ley provincial 1236-A']},
+   {k:'Factor', c:['Culpa o dolo; objetivo si es de resultado','Dolo o culpa, según el tipo','Negligencia, impericia, incumplimiento']},
+   {k:'Quién reclama', c:['La víctima','El Estado','El Colegio (de oficio o por denuncia)']},
+   {k:'Consecuencia', c:['Indemnización','Pena: prisión, multa, inhabilitación','Llamado de atención a cancelación de matrícula']}
+ ]}},
+
+{title:'Factores de atribución y obligación de resultado', type:'tree',
+ sub:'Si la obligación es de resultado, la responsabilidad es objetiva: solo se libera probando causa ajena.',
+ tree:{root:{l:'¿Cómo se atribuye la responsabilidad?', d:'Depende del tipo de obligación y del factor de atribución que corresponda.'},
+ branches:[
+  {l:'Obligación de medios', bc:'var(--u2)', leaves:[
+    {l:'Hay que probar la culpa', d:'El acreedor debe demostrar negligencia, imprudencia o impericia del deudor.'},
+    {l:'Profesionales liberales', d:'Art. 1768: obligaciones de hacer con responsabilidad SUBJETIVA, salvo que prometan un resultado. ⚠️ No les aplica el régimen de actividades riesgosas.'}
+   ]},
+  {l:'Obligación de resultado', bc:'var(--u1)', leaves:[
+    {l:'Responsabilidad objetiva', d:'El deudor se presume responsable.'},
+    {l:'Solo se libera por causa ajena', d:'Art. 1723: hecho del tercero, caso fortuito o fuerza mayor.'},
+    {l:'Ejemplo', d:'Portal de Mendoza c/ Soler: sitio web nunca entregado completo, obligación de resultado.'}
+   ]},
+  {l:'Independencia de acciones', bc:'#8fa3c8', leaves:[
+    {l:'Art. 1774', d:'La acción civil y la penal son independientes.'},
+    {l:'Art. 1776', d:'Pero la condena penal hace cosa juzgada en lo civil sobre el hecho y la culpa.'}
+   ]}
+ ]}},
+
+{title:'Escalera de sanciones (Ley 1236-A)', type:'ladder',
+ sub:'De menor a mayor gravedad. Las dos últimas exigen unanimidad del Tribunal.',
+ ladder:[
+  {l:'Llamado de atención', d:'La sanción más leve.'},
+  {l:'Apercibimiento privado o público', d:'Advertencia formal, con o sin publicidad.'},
+  {l:'Multa', d:'Se paga dentro de los 10 días hábiles.'},
+  {l:'Suspensión de hasta 1 año', d:'Más de 6 meses exige unanimidad del Tribunal.'},
+  {l:'Cancelación de la matrícula', d:'Inhabilita hasta 5 años. Requiere unanimidad. No es definitiva. ⚠️'}
+ ]},
+
+{title:'Reglas del ejercicio profesional', type:'cards',
+ sub:'Ley provincial 1236-A, Colegio de Profesionales de Ciencias Informáticas de San Juan.',
+ cards:[
+  {l:'Título habilitante (art. 2)', d:'Grado de 4 años o más; terciario de 3 años con acreditación; o idóneo autorizado.'},
+  {l:'Matrícula obligatoria (arts. 3 y 9)', d:'El ejercicio exige matrícula. Sin ella hay ejercicio ilegítimo de la profesión (arts. 13-14).'},
+  {l:'Firma y número (art. 11)', d:'La documentación del ejercicio profesional debe llevar firma y número de matrícula; el profesional se hace responsable de su labor.'},
+  {l:'Poder disciplinario (art. 48)', d:'Se ejerce sin perjuicio de la responsabilidad civil, penal o administrativa. ⚠️ No las excluye.'},
+  {l:'Causales (art. 55)', d:'Facilitar el título; violar incompatibilidades; incumplir la ley y las normas del ejercicio; negligencias reiteradas y frecuentes; condena criminal por delito doloso de acción pública.'},
+  {l:'Prescripción', d:'3 años. La acción se inicia de oficio o por denuncia (art. 53).'}
+ ]},
+
+{title:'Los dos casos de la cátedra', type:'cards', t:true,
+ sub:'Un incumplimiento no es un delito; un engaño al sistema sí. Los dos casos ilustran la frontera.',
+ cards:[
+  {l:'Portal de Mendoza c/ Soler', d:'Hecho: sitio web a medida nunca entregado completo. Responsabilidad CIVIL CONTRACTUAL por obligación de resultado. Condena: $62.225,25 más intereses y costas; cláusula penal reducida porque el 1 % diario era excesivo.'},
+  {l:'Lazarte Di Lieto', d:'Hecho: se apropió de bitcoins usando la clave semilla del cliente. Responsabilidad PENAL por art. 173 inc. 16, más civil concurrente. Condena: 3 años de prisión en suspenso, reglas de conducta, prohibición de contacto y costas.'},
+  {l:'La lección del primero', d:'Retrasar la entrega de un software es incumplimiento contractual, no delito. Delito solo si hay una conducta típica, por ejemplo un engaño inicial.'},
+  {l:'La lección del segundo', d:'El engaño fue al SISTEMA, no a la víctima: por eso 173 inc. 16 y no 172.'}
+ ]},
+
+{title:'Tendencias: IA y neuroderechos', type:'cards',
+ sub:'Lectura breve de la unidad 5, buena para una pregunta de actualidad al final.',
+ cards:[
+  {l:'Reglamento (UE) 2024/1689', d:'Prohíbe sistemas de IA que amenacen la seguridad, los derechos o los medios de vida: manipulación cognitivo-conductual, actuación policial predictiva, reconocimiento de emociones en el trabajo y en la educación.'},
+  {l:'Neuroderechos', d:'Protección de la privacidad mental, la identidad personal, el libre albedrío, el acceso equitativo y la protección contra sesgos algorítmicos.'},
+  {l:'Responsabilidad penal de personas jurídicas', d:'Ley 27.401: pueden ser penadas por delitos cometidos en su beneficio, incluidos fraude informático, difusión de malware y violación de propiedad intelectual.'}
+ ]}
+]}
+];
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const K_SEEN = 'lp_guia_visual_v1_seen';
+let seen = {};
+try{ seen = JSON.parse(localStorage.getItem(K_SEEN)||'{}') || {}; }catch(e){ seen = {}; }
+function persist(){ try{ localStorage.setItem(K_SEEN, JSON.stringify(seen)); }catch(e){} }
+
+let secCount = 0;
+function secId(u,i){ return 's'+u+'-'+i; }
+
+
+const RENDER = {
+ tree(s){
+  const t = s.tree;
+  let h = '<div class="tree">';
+  h += '<div class="root">'+esc(t.root.l)+'</div>';
+  if(t.root.d) h += '<div class="hint" style="margin:8px 0 0;text-align:center;max-width:620px">'+esc(t.root.d)+'</div>';
+  h += '<div class="stem"></div><div class="branches">';
+  t.branches.forEach(b=>{
+    h += '<div class="branch">';
+    h += '<div class="bhead">'+esc(b.l)+'</div>';
+    (b.leaves||[]).forEach(lf=>{
+      h += '<button class="leaf" type="button"><span class="lbl">'+esc(lf.l)+'</span>'
+        + (lf.d?'<span class="d">'+esc(lf.d)+'</span>':'')+'</button>';
+    });
+    h += '</div>';
+  });
+  h += '</div></div>';
+  return h;
+ },
+
+ compare(s){
+  const c = s.cmp;
+  const cls = c.cls || (c.cols.length===2?'cmp-2':'');
+  let h = '<div class="cmp '+cls+'">';
+  h += '<div class="cmp-row cmp-head"><div class="k"></div>'
+     + c.cols.map(x=>'<div>'+esc(x)+'</div>').join('') + '</div>';
+  c.rows.forEach(r=>{
+    h += '<div class="cmp-row"><div class="k">'+esc(r.k)+'</div>'
+       + r.c.map(x=>'<div>'+esc(x)+'</div>').join('') + '</div>';
+  });
+  h += '</div>';
+  return h;
+ },
+
+ flow(s){
+  let h = '<div class="flow">';
+  s.flow.forEach((st,i)=>{
+    if(i) h += '<div class="farrow">→</div>';
+    h += '<button class="fstep" type="button">'
+      + '<span class="n">'+(i+1)+'</span>'
+      + '<span class="lbl">'+esc(st.l)+'</span>'
+      + (st.d?'<span class="d">'+esc(st.d)+'</span>':'')
+      + '</button>';
+  });
+  h += '</div>';
+  return h;
+ },
+
+ timeline(s){
+  let h = '<div class="tl">';
+  s.tl.forEach(it=>{
+    h += '<button class="tl-item" type="button">'
+      + '<span class="v">'+esc(it.v)+'</span>'
+      + '<span class="lbl">'+esc(it.l)+'</span>'
+      + (it.d?'<span class="d">'+esc(it.d)+'</span>':'')
+      + '</button>';
+  });
+  h += '</div>';
+  return h;
+ },
+
+ ladder(s){
+  let h = '<div class="ladder">';
+  s.ladder.forEach((st,i)=>{
+    h += '<button class="lstep" data-lv="'+(i+1)+'" type="button">'
+      + '<span class="lv">'+(i+1)+'</span>'
+      + '<span style="flex:1"><span class="lbl">'+esc(st.l)+'</span>'
+      + (st.d?'<span class="d">'+esc(st.d)+'</span>':'')+'</span>'
+      + '</button>';
+  });
+  h += '</div>';
+  return h;
+ },
+
+ decide(s){
+  const d = s.decide;
+  let h = '<div class="decide"><div class="dq">'+esc(d.q)+'</div><div class="dbranches">';
+  d.branches.forEach(b=>{
+    const cls = /^S[IÍ]/i.test(b.tag) ? 'si' : 'no';
+    h += '<div class="dbr"><span class="dtag '+cls+'">'+esc(b.tag)+'</span>'
+      + (b.cond?'<p class="dcond">'+esc(b.cond)+'</p>':'')
+      + '<div class="dout">';
+    b.out.forEach(o=>{
+      h += '<button class="fcard" type="button"><span class="lbl">'+esc(o.l)+'</span>'
+        + (o.d?'<span class="d">'+esc(o.d)+'</span>':'')+'</button>';
+    });
+    h += '</div></div>';
+  });
+  h += '</div></div>';
+  return h;
+ },
+
+ cards(s){
+  let h = '<div class="cards">';
+  s.cards.forEach(c=>{
+    h += '<button class="fcard" type="button"><span class="lbl">'+esc(c.l)+'</span>'
+      + (c.d?'<span class="d">'+esc(c.d)+'</span>':'')+'</button>';
+  });
+  h += '</div>';
+  return h;
+ }
+};
+
+/* ---------- construir DOM ---------- */
+const main = document.getElementById('main');
+let html = '';
+
+UNITS.forEach(U=>{
+  html += '<section class="unit" id="u'+U.u+'">';
+  html += '<div class="unit-head"><span class="unit-num">Unidad '+U.u+'</span>'
+       + '<h2>'+esc(U.name)+'</h2></div>';
+  html += '<p class="unit-desc">'+esc(U.desc)+'</p>';
+
+  U.sections.forEach((S,i)=>{
+    const id = secId(U.u,i);
+    secCount++;
+    html += '<div class="sec'+(seen[id]?' done':'')+'" id="'+id+'" data-search="'+esc((S.title+' '+(S.sub||'')+' '+JSON.stringify(S)).toLowerCase())+'">';
+    html += '<div class="sec-head"><h3 class="sec-title">'+esc(S.title)+'</h3>'
+         +  '<button class="chk" type="button" data-sec="'+id+'" title="Marcar como repasada">'+(seen[id]?'✓':'')+'</button></div>';
+    html += '<p class="sec-sub">'+esc(S.sub||'')+'</p>';
+    if(S.p || S.t){
+      html += '<div class="tagrow">';
+      if(S.p) html += '<span class="badge p">Cayó en '+esc(S.p)+'</span>';
+      if(S.t) html += '<span class="badge t">Trampa frecuente</span>';
+      html += '</div>';
+    }
+    html += RENDER[S.type](S);
+    html += '<p class="hint">Tocá los recuadros para ver el detalle.</p>';
+    html += '</div>';
+  });
+  html += '</section>';
+});
+main.innerHTML = html;
+
+/* ---------- interacción: abrir/cerrar ---------- */
+main.addEventListener('click',e=>{
+  const btn = e.target.closest('.node, .leaf, .fstep, .tl-item, .lstep, .fcard');
+  if(btn && main.contains(btn)){
+    if(btn.querySelector('.d')) btn.classList.toggle('open');
+    return;
+  }
+  const chk = e.target.closest('.chk');
+  if(chk){
+    const id = chk.dataset.sec;
+    seen[id] = !seen[id];
+    if(!seen[id]) delete seen[id];
+    persist();
+    chk.closest('.sec').classList.toggle('done', !!seen[id]);
+    chk.textContent = seen[id] ? '✓' : '';
+    updateProgress();
+  }
+});
+
+/* ---------- progreso ---------- */
+function updateProgress(){
+  const n = Object.keys(seen).length;
+  document.getElementById('pmin').textContent = n+'/'+secCount;
+}
+updateProgress();
+
+/* ---------- búsqueda ---------- */
+const q = document.getElementById('q');
+q.addEventListener('input',()=>{
+  const term = q.value.trim().toLowerCase();
+  let visibles = 0;
+  document.querySelectorAll('.sec').forEach(sec=>{
+    const hit = !term || sec.dataset.search.includes(term);
+    sec.classList.toggle('hidden', !hit);
+    if(hit) visibles++;
+  });
+  document.querySelectorAll('.unit').forEach(un=>{
+    const any = [...un.querySelectorAll('.sec')].some(s=>!s.classList.contains('hidden'));
+    un.classList.toggle('hidden', !any);
+  });
+  let nr = document.getElementById('noRes');
+  if(visibles===0){
+    if(!nr){
+      nr = document.createElement('p');
+      nr.id='noRes'; nr.className='nores';
+      nr.textContent='Sin resultados para esa búsqueda.';
+      main.appendChild(nr);
+    }
+  } else if(nr){ nr.remove(); }
+});
+
+/* ---------- abrir todo con doble clic en el título ---------- */
+document.querySelectorAll('.sec-title').forEach(t=>{
+  t.style.cursor='pointer';
+  t.title='Doble clic para abrir o cerrar todos los recuadros de esta sección';
+  t.addEventListener('dblclick',()=>{
+    const sec = t.closest('.sec');
+    const nodes = [...sec.querySelectorAll('.node, .leaf, .fstep, .tl-item, .lstep, .fcard')].filter(n=>n.querySelector('.d'));
+    const anyClosed = nodes.some(n=>!n.classList.contains('open'));
+    nodes.forEach(n=>n.classList.toggle('open', anyClosed));
+  });
+});
+</script>
+</body>
+</html>
